@@ -154,6 +154,11 @@ tests/cpp-tests/Resources/audio
 /*/*/*/*/prebuilt-mk/Android.mk
 *.xcscmblueprint
 
-*.dir/
+# Ignore engine
+cocos2d/*
+
+# Ingore generated VS file
+*.vcxproj*
+*.sln
 
 # End of https://www.toptal.com/developers/gitignore/api/cocos2dx
