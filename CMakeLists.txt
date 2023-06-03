@@ -1,33 +1,10 @@
-#/****************************************************************************
-# Copyright (c) 2013-2014 cocos2d-x.org
-# Copyright (c) 2015-2017 Chukong Technologies Inc.
-#
-# http://www.cocos2d-x.org
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-# ****************************************************************************/
-
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.18.3)
 
 set(APP_NAME roguelike)
 
 project(${APP_NAME})
+
+include_directories(src)
 
 if(XCODE)
     if(NOT DEFINED CMAKE_XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET)
@@ -43,6 +20,8 @@ if(NOT DEFINED BUILD_ENGINE_DONE) # to test roguelike into root project
     add_subdirectory(${COCOS2DX_ROOT_PATH}/cocos ${ENGINE_BINARY_PATH}/cocos/core)
 endif()
 
+set(CMAKE_CXX_STANDARD 20)
+
 # record sources, headers, resources...
 set(GAME_SOURCE)
 set(GAME_HEADER)
@@ -56,12 +35,60 @@ endif()
 
 # add cross-platforms source files and header files 
 list(APPEND GAME_SOURCE
-     Classes/AppDelegate.cpp
-     Classes/HelloWorldScene.cpp
+     src/AppDelegate.cpp
+     src/GameScene.cpp
+     
+     src/Commands/MoveDirectionCommand.cpp
+     
+     src/GameLoop/GameLoop.cpp
+     
+     src/Player/Player.cpp
+     src/Player/Invertory.cpp
+     src/Player/PlayerInput.cpp
+     
+     src/ItemsSystem/Weapon.cpp
+     
+     src/WorldSystem/World.cpp
+     src/WorldSystem/ReadFileWorld.cpp
+     
+     src/Stats/StatsContainer.cpp
+     
+     src/Stats/Modificators/StatWithModificators.cpp
      )
 list(APPEND GAME_HEADER
-     Classes/AppDelegate.h
-     Classes/HelloWorldScene.h
+     src/AppDelegate.h
+     src/GameScene.h
+     
+     src/GameLoop/GameLoop.h
+     src/GameLoop/IUpdatable.h
+     
+     src/Commands/IAttackCommand.h
+     src/Commands/IMoveCommand.h
+     src/Commands/MoveDirectionCommand.h
+     
+     src/Player/Player.h
+     src/Player/Invertory.h
+     src/Player/PlayerInput.h
+     
+     src/ItemsSystem/IItem.h
+     src/ItemsSystem/Weapon.h
+     
+     src/WorldSystem/World.h
+     src/WorldSystem/IWorldBuilder.h
+     src/WorldSystem/ReadFileWorld.h
+     
+     src/Stats/IHaveStats.h
+     src/Stats/IStat.h
+     src/Stats/IStatsContainer.h
+     src/Stats/StatProxy.h
+     src/Stats/StatsContainer.h
+     src/Stats/StatType.h
+     
+     src/Stats/Modificators/IStatModificator.h
+     src/Stats/Modificators/StatWithModificators.h
+     
+     src/Utils/Direction.h
+     src/Utils/EventsSystem.h
      )
 
 if(ANDROID)
