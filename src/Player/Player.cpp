@@ -42,6 +42,7 @@ Player::Player(std::shared_ptr<IMoveCommand> moveCommand, std::shared_ptr<IAttac
     , m_moveCommand(std::move(moveCommand))
     , m_attackCommand(std::move(attackCommand))
     , m_stats_container(std::make_shared<StatsContainer>())
+    , moveDelegate(CC_CALLBACK_1(Player::move, this))
 {
     m_input.moved += moveDelegate;
 }

@@ -21,7 +21,8 @@ public:
 
     EventContainer<> moved;
 private:
-    FunctionHandler<Direction> moveDelegate = CC_CALLBACK_1(Player::move, this);
+//    FunctionHandler<Direction> moveDelegate = CC_CALLBACK_1(Player::move, this);
+    FunctionHandler<Direction> moveDelegate;
 
     Player(std::shared_ptr<IMoveCommand> moveCommand, std::shared_ptr<IAttackCommand> attackCommand);
     void move(Direction direction);
