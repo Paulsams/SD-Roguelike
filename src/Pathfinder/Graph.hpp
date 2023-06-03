@@ -3,6 +3,19 @@
 #include <functional>
 
 namespace pathfinder {
+
+    // {y, x}
+    std::vector<std::pair<int, int>> direction{
+            {-1, 0},
+            {1, 0},
+            {0, -1},
+            {0, 1},
+//            {-1, -1},
+//            {1, -1},
+//            {-1, 1},
+//            {1, 1},
+    };
+
     class Graph {
         std::vector<Node> nodes;
         std::vector<bool> visited;
@@ -26,15 +39,10 @@ namespace pathfinder {
             for(int x = 0; x < width; ++x) {
                 for (int y = 0; y < height; ++y) {
                     Node curNode(cocos2d::Point(x, y), fToTileType(tiles[y * width + x]));
-
-                    if(y > 0)
-                        curNode.neighbors.push_back(&nodes[(y - 1) * width + (x + 0)]);
-                    if(y < height - 1)
-                        curNode.neighbors.push_back(&nodes[(y + 1) * width + (x + 0)]);
-                    if (x > 0)
-                        curNode.neighbors.push_back(&nodes[(y + 0) * width + (x - 1)]);
-                    if(x < width - 1)
-                        curNode.neighbors.push_back(&nodes[(y + 0) * width + (x + 1)]);
+                    for (auto[yy, xx]: direction) {
+                        if (y > 0 && y < height - 1 && x > 0 && x < width - 1)
+                            curNode.neighbors.push_back(&nodes[(y - yy) * width + (x + xx)]);
+                    }
 
                     auto node = getNodeByPos(x, y);
                     *node = std::move(curNode);
