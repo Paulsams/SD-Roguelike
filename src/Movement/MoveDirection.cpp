@@ -1,11 +1,11 @@
-﻿#include "MoveDirectionCommand.h"
+﻿#include "MoveDirection.h"
 
 using namespace cocos2d;
 
-MoveDirectionCommand::MoveDirectionCommand(World* world)
+MoveDirection::MoveDirection(World* world)
     : m_world(world) { }
 
-void MoveDirectionCommand::move(Node* object)
+void MoveDirection::move(Node* object)
 {
     Size tile = m_world->getTileSize();
     
@@ -13,7 +13,7 @@ void MoveDirectionCommand::move(Node* object)
     object->setPosition(object->getPosition() + moveStep);
 }
 
-void MoveDirectionCommand::setDirection(Vec2 direction)
+void MoveDirection::setDirection(Vec2 direction)
 {
     m_direction = direction;
 }

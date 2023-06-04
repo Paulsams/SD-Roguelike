@@ -1,12 +1,14 @@
 #include "Player.h"
 
-#include "Commands/MoveDirectionCommand.h"
+#include "Movement/MoveDirection.h"
+#include "Stats/StatProxy.h"
+#include "Stats/Modificators/StatWithModificators.h"
 
 using namespace cocos2d;
 
-Player* Player::create(std::shared_ptr<IMoveCommand> moveCommand, std::shared_ptr<IAttackCommand> attackCommand)
+Player* Player::create(std::shared_ptr<IMovement> movement, std::shared_ptr<IAttack> attack)
 {
-    Player* player = new (std::nothrow) Player(std::move(moveCommand), std::move(attackCommand));
+    Player* player = new (std::nothrow) Player(std::move(movement), std::move(attack));
     if (player && player->init())
     {
         player->autorelease();
@@ -20,7 +22,7 @@ void Player::update() { }
 
 const std::shared_ptr<StatsContainer> Player::get() const
 {
-    return m_stats_container;
+    return m_statsContainer;
 }
 
 bool Player::init()
@@ -36,21 +38,25 @@ bool Player::init()
     return true;
 }
 
-Player::Player(std::shared_ptr<IMoveCommand> moveCommand, std::shared_ptr<IAttackCommand> attackCommand)
-    : m_input(this)
+Player::Player(std::shared_ptr<IMovement> movement, std::shared_ptr<IAttack> attack)
+    : m_moveDelegate(CC_CALLBACK_1(Player::move, this))
+    , m_input(this)
     , m_sprite(Sprite::create("Player.png"))
-    , m_moveCommand(std::move(moveCommand))
-    , m_attackCommand(std::move(attackCommand))
-    , m_stats_container(std::make_shared<StatsContainer>())
-    , moveDelegate(CC_CALLBACK_1(Player::move, this))
+    , m_movement(std::move(movement))
+    , m_attack(std::move(attack))
+    , m_statsContainer(std::make_shared<StatsContainer>())
 {
-    m_input.moved += moveDelegate;
+    m_input.moved += m_moveDelegate;
+    m_statsContainer->add(Health, std::make_shared<StatWithModificators>());
+    m_statsContainer->add(Mana, std::make_shared<StatWithModificators>());
+    m_statsContainer->add(Level, std::make_shared<StatWithModificators>());
+    // m_statsContainer->add(Attack, std::make_shared<StatProxy>());
 }
 
 void Player::move(Direction direction)
 {
-    std::dynamic_pointer_cast<MoveDirectionCommand>(m_moveCommand)->setDirection(direction.getVector());
-    m_moveCommand->move(this);
+    std::dynamic_pointer_cast<MoveDirection>(m_movement)->setDirection(direction.getVector());
+    m_movement->move(this);
 
     moved();
 }

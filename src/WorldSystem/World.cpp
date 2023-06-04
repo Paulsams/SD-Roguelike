@@ -2,9 +2,9 @@
 
 using namespace cocos2d;
 
-World* World::create(std::shared_ptr<IWorldBuilder> builder)
+World* World::create(TMXTiledMap* tilemap)
 {
-    World* world = new (std::nothrow) World(builder);
+    auto world = new (std::nothrow) World(tilemap);
     if (world && world->init())
     {
         world->autorelease();
@@ -14,15 +14,11 @@ World* World::create(std::shared_ptr<IWorldBuilder> builder)
     return nullptr;
 }
 
-void World::setBuilder(std::shared_ptr<IWorldBuilder> builder)
+bool World::init()
 {
-    m_builder = std::move(builder);
-}
-
-bool World::generate()
-{
-    m_tilemap = m_builder->generate();
     this->addChild(m_tilemap, 0, 99);
+
+    const TMXLayer* background = m_tilemap->getLayer("Background");
 
     const TMXObjectGroup* objectGroup = m_tilemap->getObjectGroup("Objects");
 
@@ -53,5 +49,5 @@ Size World::getTileSize() const
     return m_tilemap->getTileSize();
 }
 
-World::World(std::shared_ptr<IWorldBuilder> builder)
-    : m_builder(std::move(builder)) { }
+World::World(TMXTiledMap* tilemap)
+    : m_tilemap(tilemap) { }

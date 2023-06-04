@@ -1,12 +1,12 @@
 ﻿#pragma once
-#include "IMoveCommand.h"
+#include "IMovement.h"
 #include "math/Vec2.h"
 #include "WorldSystem/World.h"
 
-class MoveDirectionCommand : public IMoveCommand
+class MoveDirection : public IMovement
 {
 public:
-    explicit MoveDirectionCommand(World* world);
+    explicit MoveDirection(World* world);
     
     void move(cocos2d::Node* object) override;
     void setDirection(cocos2d::Vec2 direction);

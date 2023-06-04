@@ -4,15 +4,15 @@
 #include "PlayerInput.h"
 #include "Utils/Direction.h"
 #include "Utils/EventsSystem.h"
-#include "Commands/IAttackCommand.h"
-#include "Commands/IMoveCommand.h"
+#include "ItemsSystem/IAttack.h"
+#include "Movement/IMovement.h"
 #include "GameLoop/IUpdatable.h"
 #include "Stats/IHaveStats.h"
 
 class Player : public cocos2d::Node, public IHaveStats, public IUpdatable
 {
 public:
-    static Player* create(std::shared_ptr<IMoveCommand> moveCommand, std::shared_ptr<IAttackCommand> attackCommand);
+    static Player* create(std::shared_ptr<IMovement> movement, std::shared_ptr<IAttack> attack);
 
     void update() override;
     const std::shared_ptr<StatsContainer> get() const override;
@@ -21,15 +21,14 @@ public:
 
     EventContainer<> moved;
 private:
-//    FunctionHandler<Direction> moveDelegate = CC_CALLBACK_1(Player::move, this);
-    FunctionHandler<Direction> moveDelegate;
+    FunctionHandler<Direction> m_moveDelegate;
 
-    Player(std::shared_ptr<IMoveCommand> moveCommand, std::shared_ptr<IAttackCommand> attackCommand);
+    Player(std::shared_ptr<IMovement> movement, std::shared_ptr<IAttack> attack);
     void move(Direction direction);
     
     PlayerInput m_input;
     cocos2d::Sprite* m_sprite;
-    std::shared_ptr<IMoveCommand> m_moveCommand;
-    std::shared_ptr<IAttackCommand> m_attackCommand;
-    std::shared_ptr<StatsContainer> m_stats_container;
+    std::shared_ptr<IMovement> m_movement;
+    std::shared_ptr<IAttack> m_attack;
+    std::shared_ptr<StatsContainer> m_statsContainer;
 };

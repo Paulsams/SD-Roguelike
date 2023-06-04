@@ -15,8 +15,11 @@ bool AppDelegate::applicationDidFinishLaunching() {
     auto director = Director::getInstance();
     director->setProjection(Director::Projection::_2D);
     if(!director->getOpenGLView()) {
-        GLViewImpl* glViewImpl = GLViewImpl::create("Roguelike");
-        director->setOpenGLView(glViewImpl);
+        GLViewImpl* glView = GLViewImpl::create("Roguelike", true);
+        glView->setDesignResolutionSize(1280, 720, ResolutionPolicy::SHOW_ALL);
+        glView->setWindowed(1280, 720);
+        //director->setAnimationInterval(0.01f);
+        director->setOpenGLView(glView);
     }
 
 #ifdef _DEBUG

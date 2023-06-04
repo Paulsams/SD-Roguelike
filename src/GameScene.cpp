@@ -1,8 +1,8 @@
 #include "GameScene.h"
-#include "Commands/IMoveCommand.h"
-#include "Commands/MoveDirectionCommand.h"
+#include "Movement/MoveDirection.h"
+#include "UI/Canvas.h"
 #include "WorldSystem/World.h"
-#include "WorldSystem/ReadFileWorld.h"
+#include "WorldSystem/ReadFileWorldBuilder.h"
 
 using namespace cocos2d;
 
@@ -14,10 +14,21 @@ Scene* GameScene::createScene()
     Size size = Director::getInstance()->getWinSize();
     camera->initOrthographic(size.width, size.height, 1, 100);
     camera->setPosition(0, 0);
-    camera->setPositionZ(10);
+    camera->setPositionZ(cameraZ);
     
-    GameScene* layer = GameScene::create(camera);
-    scene->addChild(layer);
+    GameScene* gameScene = GameScene::create(camera);
+    scene->addChild(gameScene);
+    
+    Director::getInstance()->getEventDispatcher()->addCustomEventListener(GLViewImpl::EVENT_WINDOW_RESIZED,
+        [gameScene, camera](Event*)
+    {
+        Size size = Director::getInstance()->getWinSize();
+        camera->initOrthographic(size.width, size.height, 1, 100);
+        camera->setPosition(gameScene->getViewPointCenter(gameScene->m_player->getPosition()));
+        camera->setPositionZ(cameraZ);
+
+        gameScene->m_canvas->setContentSize(size);
+    });
 
     return scene;
 }
@@ -40,19 +51,18 @@ bool GameScene::init(Camera* camera)
         return false;
 
     m_camera = camera;
-
-    m_gameLoop = std::make_shared<GameLoop>();
-
-    const auto readFileGenerator = std::make_shared<ReadFileWorld>();
-    readFileGenerator->changePath("TileMap.tmx");
-    m_world = World::create(readFileGenerator);
-    this->addChild(m_world);
     
-    if (!m_world->generate())
-        return false;
+    m_gameLoop = std::make_shared<GameLoop>();
+    
+    m_canvas = Canvas::create(m_gameLoop);
+    m_canvas->setContentSize(Director::getInstance()->getWinSize());
+    this->addChild(m_canvas, 1);
+    
+    m_world = World::create(ReadFileWorldBuilder().setPath("TileMap.tmx").build());
+    this->addChild(m_world);
 
-    const std::shared_ptr<IMoveCommand> movePlayerCommand = std::make_shared<MoveDirectionCommand>(m_world);
-    const std::shared_ptr<IAttackCommand> attackPlayerCommand;
+    const std::shared_ptr<IMovement> movePlayerCommand = std::make_shared<MoveDirection>(m_world);
+    const std::shared_ptr<IAttack> attackPlayerCommand;
 
     m_player = Player::create(movePlayerCommand, attackPlayerCommand);
     m_player->setPosition(m_world->getSpawnPoint());
@@ -64,8 +74,8 @@ bool GameScene::init(Camera* camera)
 
     m_player->moved += [this]()
     {
-        const int moveCameraTag = 10;
-        const float moveCameraTime = 0.7f;
+        static constexpr int moveCameraTag = 10;
+        static constexpr float moveCameraTime = 0.7f;
         
         Point viewPoint = getViewPointCenter(m_player->getPosition());
         m_camera->stopActionByTag(moveCameraTag);
@@ -73,34 +83,22 @@ bool GameScene::init(Camera* camera)
         auto moveTo = MoveTo::create(moveCameraTime, {viewPoint.x, viewPoint.y, m_camera->getPositionZ()});
         moveTo->setTag(moveCameraTag);
         m_camera->runAction(moveTo);
-    };
 
-    // auto label = Label::createWithSystemFont("Hello World", "Arial", 96);
-    // label->setAnchorPoint(Vec2(0.0, 0.0));
-    // this->addChild(label, 1);
+        this->m_gameLoop->step();
+    };
     
     return true;
 }
 
-Point GameScene::getViewPointCenter(Point position)
+Point GameScene::getViewPointCenter(Point position) const
 {
     const Size winSize = Director::getInstance()->getWinSize();
     const Size mapSize = m_world->getSize();
     const Size tileSize = m_world->getTileSize();
     
     Point viewPoint = position - Point(winSize.width / 2, winSize.height / 2);
-    viewPoint.x = std::clamp(viewPoint.x, 0.0f, mapSize.width * tileSize.width - winSize.width);
+    viewPoint.x = std::clamp(viewPoint.x, 0.0f, mapSize.width * tileSize.width - winSize.width + Canvas::widthRightPanel);
     viewPoint.y = std::clamp(viewPoint.y, 0.0f, mapSize.height * tileSize.height - winSize.height);
-
+    
     return viewPoint;
-
-    // int x = MAX(position.x, winSize.width / 2);
-    // int y = MAX(position.y, winSize.height / 2);
-    // x = MIN(x, (m_tilemap->getMapSize().width * this->m_tilemap->getTileSize().width) - winSize.width / 2);
-    // y = MIN(y, (m_tilemap->getMapSize().height * m_tilemap->getTileSize().height) - winSize.height/2);
-    // Point actualPosition = Point(x, y);
-    //
-    // Point centerOfView = Point(winSize.width / 2, winSize.height / 2);
-    // Point viewPoint = actualPosition - centerOfView;
-    // m_camera->setPosition(viewPoint);
 }

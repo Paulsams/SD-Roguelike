@@ -4,7 +4,7 @@
 #include "IStatModificator.h"
 #include "../IStat.h"
 
-class StatWithModificators final : IStat
+class StatWithModificators final : public IStat
 {
 public:
     float getValue() const override;

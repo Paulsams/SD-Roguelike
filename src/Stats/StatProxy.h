@@ -4,14 +4,14 @@
 class StatProxy final : public IStat
 {
 public:
-    explicit StatProxy(const IStat& other)
-        : other(other) { }
+    explicit StatProxy(std::shared_ptr<IStat> other)
+        : other(std::move(other)) { }
 
     float getValue() const override
     {
-        return other.getValue();
+        return other->getValue();
     }
 
 private:
-    const IStat& other;
+    const std::shared_ptr<IStat> other;
 };

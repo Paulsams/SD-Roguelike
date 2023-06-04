@@ -38,8 +38,6 @@ list(APPEND GAME_SOURCE
      src/AppDelegate.cpp
      src/GameScene.cpp
      
-     src/Commands/MoveDirectionCommand.cpp
-     
      src/GameLoop/GameLoop.cpp
      
      src/Player/Player.cpp
@@ -48,12 +46,17 @@ list(APPEND GAME_SOURCE
      
      src/ItemsSystem/Weapon.cpp
      
+     src/Movement/MoveDirection.cpp
+     
      src/WorldSystem/World.cpp
-     src/WorldSystem/ReadFileWorld.cpp
+     src/WorldSystem/ReadFileWorldBuilder.cpp
      
      src/Stats/StatsContainer.cpp
      
      src/Stats/Modificators/StatWithModificators.cpp
+     
+     src/UI/Canvas.cpp
+     src/UI/StepCounter.cpp
      )
 list(APPEND GAME_HEADER
      src/AppDelegate.h
@@ -62,20 +65,21 @@ list(APPEND GAME_HEADER
      src/GameLoop/GameLoop.h
      src/GameLoop/IUpdatable.h
      
-     src/Commands/IAttackCommand.h
-     src/Commands/IMoveCommand.h
-     src/Commands/MoveDirectionCommand.h
+     src/Commands/ICommand.h
      
      src/Player/Player.h
      src/Player/Invertory.h
      src/Player/PlayerInput.h
      
+     src/ItemsSystem/IAttack.h
      src/ItemsSystem/IItem.h
      src/ItemsSystem/Weapon.h
      
+     src/Movement/IMovement.h
+     src/Movement/MoveDirection.h
+     
      src/WorldSystem/World.h
-     src/WorldSystem/IWorldBuilder.h
-     src/WorldSystem/ReadFileWorld.h
+     src/WorldSystem/ReadFileWorldBuilder.h
      
      src/Stats/IHaveStats.h
      src/Stats/IStat.h
@@ -86,6 +90,10 @@ list(APPEND GAME_HEADER
      
      src/Stats/Modificators/IStatModificator.h
      src/Stats/Modificators/StatWithModificators.h
+     
+     src/UI/Canvas.h
+     src/UI/Colors.h
+     src/UI/StepCounter.h
      
      src/Utils/Direction.h
      src/Utils/EventsSystem.h
