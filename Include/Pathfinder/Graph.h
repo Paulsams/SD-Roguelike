@@ -1,5 +1,5 @@
 #pragma once
-#include "Node.hpp"
+#include "Node.h"
 #include <functional>
 
 namespace pathfinder {

@@ -48,6 +48,8 @@ list(APPEND GAME_SOURCE
 
     Source/Movement/MoveDirection.cpp
 
+    Source/Pathfinder/Pathfinder.cpp
+
     Source/WorldSystem/World.cpp
     Source/WorldSystem/ReadFileWorldBuilder.cpp
 
@@ -78,6 +80,8 @@ list(APPEND GAME_HEADER
 
     Include/Movement/IMovement.h
     Include/Movement/MoveDirection.h
+
+    Include/Pathfinder/Pathfinder.h
 
     Include/WorldSystem/World.h
     Include/WorldSystem/ReadFileWorldBuilder.h
