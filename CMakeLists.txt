@@ -81,6 +81,7 @@ list(APPEND GAME_HEADER
 
     Include/WorldSystem/World.h
     Include/WorldSystem/ReadFileWorldBuilder.h
+    Include/WorldSystem/RandomGeneratorWorldBuilder.h
 
     Include/Stats/IHaveStats.h
     Include/Stats/IStat.h
@@ -98,6 +99,7 @@ list(APPEND GAME_HEADER
 
     Include/Utils/Direction.h
     Include/Utils/EventsSystem.h
+    Include/Utils/Common.h
     )
 
 if(ANDROID)
