@@ -1,5 +1,5 @@
-#include "PlayerInput.h"
-#include "Player.h"
+#include "Player/PlayerInput.h"
+#include "Player/Player.h"
 
 using namespace cocos2d;
 

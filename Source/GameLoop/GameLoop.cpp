@@ -1,4 +1,4 @@
-﻿#include "GameLoop.h"
+﻿#include "GameLoop/GameLoop.h"
 
 GameLoop::GameLoop()
     : currentStep(0) { }

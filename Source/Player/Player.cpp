@@ -1,4 +1,4 @@
-#include "Player.h"
+#include "Player/Player.h"
 
 #include "Movement/MoveDirection.h"
 #include "Stats/StatProxy.h"

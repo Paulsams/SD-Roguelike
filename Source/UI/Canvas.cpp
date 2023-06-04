@@ -1,10 +1,10 @@
-﻿#include "Canvas.h"
+﻿#include "UI/Canvas.h"
 
 #include <utility>
 
 #include "cocos2d.h"
-#include "Colors.h"
-#include "StepCounter.h"
+#include "UI/Colors.h"
+#include "UI/StepCounter.h"
 #include "GameLoop/GameLoop.h"
 #include "ui/UIHBox.h"
 #include "ui/UIImageView.h"

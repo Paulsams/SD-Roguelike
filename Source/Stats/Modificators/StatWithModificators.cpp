@@ -1,4 +1,4 @@
-#include "StatWithModificators.h"
+#include "Stats/Modificators/StatWithModificators.h"
 
 float StatWithModificators::getValue() const
 {

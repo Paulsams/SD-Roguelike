@@ -4,11 +4,11 @@ set(APP_NAME roguelike)
 
 project(${APP_NAME})
 
-include_directories(src)
+include_directories(Include)
 
 if(XCODE)
     if(NOT DEFINED CMAKE_XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET)
-        SET (CMAKE_XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET 8.0)
+        set(CMAKE_XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET 8.0)
     endif()
 endif()
 
@@ -35,69 +35,70 @@ endif()
 
 # add cross-platforms source files and header files 
 list(APPEND GAME_SOURCE
-     src/AppDelegate.cpp
-     src/GameScene.cpp
-     
-     src/GameLoop/GameLoop.cpp
-     
-     src/Player/Player.cpp
-     src/Player/Invertory.cpp
-     src/Player/PlayerInput.cpp
-     
-     src/ItemsSystem/Weapon.cpp
-     
-     src/Movement/MoveDirection.cpp
-     
-     src/WorldSystem/World.cpp
-     src/WorldSystem/ReadFileWorldBuilder.cpp
-     
-     src/Stats/StatsContainer.cpp
-     
-     src/Stats/Modificators/StatWithModificators.cpp
-     
-     src/UI/Canvas.cpp
-     src/UI/StepCounter.cpp
-     )
+    Source/AppDelegate.cpp
+    Source/GameScene.cpp
+
+    Source/GameLoop/GameLoop.cpp
+
+    Source/Player/Player.cpp
+    Source/Player/Invertory.cpp
+    Source/Player/PlayerInput.cpp
+
+    Source/ItemsSystem/Weapon.cpp
+
+    Source/Movement/MoveDirection.cpp
+
+    Source/WorldSystem/World.cpp
+    Source/WorldSystem/ReadFileWorldBuilder.cpp
+
+    Source/Stats/StatsContainer.cpp
+
+    Source/Stats/Modificators/StatWithModificators.cpp
+
+    Source/UI/Canvas.cpp
+    Source/UI/StepCounter.cpp
+    )
+
 list(APPEND GAME_HEADER
-     src/AppDelegate.h
-     src/GameScene.h
-     
-     src/GameLoop/GameLoop.h
-     src/GameLoop/IUpdatable.h
-     
-     src/Commands/ICommand.h
-     
-     src/Player/Player.h
-     src/Player/Invertory.h
-     src/Player/PlayerInput.h
-     
-     src/ItemsSystem/IAttack.h
-     src/ItemsSystem/IItem.h
-     src/ItemsSystem/Weapon.h
-     
-     src/Movement/IMovement.h
-     src/Movement/MoveDirection.h
-     
-     src/WorldSystem/World.h
-     src/WorldSystem/ReadFileWorldBuilder.h
-     
-     src/Stats/IHaveStats.h
-     src/Stats/IStat.h
-     src/Stats/IStatsContainer.h
-     src/Stats/StatProxy.h
-     src/Stats/StatsContainer.h
-     src/Stats/StatType.h
-     
-     src/Stats/Modificators/IStatModificator.h
-     src/Stats/Modificators/StatWithModificators.h
-     
-     src/UI/Canvas.h
-     src/UI/Colors.h
-     src/UI/StepCounter.h
-     
-     src/Utils/Direction.h
-     src/Utils/EventsSystem.h
-     )
+    Include/AppDelegate.h
+    Include/GameScene.h
+
+    Include/GameLoop/GameLoop.h
+    Include/GameLoop/IUpdatable.h
+
+    Include/Commands/ICommand.h
+
+    Include/Player/Player.h
+    Include/Player/Invertory.h
+    Include/Player/PlayerInput.h
+
+    Include/ItemsSystem/IAttack.h
+    Include/ItemsSystem/IItem.h
+    Include/ItemsSystem/Weapon.h
+
+    Include/Movement/IMovement.h
+    Include/Movement/MoveDirection.h
+
+    Include/WorldSystem/World.h
+    Include/WorldSystem/ReadFileWorldBuilder.h
+
+    Include/Stats/IHaveStats.h
+    Include/Stats/IStat.h
+    Include/Stats/IStatsContainer.h
+    Include/Stats/StatProxy.h
+    Include/Stats/StatsContainer.h
+    Include/Stats/StatType.h
+
+    Include/Stats/Modificators/IStatModificator.h
+    Include/Stats/Modificators/StatWithModificators.h
+
+    Include/UI/Canvas.h
+    Include/UI/Colors.h
+    Include/UI/StepCounter.h
+
+    Include/Utils/Direction.h
+    Include/Utils/EventsSystem.h
+    )
 
 if(ANDROID)
     # change APP_NAME to the share library name for Android, it's value depend on AndroidManifest.xml
