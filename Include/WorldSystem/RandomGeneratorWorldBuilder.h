@@ -3,19 +3,18 @@
 #include "Utils/Common.h"
 
 #include "2d/CCTMXTiledMap.h"
+#include "2d/CCTMXLayer.h"
+
+#include <iostream>
+#include <thread>
+#include <cstring>
 
 class RandomGeneratorWorldBuilder
 {
 public:
     RandomGeneratorWorldBuilder() = default;
 
-    cocos2d::TMXTiledMap* build() const
-    {
-        if (m_height == 0 || m_width == 0 || m_iterCount == 0)
-            return nullptr;
-
-        return generateWorld();
-    }
+    cocos2d::TMXTiledMap* build() const;
 
     RandomGeneratorWorldBuilder& setPath(const std::string& path)
     {
@@ -23,19 +22,19 @@ public:
         return *this;
     }
 
-    RandomGeneratorWorldBuilder& setHeight(size_t height)
+    RandomGeneratorWorldBuilder& setHeight(int64_t height)
     {
         m_height = height;
         return *this;
     }
 
-    RandomGeneratorWorldBuilder& setWidth(size_t width)
+    RandomGeneratorWorldBuilder& setWidth(int64_t width)
     {
         m_width = width;
         return *this;
     }
 
-    RandomGeneratorWorldBuilder& setIterCount(size_t iterCount)
+    RandomGeneratorWorldBuilder& setIterCount(int64_t iterCount)
     {
         m_iterCount = iterCount;
         return *this;
@@ -73,35 +72,35 @@ private:
 
         Container(Vec2Int _point, int64_t _w, int64_t _h)
             : point(_point)
+            , center(point.x + _w/2, point.y + _h/2)
             , w(_w)
             , h(_h)
-            , center(point.x + _w/2, point.y + _h/2)
         {}
 
         Container(int64_t _x, int64_t _y, int64_t _w, int64_t _h)
                 : point(_x, _y)
+                , center(point.x + _w/2, point.y + _h/2)
                 , w(_w)
                 , h(_h)
-                , center(point.x + _w/2, point.y + _h/2)
         {}
 
         Vec2Int point;
         Vec2Int center;
-        int64_t h = 0;
         int64_t w = 0;
+        int64_t h = 0;
     };
 
     struct Room
     {
-        Room(const Container& _cont) : cont(_cont)
+        explicit Room(const Container& _cont) : cont(_cont)
         {
-            point.x = cont.point.x + cocos2d::random(0l, cont.w/3);
-            point.y = cont.point.y + cocos2d::random(0l, cont.h/3);
+            point.x = cont.point.x + cocos2d::random(1l, cont.w/3);
+            point.y = cont.point.y + cocos2d::random(1l, cont.h/3);
             w = cont.w - (point.x - cont.point.x);
             h = cont.h - (point.y - cont.point.y);
 
-            w -= cocos2d::random(0l, w/3);
-            h -= cocos2d::random(0l, h/3);
+            w -= cocos2d::random(1l, w/3);
+            h -= cocos2d::random(1l, h/3);
         }
 
         Container cont;
@@ -112,84 +111,32 @@ private:
 
     struct Tree
     {
-        Tree(const Container& _leaf) : leaf(_leaf) {}
+        explicit Tree(const Container& _leaf) : leaf(_leaf) {}
 
-        std::list<Container> getLeafs() const
-        {
-            if (!left && ! right)
-                return {leaf};
-            std::list<Container> res = left->getLeafs();
-            res.splice(res.end(), right->getLeafs());
-            return res;
-        }
+        std::list<Container> getLeafs() const;
+        std::list<std::pair<Vec2Int, Vec2Int>> getPaths() const;
+
         Container leaf;
         std::shared_ptr<Tree> left;
         std::shared_ptr<Tree> right;
     };
 
-    std::pair<Container, Container> randomSplit(const Container& cont) const
-    {
-        Container c1;
-        Container c2;
-        if (cocos2d::random() % 2 == 0)
-        {
-            // Vertical
-            c1 = Container{cont.point, cocos2d::random(1l, cont.w), cont.h};
-            c2 = Container{cont.point.x + c1.w, cont.point.y, cont.w - c1.w, cont.h};
+    std::pair<Container, Container> randomSplit(const Container& cont) const;
+    std::shared_ptr<Tree> splitContainer(const Container& cont, size_t iterCount) const;
 
-            if (m_discardByRatio)
-            {
-                double c1WR = static_cast<double>(c1.w) / c1.h;
-                double c2WR = static_cast<double>(c2.w) / c2.h;
-                if (c1WR < m_widthRatio || c2WR < m_widthRatio)
-                    return randomSplit(cont);
-            }
-        }
-        else
-        {
-            // Horizontal
-            c1 = Container{cont.point, cont.w, cocos2d::random(1l, cont.h)};
-            c2 = Container{cont.point.x, cont.point.y + c1.h, cont.w, cont.h - c1.h};
+    void drawBackground(cocos2d::TMXLayer* layer) const;
+    void drawPaths(cocos2d::TMXLayer* layer, const std::shared_ptr<Tree>& tree) const;
+    void drawRooms(cocos2d::TMXLayer* layer, const std::shared_ptr<Tree>& tree) const;
 
-            if (m_discardByRatio)
-            {
-                double c1HR = static_cast<double>(c1.h) / c1.w;
-                double c2HR = static_cast<double>(c2.h) / c2.w;
-                if (c1HR < m_heightRatio || c2HR < m_heightRatio)
-                    return randomSplit(cont);
-            }
-        }
-        return std::make_pair(c1, c2);
-    }
-
-    std::shared_ptr<Tree> splitContainer(const Container& cont, size_t iterCount) const
-    {
-        auto root = std::make_shared<Tree>(cont);
-        if (iterCount)
-        {
-            auto [c1, c2] = randomSplit(cont);
-            root->left = std::move(splitContainer(c1, iterCount - 1));
-            root->right = std::move(splitContainer(c2, iterCount - 1));
-        }
-        return root;
-    }
-
-    cocos2d::TMXTiledMap* generateWorld() const
-    {
-        cocos2d::TMXTiledMap* tiledMap = cocos2d::TMXTiledMap::create(m_path);
-        Container mainContainer(0, 0, m_width, m_height);
-        std::shared_ptr<Tree> tree = splitContainer(mainContainer, m_iterCount);
-
-
-        return nullptr;
-    }
-
+    cocos2d::TMXTiledMap* generateWorld() const;
 
     std::string m_path;
 
     int64_t m_height = 0;
     int64_t m_width = 0;
+
     int64_t m_iterCount = 0;
+
     bool m_discardByRatio = true;
 
     double m_widthRatio = 0.45;
