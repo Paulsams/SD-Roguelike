@@ -41,7 +41,7 @@ std::pair<RandomGeneratorWorldBuilder::Container, RandomGeneratorWorldBuilder::C
     if (cocos2d::random() % 2 == 0)
     {
         // Vertical
-        c1 = Container{cont.point, cocos2d::random(1l, cont.w), cont.h};
+        c1 = Container{cont.point, cocos2d::random((int64_t) 1, cont.w), cont.h};
         c2 = Container{cont.point.x + c1.w, cont.point.y, cont.w - c1.w, cont.h};
 
         if (m_discardByRatio)
@@ -55,7 +55,7 @@ std::pair<RandomGeneratorWorldBuilder::Container, RandomGeneratorWorldBuilder::C
     else
     {
         // Horizontal
-        c1 = Container{cont.point, cont.w, cocos2d::random(1l, cont.h)};
+        c1 = Container{cont.point, cont.w, cocos2d::random((int64_t) 1, cont.h)};
         c2 = Container{cont.point.x, cont.point.y + c1.h, cont.w, cont.h - c1.h};
 
         if (m_discardByRatio)

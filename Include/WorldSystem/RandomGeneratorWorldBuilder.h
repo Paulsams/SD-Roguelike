@@ -96,13 +96,13 @@ private:
     {
         explicit Room(const Container& _cont) : cont(_cont)
         {
-            point.x = cont.point.x + cocos2d::random(1l, cont.w/3);
-            point.y = cont.point.y + cocos2d::random(1l, cont.h/3);
+            point.x = cont.point.x + cocos2d::random(1ll, cont.w/3ll);
+            point.y = cont.point.y + cocos2d::random(1ll, cont.h/3ll);
             w = cont.w - (point.x - cont.point.x);
             h = cont.h - (point.y - cont.point.y);
 
-            w -= cocos2d::random(1l, w/3);
-            h -= cocos2d::random(1l, h/3);
+            w -= cocos2d::random(1ll, w/3ll);
+            h -= cocos2d::random(1ll, h/3ll);
         }
 
         Container cont;

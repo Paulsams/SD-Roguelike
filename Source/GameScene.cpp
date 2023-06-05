@@ -26,7 +26,8 @@ Scene* GameScene::createScene()
     {
         Size size = Director::getInstance()->getWinSize();
         camera->initOrthographic(size.width, size.height, 1, 100);
-        camera->setPosition(gameScene->getViewPointCenter(gameScene->m_player->getPosition()));
+        camera->setPosition(gameScene->getViewPointCenter(gameScene->m_player->getPosition()
+            * gameScene->m_world->getScale()));
         camera->setPositionZ(cameraZ);
 
         gameScene->m_canvas->setContentSize(size);
@@ -80,12 +81,12 @@ bool GameScene::init(Camera* camera)
     m_player->moved += [this]()
     {
         static constexpr int moveCameraTag = 10;
-        static constexpr float moveCameraTime = 0.7f;
+        static constexpr float moveCameraTime = 0.4f;
         static constexpr float coefficientOffsetSize = 0.4f;
 
         Size winSize = Director::getInstance()->getWinSize();
         
-        Point viewPoint = getViewPointCenter(m_player->getPosition());
+        Point viewPoint = getViewPointCenter(m_player->getPosition() * m_world->getScale());
         m_camera->stopActionByTag(moveCameraTag);
         
         //m_world->moveTilemap(m_camera->getPosition() - viewPoint);
