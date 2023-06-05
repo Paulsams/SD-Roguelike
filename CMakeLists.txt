@@ -22,24 +22,24 @@ endif()
 
 set(CMAKE_CXX_STANDARD 20)
 
-if(MSVC)
-    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /WX")
-    else()
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /WX /O3")
-    endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
-else()
-    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-#        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fsanitize=address -fno-omit-frame-pointer")
-    else()
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wpedantic -Wextra -Wunused-parameter \
-        -Wcast-align -Wcast-qual -Wduplicated-branches \
-        -Wduplicated-cond -Wextra-semi -Wfloat-equal -Wlogical-op \
-        -Wnon-virtual-dtor -Wsign-promo \
-        -pedantic-errors \
-        -O3")
-    endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
-endif()
+#if(MSVC)
+#    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+#        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /WX")
+#    else()
+#        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /WX /O3")
+#    endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
+#else()
+#    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+##        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fsanitize=address -fno-omit-frame-pointer")
+#    else()
+#        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wpedantic -Wextra -Wunused-parameter \
+#        -Wcast-align -Wcast-qual -Wduplicated-branches \
+#        -Wduplicated-cond -Wextra-semi -Wfloat-equal -Wlogical-op \
+#        -Wnon-virtual-dtor -Wsign-promo \
+#        -pedantic-errors \
+#        -O3")
+#    endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
+#endif()
 
 # record sources, headers, resources...
 set(GAME_SOURCE)
