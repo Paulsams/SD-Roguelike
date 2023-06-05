@@ -6,8 +6,10 @@
 #include "2d/CCTMXTiledMap.h"
 #include "math/Vec2.h"
 
-using Tilemap = cocos2d::FastTMXTiledMap;
-using TilemapLayer = cocos2d::FastTMXLayer;
+//using Tilemap = cocos2d::FastTMXTiledMap;
+//using TilemapLayer = cocos2d::FastTMXLayer;
+using Tilemap = cocos2d::TMXTiledMap;
+using TilemapLayer = cocos2d::TMXLayer;
 
 struct Vec2Int
 {

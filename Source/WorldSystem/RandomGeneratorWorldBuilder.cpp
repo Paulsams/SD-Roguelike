@@ -1,6 +1,6 @@
 #include "WorldSystem/RandomGeneratorWorldBuilder.h"
 
-cocos2d::TMXTiledMap* RandomGeneratorWorldBuilder::build() const
+Tilemap* RandomGeneratorWorldBuilder::build() const
 {
     if (m_path.empty()
         || m_height == 0
@@ -81,15 +81,15 @@ std::shared_ptr<RandomGeneratorWorldBuilder::Tree> RandomGeneratorWorldBuilder::
     return root;
 }
 
-void RandomGeneratorWorldBuilder::drawBackground(cocos2d::TMXLayer* layer) const
+void RandomGeneratorWorldBuilder::drawBackground(TilemapLayer* layer) const
 {
     for (int64_t i = 0; i < m_width; ++i)
         for (int64_t j = 0; j < m_height; ++j)
-//                layer->setTileGID(664, cocos2d::Vec2(i, j));
-            layer->setTileGID((i + j) % 3050, cocos2d::Vec2(i, j));
+                layer->setTileGID(1186 + cocos2d::random(0, 6), cocos2d::Vec2(i, j));
+//            layer->setTileGID((i + j) % 3050, cocos2d::Vec2(i, j));
 }
 
-void RandomGeneratorWorldBuilder::drawPaths(cocos2d::TMXLayer* layer, const std::shared_ptr<Tree>& tree) const
+void RandomGeneratorWorldBuilder::drawPaths(TilemapLayer* layer, const std::shared_ptr<Tree>& tree) const
 {
     auto paths = tree->getPaths();
     for (auto [from, to] : paths)
@@ -100,19 +100,19 @@ void RandomGeneratorWorldBuilder::drawPaths(cocos2d::TMXLayer* layer, const std:
             int64_t bound = std::abs(from.y - to.y);
             for (int64_t i = 0; i < bound; ++i)
                 for (int8_t j = -alpha/2; j <= alpha/2; ++j)
-                    layer->setTileGID(1058, cocos2d::Vec2(from.x + j, std::min(from.y, to.y) + i));
+                    layer->setTileGID(882 + cocos2d::random(0, 3), cocos2d::Vec2(from.x + j, std::min(from.y, to.y) + i));
         }
         else
         {
             int64_t bound = std::abs(from.x - to.x);
             for (int64_t i = 0; i < bound; ++i)
                 for (int8_t j = -alpha/2; j <= alpha/2; ++j)
-                    layer->setTileGID(1058, cocos2d::Vec2(std::min(from.x, to.x) + i, from.y + j));
+                    layer->setTileGID(882 + cocos2d::random(0, 3), cocos2d::Vec2(std::min(from.x, to.x) + i, from.y + j));
         }
     }
 }
 
-void RandomGeneratorWorldBuilder::drawRooms(cocos2d::TMXLayer* layer, const std::shared_ptr<Tree>& tree) const
+void RandomGeneratorWorldBuilder::drawRooms(TilemapLayer* layer, const std::shared_ptr<Tree>& tree) const
 {
     std::list<Container> leafs = tree->getLeafs();
     for (const Container& cont : leafs)
@@ -120,13 +120,13 @@ void RandomGeneratorWorldBuilder::drawRooms(cocos2d::TMXLayer* layer, const std:
         Room room(cont);
         for (int64_t i = 0; i < room.w; ++i)
             for (int64_t j = 0; j < room.h; ++j)
-                layer->setTileGID(1058, cocos2d::Vec2(i + room.point.x, j + room.point.y));
+                layer->setTileGID(882 + cocos2d::random(0, 3), cocos2d::Vec2(i + room.point.x, j + room.point.y));
     }
 }
 
-cocos2d::TMXTiledMap* RandomGeneratorWorldBuilder::generateWorld() const
+Tilemap* RandomGeneratorWorldBuilder::generateWorld() const
 {
-    cocos2d::TMXTiledMap* tiledMap = cocos2d::TMXTiledMap::create(m_path);
+    Tilemap* tileMap = Tilemap::create(m_path);
     Container mainContainer(0, 0, m_width, m_height);
     std::shared_ptr<Tree> tree = splitContainer(mainContainer, m_iterCount);
 
@@ -134,9 +134,9 @@ cocos2d::TMXTiledMap* RandomGeneratorWorldBuilder::generateWorld() const
     std::memset(tiles, 0, m_width * m_height * sizeof(uint32_t));
 
     cocos2d::Size size(m_width, m_height);
-    tiledMap->setMapSize(size);
+    tileMap->setMapSize(size);
 
-    cocos2d::TMXLayer* layer = tiledMap->getLayer("Background");
+    TilemapLayer* layer = tileMap->getLayer("Background");
     void* oldTiles = layer->getTiles();
     free(oldTiles);
 
@@ -147,5 +147,5 @@ cocos2d::TMXTiledMap* RandomGeneratorWorldBuilder::generateWorld() const
     drawPaths(layer, tree);
     drawRooms(layer, tree);
 
-    return tiledMap;
+    return tileMap;
 }

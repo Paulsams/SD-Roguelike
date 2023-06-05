@@ -1,8 +1,10 @@
 #pragma once
 
-#include <vector>
 #include "IStatModificator.h"
 #include "Stats/IStat.h"
+
+#include <vector>
+#include <ranges>
 
 class StatWithModificators final : public IStat
 {

@@ -29,13 +29,13 @@ void PlayerInput::tryInvokeDirectionFromInput(const EventKeyboard::KeyCode keyCo
     switch (keyCode)
     {
     case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
-        return moved(Direction{Left});
+        return moved(Direction{LEFT});
     case EventKeyboard::KeyCode::KEY_UP_ARROW:
-        return moved(Direction{Up});
+        return moved(Direction{UP});
     case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
-        return moved(Direction{Right});
+        return moved(Direction{RIGHT});
     case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
-        return moved(Direction{Down});
+        return moved(Direction{DOWN});
     default: ;
     }
 }

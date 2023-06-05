@@ -1,5 +1,7 @@
 ﻿#pragma once
+
 #include <functional>
+#include <list>
 
 template <typename... Args>
 class FunctionHandler

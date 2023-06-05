@@ -3,6 +3,7 @@
 #include "UI/Canvas.h"
 #include "WorldSystem/World.h"
 #include "WorldSystem/ReadFileWorldBuilder.h"
+#include "WorldSystem/RandomGeneratorWorldBuilder.h"
 
 using namespace cocos2d;
 
@@ -54,7 +55,9 @@ bool GameScene::init(Camera* camera)
     m_camera = camera;
     
     m_gameLoop = std::make_shared<GameLoop>();
-    m_world = World::create(ReadFileWorldBuilder().setPath("TileMap.tmx").build());
+//    m_world = World::create(ReadFileWorldBuilder().setPath("TileMap.tmx").build());
+    m_world = World::create(RandomGeneratorWorldBuilder().setPath("Template.tmx").setWidth(100).setHeight(100).setIterCount(5).build());
+    m_world->setScale(2);
     this->addChild(m_world);
 
     m_player = Player::create();

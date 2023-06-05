@@ -5,7 +5,7 @@
  </tileset>
  <layer id="1" name="Background" width="1" height="1">
   <data>
-   <tile/>
+   <tile gid="2991"/>
   </data>
  </layer>
  <objectgroup id="2" name="Enemies">

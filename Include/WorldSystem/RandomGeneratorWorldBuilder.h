@@ -2,7 +2,9 @@
 
 #include "Utils/Common.h"
 
+#include "2d/CCFastTMXTiledMap.h"
 #include "2d/CCTMXTiledMap.h"
+#include "2d/CCFastTMXLayer.h"
 #include "2d/CCTMXLayer.h"
 
 #include <iostream>
@@ -14,7 +16,7 @@ class RandomGeneratorWorldBuilder
 public:
     RandomGeneratorWorldBuilder() = default;
 
-    cocos2d::TMXTiledMap* build() const;
+    Tilemap* build() const;
 
     RandomGeneratorWorldBuilder& setPath(const std::string& path)
     {
@@ -124,11 +126,11 @@ private:
     std::pair<Container, Container> randomSplit(const Container& cont) const;
     std::shared_ptr<Tree> splitContainer(const Container& cont, size_t iterCount) const;
 
-    void drawBackground(cocos2d::TMXLayer* layer) const;
-    void drawPaths(cocos2d::TMXLayer* layer, const std::shared_ptr<Tree>& tree) const;
-    void drawRooms(cocos2d::TMXLayer* layer, const std::shared_ptr<Tree>& tree) const;
+    void drawBackground(TilemapLayer* layer) const;
+    void drawPaths(TilemapLayer* layer, const std::shared_ptr<Tree>& tree) const;
+    void drawRooms(TilemapLayer* layer, const std::shared_ptr<Tree>& tree) const;
 
-    cocos2d::TMXTiledMap* generateWorld() const;
+    Tilemap* generateWorld() const;
 
     std::string m_path;
 

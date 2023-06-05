@@ -27,7 +27,10 @@ public:
     cocos2d::Size getSize() const;
     cocos2d::Size getTileSize() const;
 
-    void updateCullingRect(cocos2d::Rect rect) { m_background->setCullingRect(rect); }
+    void updateCullingRect(cocos2d::Rect rect)
+    {
+//        m_background->setCullingRect(rect);
+    }
 
     void addPlayer(Player* player);
     const Player* getNearestPlayer(cocos2d::Vec2 position) const;
