@@ -19,3 +19,8 @@ bool StatsContainer::remove(const StatType type)
 {
     return m_stats.erase(type) == 1;
 }
+
+std::shared_ptr<IStat> StatsContainer::get(StatType type)
+{
+    return m_stats[type];
+}

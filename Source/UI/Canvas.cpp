@@ -6,18 +6,19 @@
 #include "UI/Colors.h"
 #include "UI/StepCounter.h"
 #include "GameLoop/GameLoop.h"
+#include "Stats/StatsContainer.h"
+#include "UI/StatBar.h"
 #include "ui/UIHBox.h"
 #include "ui/UIImageView.h"
-#include "ui/UILoadingBar.h"
 #include "ui/UIVBox.h"
 
 using namespace cocos2d;
 using namespace cocos2d::ui;
 using namespace ::ui;
 
-Canvas* Canvas::create(std::shared_ptr<GameLoop> gameLoop)
+Canvas* Canvas::create(World* world, Player* player, std::shared_ptr<GameLoop> gameLoop)
 {
-    Canvas* canvas = new (std::nothrow) Canvas(std::move(gameLoop));
+    Canvas* canvas = new (std::nothrow) Canvas(world, player, std::move(gameLoop));
     if (canvas && canvas->init())
     {
         canvas->autorelease();
@@ -61,39 +62,38 @@ bool Canvas::init()
     const auto playerStatsBox = VBox::create({widthRightPanel - playerIconLayout->getContentSize().width,
         playerBox->getContentSize().height});
     playerStatsBox->setBackGroundColorType(Layout::BackGroundColorType::SOLID);
-    playerStatsBox->setBackGroundColor(Color3B::BLUE);
+    playerStatsBox->setBackGroundColor(Colors::backgroundForStatBar);
     playerBox->addChild(playerStatsBox);
     playerBox->addChild(playerIconLayout);
     
-    const auto marginFromBar = Margin(10.0f, 10.0f, 10.0f, 10.0f);
-    const auto marginSizeOffset = Size(marginFromBar.right + marginFromBar.left,
+    const auto marginFromBar = Margin(0.0f, 10.0f, 10.0f, 10.0f);
+    const auto marginSizeOffset = Size(marginFromBar.left + marginFromBar.right,
                                        marginFromBar.top + marginFromBar.bottom);
     LinearLayoutParameter* marginParameter = LinearLayoutParameter::create();
     marginParameter->setMargin(marginFromBar);
     marginParameter->setGravity(LinearLayoutParameter::LinearGravity::CENTER_HORIZONTAL);
 
-    const auto playerHpLayout = Layout::create();
-    playerHpLayout->setContentSize(Size(playerStatsBox->getContentSize().width, 50.0f) - marginSizeOffset);
-    playerHpLayout->setLayoutParameter(marginParameter);
-    playerHpLayout->setAnchorPoint(Vec2::ZERO);
-    playerStatsBox->addChild(playerHpLayout);
+    const std::shared_ptr<StatsContainer> playerStats = m_player->getStats();
+    
+    std::shared_ptr<IStat> playerHpStat;
+    if (playerStats->tryGet(Health, playerHpStat))
+    {
+        const auto playerHp = StatBar::create(marginParameter,
+            Size(playerStatsBox->getContentSize().width - 40.0f, 50.0f) - marginSizeOffset,
+            "health-bar.png",
+            playerHpStat);
+        playerStatsBox->addChild(playerHp);
+    }
 
-    const auto playerHp = LoadingBar::create("health-bar.png", 70);
-    playerHp->ignoreContentAdaptWithSize(false);
-    playerHp->setContentSize(playerHpLayout->getContentSize());
-    playerHp->setAnchorPoint(Vec2::ZERO);
-    playerHpLayout->addChild(playerHp);
-
-    const auto playerManaLayout = Layout::create();
-    playerManaLayout->setContentSize(Size(playerStatsBox->getContentSize().width, 50.0f) - marginSizeOffset);
-    playerManaLayout->setLayoutParameter(marginParameter);
-    playerStatsBox->addChild(playerManaLayout);
-
-    const auto playerMana = LoadingBar::create("health-bar.png", 30);
-    playerMana->ignoreContentAdaptWithSize(false);
-    playerMana->setContentSize(playerManaLayout->getContentSize());
-    playerMana->setAnchorPoint(Vec2::ZERO);
-    playerManaLayout->addChild(playerMana);
+    std::shared_ptr<IStat> playerManaStat;
+    if (playerStats->tryGet(Mana, playerManaStat))
+    {
+        const auto playerMana = StatBar::create(marginParameter,
+            Size(playerStatsBox->getContentSize().width - 40.0f, 50.0f) - marginSizeOffset,
+            "health-bar.png",
+            playerManaStat);
+        playerStatsBox->addChild(playerMana);
+    }
     
     const auto stepCounter = StepCounter::create(m_gameLoop->currentStep);
     stepCounter->setContentSize({widthRightPanel, 30.0f});
@@ -102,24 +102,17 @@ bool Canvas::init()
     return true;
 }
 
-// search({{-1, 0}, {1, 0}, {0, 1}, {0, -1}, {-1, -1}, {1, 1}, {}})
-//
-// void search(std::vector<Vec2> possibleMove)
-// {
-//     for (auto possible : possibleMove)
-//     {
-//         if (x > 0 && x < width - 1 && y > 0 && y < height - 1)
-//             curNode.neighbors.push_back(&nodes[(possible.y - 1) * width + (possible.x + 0)]);
-//     }
-// }
-
 void Canvas::update(float delta)
 {
+    Node::update(delta);
+    
     this->setPosition(this->getScene()->getDefaultCamera()->getPosition());
 }
 
-Canvas::Canvas(std::shared_ptr<GameLoop> gameLoop)
-    : m_gameLoop(std::move(gameLoop))
+Canvas::Canvas(World* world, Player* player, std::shared_ptr<GameLoop> gameLoop)
+    : m_world(world)
+    , m_player(player)
+    , m_gameLoop(std::move(gameLoop))
 {
     this->scheduleUpdate();
 }

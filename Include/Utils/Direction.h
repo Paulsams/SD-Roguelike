@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "math/Vec2.h"
+#include "Common.h"
 
 enum DirectionType
 {
@@ -17,7 +17,7 @@ public:
     explicit Direction(DirectionType type)
         : type(type) { }
 
-    cocos2d::Vec2 getVector() const
+    Vec2Int getVector() const
     {
         switch (type)
         {

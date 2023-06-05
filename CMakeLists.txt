@@ -64,6 +64,7 @@ list(APPEND GAME_SOURCE
 
     Source/GameLoop/GameLoop.cpp
 
+    Source/Player/Backpack.cpp
     Source/Player/Player.cpp
     Source/Player/Invertory.cpp
     Source/Player/PlayerInput.cpp
@@ -82,6 +83,7 @@ list(APPEND GAME_SOURCE
 
     Source/UI/Canvas.cpp
     Source/UI/StepCounter.cpp
+    Source/UI/StatBar.cpp
     )
 
 list(APPEND GAME_HEADER
@@ -93,11 +95,13 @@ list(APPEND GAME_HEADER
 
     Include/Commands/ICommand.h
 
+    Include/Player/Backpack.h
     Include/Player/Player.h
     Include/Player/Invertory.h
     Include/Player/PlayerInput.h
 
     Include/ItemsSystem/IAttack.h
+    Include/ItemsSystem/IAttackSearch.h
     Include/ItemsSystem/IItem.h
     Include/ItemsSystem/Weapon.h
 
@@ -111,7 +115,6 @@ list(APPEND GAME_HEADER
     Include/Stats/IHaveStats.h
     Include/Stats/IStat.h
     Include/Stats/IStatsContainer.h
-    Include/Stats/StatProxy.h
     Include/Stats/StatsContainer.h
     Include/Stats/StatType.h
 
@@ -121,6 +124,7 @@ list(APPEND GAME_HEADER
     Include/UI/Canvas.h
     Include/UI/Colors.h
     Include/UI/StepCounter.h
+    Include/UI/StatBar.h
 
     Include/Utils/Direction.h
     Include/Utils/EventsSystem.h
