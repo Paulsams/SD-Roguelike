@@ -22,6 +22,25 @@ endif()
 
 set(CMAKE_CXX_STANDARD 20)
 
+#if(MSVC)
+#    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+#        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /WX")
+#    else()
+#        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /WX /O3")
+#    endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
+#else()
+#    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+##        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fsanitize=address -fno-omit-frame-pointer")
+#    else()
+#        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wpedantic -Wextra -Wunused-parameter \
+#        -Wcast-align -Wcast-qual -Wduplicated-branches \
+#        -Wduplicated-cond -Wextra-semi -Wfloat-equal -Wlogical-op \
+#        -Wnon-virtual-dtor -Wsign-promo \
+#        -pedantic-errors \
+#        -O3")
+#    endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
+#endif()
+
 # record sources, headers, resources...
 set(GAME_SOURCE)
 set(GAME_HEADER)
@@ -40,8 +59,8 @@ list(APPEND GAME_SOURCE
 
     Source/GameLoop/GameLoop.cpp
 
+    Source/Player/Backpack.cpp
     Source/Player/Player.cpp
-    Source/Player/Invertory.cpp
     Source/Player/PlayerInput.cpp
 
     Source/ItemsSystem/Weapon.cpp
@@ -50,13 +69,16 @@ list(APPEND GAME_SOURCE
 
     Source/WorldSystem/World.cpp
     Source/WorldSystem/ReadFileWorldBuilder.cpp
+    Source/WorldSystem/RandomGeneratorWorldBuilder.cpp
 
     Source/Stats/StatsContainer.cpp
 
     Source/Stats/Modificators/StatWithModificators.cpp
 
     Source/UI/Canvas.cpp
+    Source/UI/InventoryView.cpp
     Source/UI/StepCounter.cpp
+    Source/UI/StatBar.cpp
     )
 
 list(APPEND GAME_HEADER
@@ -68,12 +90,16 @@ list(APPEND GAME_HEADER
 
     Include/Commands/ICommand.h
 
+    Include/Player/Backpack.h
     Include/Player/Player.h
-    Include/Player/Invertory.h
     Include/Player/PlayerInput.h
 
-    Include/ItemsSystem/IAttack.h
+    Include/ItemsSystem/AttackData.h
+    Include/ItemsSystem/AttackHandler.h
+    Include/ItemsSystem/AttackSearchFromDFS.h
+    Include/ItemsSystem/IAttackSearch.h
     Include/ItemsSystem/IItem.h
+    Include/ItemsSystem/IVisualAttack.h
     Include/ItemsSystem/Weapon.h
 
     Include/Movement/IMovement.h
@@ -81,11 +107,11 @@ list(APPEND GAME_HEADER
 
     Include/WorldSystem/World.h
     Include/WorldSystem/ReadFileWorldBuilder.h
+    Include/WorldSystem/RandomGeneratorWorldBuilder.h
 
     Include/Stats/IHaveStats.h
     Include/Stats/IStat.h
     Include/Stats/IStatsContainer.h
-    Include/Stats/StatProxy.h
     Include/Stats/StatsContainer.h
     Include/Stats/StatType.h
 
@@ -94,10 +120,13 @@ list(APPEND GAME_HEADER
 
     Include/UI/Canvas.h
     Include/UI/Colors.h
+    Include/UI/InventoryView.h
     Include/UI/StepCounter.h
+    Include/UI/StatBar.h
 
     Include/Utils/Direction.h
     Include/Utils/EventsSystem.h
+    Include/Utils/Common.h
     )
 
 if(ANDROID)

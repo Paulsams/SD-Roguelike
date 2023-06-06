@@ -2,18 +2,17 @@
 
 using namespace cocos2d;
 
-MoveDirection::MoveDirection(World* world)
-    : m_world(world) { }
+MoveDirection::MoveDirection() { }
 
-void MoveDirection::move(Node* object)
+void MoveDirection::move(Node* object, World* world)
 {
-    Size tile = m_world->getTileSize();
+    Size tile = world->getTileSize();
     
     Point moveStep = Point(m_direction.x * tile.width, m_direction.y * tile.height);
     object->setPosition(object->getPosition() + moveStep);
 }
 
-void MoveDirection::setDirection(Vec2 direction)
+void MoveDirection::setDirection(Vec2Int direction)
 {
     m_direction = direction;
 }

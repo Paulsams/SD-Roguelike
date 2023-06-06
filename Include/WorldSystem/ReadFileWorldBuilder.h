@@ -1,13 +1,13 @@
 #pragma once
 #include <string>
 
-#include "2d/CCTMXTiledMap.h"
+#include "Utils/Common.h"
 
 class ReadFileWorldBuilder
 {
 public:
     ReadFileWorldBuilder& setPath(const std::string& path);
-    cocos2d::TMXTiledMap* build() const;
+    Tilemap* build() const;
 private:
     std::string m_path;
 };

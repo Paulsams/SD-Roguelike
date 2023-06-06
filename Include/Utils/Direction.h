@@ -1,12 +1,13 @@
 ﻿#pragma once
-#include "math/Vec2.h"
+
+#include "Common.h"
 
 enum DirectionType
 {
-    Left,
-    Up,
-    Right,
-    Down
+    LEFT,
+    UP,
+    RIGHT,
+    DOWN
 };
 
 class Direction
@@ -17,17 +18,17 @@ public:
     explicit Direction(DirectionType type)
         : type(type) { }
 
-    cocos2d::Vec2 getVector() const
+    Vec2Int getVector() const
     {
         switch (type)
         {
-        case Left:
+        case LEFT:
             return {-1, 0};
-        case Up:
+        case UP:
             return {0, 1};
-        case Right:
+        case RIGHT:
             return {1, 0};
-        case Down:
+        case DOWN:
             return {0, -1};
         }
     }
