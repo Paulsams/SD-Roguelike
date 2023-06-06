@@ -168,6 +168,14 @@ struct Vec2Int
         return !(lhs == rhs);
     }
 
+    friend std::size_t hash_value(const Vec2Int& obj)
+    {
+        std::size_t seed = 0x02BEF05A;
+        seed ^= (seed << 6) + (seed >> 2) + 0x1DBA603F + static_cast<std::size_t>(obj.x);
+        seed ^= (seed << 6) + (seed >> 2) + 0x224CB762 + static_cast<std::size_t>(obj.y);
+        return seed;
+    }
+
     int64_t x = 0;
     int64_t y = 0;
 };
