@@ -65,6 +65,12 @@ list(APPEND GAME_SOURCE
 
     Source/ItemsSystem/Weapon.cpp
 
+    Source/Mobs/Mob.cpp
+    Source/Mobs/Strategy/StateContainer.cpp
+    Source/Mobs/Strategy/StrategyWithStates.cpp
+    Source/Mobs/Strategy/Normal.cpp
+    Source/Mobs/Behaviour/AggressiveBehaviour.cpp
+
     Source/WorldSystem/BaseEntity.cpp
 
     Source/Pathfinder/Pathfinder.cpp
@@ -104,6 +110,23 @@ list(APPEND GAME_HEADER
     Include/ItemsSystem/IItem.h
     Include/ItemsSystem/IVisualAttack.h
     Include/ItemsSystem/Weapon.h
+
+    Include/Mobs/Mob.h
+    Include/Mobs/Strategy/BaseStateStrategy.h
+    Include/Mobs/Strategy/IState.h
+    Include/Mobs/Strategy/NothingStrategy.h
+    Include/Mobs/Strategy/IMobStrategy.h
+    Include/Mobs/Strategy/StateContainer.h
+    Include/Mobs/Strategy/StrategyWithStates.h
+    Include/Mobs/Strategy/Normal.h
+    Include/Mobs/Behaviour/IMobBehaviour.h
+    Include/Mobs/Behaviour/AggressiveBehaviour.h
+    Include/Mobs/Behaviour/CowardlyBehaviour.h
+    Include/Mobs/Behaviour/PassiveBehaviour.h
+    Include/Mobs/Factory/BaseMobAbstractFactory.h
+    Include/Mobs/Factory/MobsConfig.h
+    Include/Mobs/Factory/MobInfo.h
+    Include/Mobs/Factory/MobsFactoryFromConfig.h
 
     Include/WorldSystem/BaseEntity.h
     
