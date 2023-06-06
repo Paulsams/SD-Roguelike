@@ -118,6 +118,21 @@ struct Vec2Int
         y -= v.y;
     }
 
+    inline float distance(const Vec2Int& v) const
+    {
+        float dx = v.x - x;
+        float dy = v.y - y;
+
+        return std::sqrt(dx * dx + dy * dy);
+    }
+
+    inline float distanceSquared(const Vec2Int& v) const
+    {
+        float dx = v.x - x;
+        float dy = v.y - y;
+        return (dx * dx + dy * dy);
+    }
+
     friend bool operator<(const Vec2Int& lhs, const Vec2Int& rhs)
     {
         if (lhs.x < rhs.x)

@@ -1,8 +1,10 @@
-#include "Pathfinder/Pathfinder.h"
+#include "Pathfinder/PathfinderAStar.h"
+
+#include "Utils/Common.h"
 
 namespace pathfinder {
 
-       std::deque<cocos2d::Point> Pathfinder::findPath(Graph& graph, Node* start, Node* end) {
+    std::vector<Vec2Int> PathfinderAStar::findPath(Graph& graph, Node* start, Node* end) {
         if (!start || !end)
             throw std::invalid_argument("start or end is null");
 
@@ -26,11 +28,11 @@ namespace pathfinder {
             graph.setVisitedNode(curNode);
 
             for(auto neighbor: curNode->neighbors) {
-                if (!graph.getVisitedNode(neighbor) && neighbor->tile != TILE_TYPE::LET) {
+                if (!graph.getVisitedNode(neighbor) && neighbor->tile != TILE_TYPE::OBSTACLE) {
                     queue.push(neighbor);
                 }
 
-                float possibleLowerLocalGoal = curNode->fLocalGoal + curNode->distance(neighbor);
+                float possibleLowerLocalGoal = curNode->fLocalGoal + curNode->distanceSquared(neighbor);
                 if (possibleLowerLocalGoal < neighbor->fLocalGoal) {
                     graph.setParentNode(neighbor, curNode);
                     neighbor->fLocalGoal = possibleLowerLocalGoal;
@@ -40,14 +42,15 @@ namespace pathfinder {
             }
         }
 
-        std::deque<cocos2d::Point> path;
-        path.push_front(end->pos);
+        std::vector<Vec2Int> path;
+        path.push_back(end->pos);
         Node* parent = nullptr;
         while (!(parent = graph.getParentNode(end))) {
-            path.push_front(parent->pos);
+            path.push_back(parent->pos);
             end = parent;
         }
 
+        std::reverse(path.begin(), path.end());
         return path;
     }
 

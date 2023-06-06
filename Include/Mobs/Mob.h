@@ -23,8 +23,8 @@ namespace mob {
         void changeBehaviour(std::shared_ptr<IMobBehaviour>);
         const std::shared_ptr<IStatsContainer> getStats() const override;
         int getVisionRange() const;
+
     private:
-        World* m_world;
         int m_visionRange;
         std::shared_ptr<IMobStrategy> m_strategy;
         std::shared_ptr<IMobBehaviour> m_behaviour;

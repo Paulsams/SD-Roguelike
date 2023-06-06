@@ -70,10 +70,12 @@ list(APPEND GAME_SOURCE
     Source/Mobs/Strategy/StrategyWithStates.cpp
     Source/Mobs/Strategy/Normal.cpp
     Source/Mobs/Behaviour/AggressiveBehaviour.cpp
+        Source/Mobs/Behaviour/CowardlyBehaviour.cpp
+        Source/Mobs/Behaviour/PassiveBehaviour.cpp
 
     Source/WorldSystem/BaseEntity.cpp
 
-    Source/Pathfinder/Pathfinder.cpp
+    Source/Pathfinder/PathfinderAStar.cpp
 
     Source/WorldSystem/World.cpp
     Source/WorldSystem/ReadFileWorldBuilder.cpp
@@ -127,11 +129,13 @@ list(APPEND GAME_HEADER
     Include/Mobs/Factory/MobsConfig.h
     Include/Mobs/Factory/MobInfo.h
     Include/Mobs/Factory/MobsFactoryFromConfig.h
+    
+    Include/Pathfinder/Graph.h
+    Include/Pathfinder/Node.h
+    Include/Pathfinder/PathfinderAStar.h
+    Include/Pathfinder/IPathfindingAlgorithm.h
 
     Include/WorldSystem/BaseEntity.h
-    
-    Include/Pathfinder/Pathfinder.h
-
     Include/WorldSystem/World.h
     Include/WorldSystem/ReadFileWorldBuilder.h
     Include/WorldSystem/RandomGeneratorWorldBuilder.h

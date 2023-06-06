@@ -1,4 +1,6 @@
 #include "WorldSystem/World.h"
+
+#include "Pathfinder/PathfinderAStar.h"
 #include "Player/Player.h"
 
 using namespace cocos2d;
@@ -20,6 +22,8 @@ bool World::init()
     this->addChild(m_tilemap, 0, 99);
 
     m_background = m_tilemap->getLayer("Background");
+    m_graph = std::make_shared<pathfinder::Graph>(m_tilemap->getMapSize(), m_background->getTiles(),
+        [](uint32_t gid){ return pathfinder::TILE_TYPE::GROUND;  });
 
     const TMXObjectGroup* objectGroup = m_tilemap->getObjectGroup("Objects");
     
@@ -38,7 +42,7 @@ bool World::init()
 void World::addEntity(BaseEntity* entity)
 {
     Vec2Int positionInWorld = entity->getPositionInWorld();
-    size_t index = positionInWorld.x + positionInWorld.y * getSize().width;
+    size_t index = getIndexFromVec2(positionInWorld);
 
     if (m_entities[index])
     {
@@ -54,10 +58,9 @@ void World::addEntity(BaseEntity* entity)
 void World::removeEntity(BaseEntity* entity)
 {
     const Vec2Int positionInWorld = entity->getPositionInWorld();
-    const size_t index = positionInWorld.x + positionInWorld.y * getSize().width;
     entity->moved -= m_movedEntityDelegate;
     entity->deleted -= m_deletedEntityDelegate;
-    m_entities[index] = nullptr;
+    m_entities[getIndexFromVec2(positionInWorld)] = nullptr;
 }
 
 bool World::tryGetEntity(Vec2Int position, const BaseEntity*& entity) const
@@ -98,8 +101,10 @@ TileType World::getTileType(Vec2Int position) const
 World::World(Tilemap* tilemap)
     : m_movedEntityDelegate(CC_CALLBACK_2(World::onEntityMoved, this))
     , m_deletedEntityDelegate(CC_CALLBACK_1(World::onDeletedEntity, this))
-    , m_entities(std::vector<BaseEntity*>(tilemap->getMapSize().width * tilemap->getMapSize().height))
+    , m_entities(std::vector<BaseEntity*>
+        (tilemap->getMapSize().width * tilemap->getMapSize().height))
     , m_tilemap(tilemap)
+    , m_pathfinding(std::make_shared<pathfinder::PathfinderAStar>())
 {
     Node::setContentSize({m_tilemap->getMapSize().width * m_tilemap->getTileSize().width,
         m_tilemap->getMapSize().height * m_tilemap->getTileSize().height});

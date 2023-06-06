@@ -1,16 +1,14 @@
 #pragma once
 
 #include "Utils/Common.h"
+#include "WorldSystem/WorldTileConfig.h"
+
 
 #include "2d/CCFastTMXTiledMap.h"
 #include "2d/CCTMXTiledMap.h"
 #include "2d/CCFastTMXLayer.h"
 #include "2d/CCTMXLayer.h"
 
-
-
-#include <iostream>
-#include <thread>
 #include <cstring>
 
 class RandomGeneratorWorldBuilder
@@ -18,11 +16,17 @@ class RandomGeneratorWorldBuilder
 public:
     RandomGeneratorWorldBuilder() = default;
 
-    Tilemap* build() const;
+    [[nodiscard]] Tilemap* build() const;
 
     RandomGeneratorWorldBuilder& setPath(const std::string& path)
     {
         m_path = path;
+        return *this;
+    }
+
+    RandomGeneratorWorldBuilder& setConfig(const std::shared_ptr<WorldTileConfig>& cfg)
+    {
+        m_config = cfg;
         return *this;
     }
 
@@ -117,24 +121,26 @@ private:
     {
         explicit Tree(const Container& _leaf) : leaf(_leaf) {}
 
-        std::list<Container> getLeafs() const;
-        std::list<std::pair<Vec2Int, Vec2Int>> getPaths() const;
+        [[nodiscard]] std::list<Container> getLeafs() const;
+        [[nodiscard]] std::list<std::pair<Vec2Int, Vec2Int>> getPaths() const;
 
         Container leaf;
         std::shared_ptr<Tree> left;
         std::shared_ptr<Tree> right;
     };
 
-    std::pair<Container, Container> randomSplit(const Container& cont) const;
-    std::shared_ptr<Tree> splitContainer(const Container& cont, size_t iterCount) const;
+    [[nodiscard]] std::pair<Container, Container> randomSplit(const Container& cont) const;
+    [[nodiscard]] std::shared_ptr<Tree> splitContainer(const Container& cont, size_t iterCount) const;
 
     void drawBackground(TilemapLayer* layer) const;
     void drawPaths(TilemapLayer* layer, const std::shared_ptr<Tree>& tree) const;
     void drawRooms(TilemapLayer* layer, const std::shared_ptr<Tree>& tree) const;
 
-    Tilemap* generateWorld() const;
+    [[nodiscard]] Tilemap* generateWorld() const;
 
     std::string m_path;
+
+    std::shared_ptr<WorldTileConfig> m_config;
 
     int64_t m_height = 0;
     int64_t m_width = 0;
