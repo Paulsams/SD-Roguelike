@@ -7,7 +7,8 @@ Tilemap* RandomGeneratorWorldBuilder::build() const
         || m_width == 0
         || m_iterCount == 0
         || std::pow(2, m_iterCount) > m_width
-        || std::pow(2, m_iterCount) > m_height)
+        || std::pow(2, m_iterCount) > m_height
+        || !m_config)
     {
         return nullptr;
     }

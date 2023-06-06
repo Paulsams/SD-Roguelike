@@ -30,21 +30,22 @@ public:
     explicit LevelTileConfig(const rapidjson::Value& jsonValue)
     {
         m_name = jsonValue["Title"].GetString();
-        ReadArray(jsonValue["Floor"], m_floor);
-        ReadArray(jsonValue["Rare floor"], m_rareFloor);
-        ReadArray(jsonValue["Walls"], m_walls);
-        ReadArray(jsonValue["Rare walls"], m_rareWalls);
-        ReadArray(jsonValue["Obstacles"], m_obstacles);
-        ReadArray(jsonValue["Normal mobs"], m_normalMobs);
-        ReadArray(jsonValue["Elite mobs"], m_eliteMobs);
-        ReadArray(jsonValue["Boss mobs"], m_bossMobs);
-        ReadArray(jsonValue["Passive mobs"], m_passiveMobs);
+        ReadArray(jsonValue["Ground"], m_ground);
+        ReadArray(jsonValue["RareGround"], m_rareGround);
+        ReadArray(jsonValue["Wall"], m_walls);
+        ReadArray(jsonValue["RareWall"], m_rareWalls);
+        ReadArray(jsonValue["Decoration"], m_obstacles);
+        ReadArray(jsonValue["NormalMob"], m_normalMobs);
+        ReadArray(jsonValue["EliteMob"], m_eliteMobs);
+        ReadArray(jsonValue["BossMob"], m_bossMobs);
+        ReadArray(jsonValue["PassiveMob"], m_passiveMobs);
+        ReadArray(jsonValue["Chest"], m_chests);
     }
 
     [[nodiscard]] const std::string& getName() const { return m_name; }
 
-    [[nodiscard]] const std::vector<int>& getFloor() const { return m_floor; }
-    [[nodiscard]] const std::vector<int>& getRareFloor() const { return m_rareFloor; }
+    [[nodiscard]] const std::vector<int>& getGround() const { return m_ground; }
+    [[nodiscard]] const std::vector<int>& getRareGround() const { return m_rareGround; }
     [[nodiscard]] const std::vector<int>& getWalls() const { return m_walls; }
     [[nodiscard]] const std::vector<int>& getRareWalls() const { return m_rareWalls; }
 
@@ -55,12 +56,14 @@ public:
     [[nodiscard]] const std::vector<int>& getBossMobs() const { return m_bossMobs; }
     [[nodiscard]] const std::vector<int>& getPassiveMobs() const { return m_passiveMobs; }
 
+    [[nodiscard]] const std::vector<int>& getChests() const { return m_chests; }
+
 private:
     std::string m_name;
 
     /// Vectors of sprite tile GIDs from tile set for this specific level
-    std::vector<int> m_floor;
-    std::vector<int> m_rareFloor;
+    std::vector<int> m_ground;
+    std::vector<int> m_rareGround;
     std::vector<int> m_walls;
     std::vector<int> m_rareWalls;
 
@@ -71,6 +74,8 @@ private:
     std::vector<int> m_bossMobs;
 
     std::vector<int> m_passiveMobs;
+
+    std::vector<int> m_chests;
 };
 
 class WorldTileConfig
@@ -87,7 +92,7 @@ public:
         rapidjson::IStreamWrapper isw(ifs);
         doc.ParseStream(isw);
 
-        const rapidjson::Value& jsonLevels = doc["Levels"];
+        const rapidjson::Value& jsonLevels = doc["Level"];
         for (auto it = jsonLevels.Begin(); it != jsonLevels.End(); ++it)
             m_levels.emplace_back(*it);
 
@@ -97,10 +102,7 @@ public:
 //        std::cout << std::endl;
     }
 
-    [[nodiscard]] const std::vector<LevelTileConfig>& getLevelsTileConfig() const
-    {
-        return m_levels;
-    }
+    [[nodiscard]] const std::vector<LevelTileConfig>& getLevelsTileConfig() const { return m_levels; }
 
 private:
     std::vector<LevelTileConfig> m_levels;
