@@ -3,20 +3,17 @@
 #include <unordered_map>
 #include <vector>
 #include <functional>
-#include <concepts>
 
-#include "Mobs/Strategy/IState.h"
 #include "Mobs/Mob.h"
 
 namespace mob
 {
-
     template<typename T>
-    concept is_required_interface = requires (T&& interface, Mob* mob)
+    concept is_required_interface = requires (T&& interfaceClass, Mob* mob)
     {
-        interface.enable();
-        interface.disable();
-        interface.update(mob);
+        interfaceClass.enable();
+        interfaceClass.disable();
+        interfaceClass.update(mob);
     };
 
     template <typename T, typename U>
@@ -26,9 +23,9 @@ namespace mob
         using func_holder = std::unordered_map<size_t,
                 std::vector< std::pair<std::function<bool(U*)>, std::shared_ptr<T>> > >;
 
-        StateContainer() = delete;
-
     public:
+        StateContainer() = delete;
+        
         StateContainer(std::shared_ptr<T> currentState, const func_holder& functions): m_currentState(std::move(currentState)),
                                                                                             m_functions(functions){}
         StateContainer(StateContainer&& other) {

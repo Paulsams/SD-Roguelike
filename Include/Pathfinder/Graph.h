@@ -3,20 +3,20 @@
 #include <functional>
 
 namespace pathfinder {
-
-    // {y, x}
-    std::vector<std::pair<int, int>> direction{
-            {-1, 0},
-            {1, 0},
-            {0, -1},
-            {0, 1},
-//            {-1, -1},
-//            {1, -1},
-//            {-1, 1},
-//            {1, 1},
-    };
-
     class Graph {
+        // {y, x}
+        inline static std::vector<std::pair<int, int>> direction {
+                {-1, 0},
+                {1, 0},
+                {0, -1},
+                {0, 1},
+    //            {-1, -1},
+    //            {1, -1},
+    //            {-1, 1},
+    //            {1, 1},
+        };
+
+        
         std::vector<Node> nodes;
         std::vector<bool> visited;
         std::vector<Node*> parents;
@@ -54,7 +54,7 @@ namespace pathfinder {
             return node->pos.y * worldSize.width + node->pos.x;
         }
 
-        Node* getNodeByPos(cocos2d::Point pos) {
+        Node* getNodeByPos(Vec2Int pos) {
             return &nodes[pos.y * worldSize.width + pos.x];
         }
 
@@ -69,6 +69,7 @@ namespace pathfinder {
         void setParentNode(Node* node, Node* parent) {
             parents[getNodePos(node)] = parent;
         }
+        
         bool getVisitedNode(Node* node) const {
             return visited[getNodePos(node)];
         }

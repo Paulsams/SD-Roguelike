@@ -1,6 +1,8 @@
 #pragma once
 
 #include "BaseEntity.h"
+#include "Pathfinder/Graph.h"
+#include "Pathfinder/IPathfindingAlgorithm.h"
 #include "Utils/Common.h"
 
 class Player;
@@ -43,13 +45,16 @@ public:
 
     TileType getTileType(Vec2Int position) const;
 
-    // std::vector<cocos2d::Point> searchPath(cocos2d::Vec2Int start, cocos2d::Vec2Int finish)
-    // {
-    //     m_pathfindingAlgorithm.search(graph, Node(), Node());
-    // }
+    std::vector<Vec2Int> findPath(Vec2Int start, Vec2Int finish) const
+    {
+        return m_pathfinding->findPath(*m_graph, m_graph->getNodeByPos(start),
+            m_graph->getNodeByPos(finish));
+    }
 
 private:
     explicit World(Tilemap* tilemap);
+
+    size_t getIndexFromVec2(Vec2Int position) const { return position.x + position.y * getSize().width; }
 
     void onEntityMoved(BaseEntity::oldPosition oldPosition, BaseEntity::newPosition newPosition);
     FunctionHandler<BaseEntity::oldPosition, BaseEntity::newPosition> m_movedEntityDelegate;
@@ -64,6 +69,7 @@ private:
     Player* m_player = nullptr;
     Tilemap* m_tilemap;
     Vec2Int m_spawnPoint;
+    std::shared_ptr<pathfinder::Graph> m_graph;
     
-    // IPathfindingAlgorithm m_pathfinding;
+    std::shared_ptr<IPathfindingAlgorithm> m_pathfinding;
 };

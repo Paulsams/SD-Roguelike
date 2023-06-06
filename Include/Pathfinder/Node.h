@@ -3,16 +3,18 @@
 #include <vector>
 #include <numeric>
 
+#include "Utils/Common.h"
+
 namespace pathfinder {
 
     enum class TILE_TYPE : uint32_t {
         GROUND = 0,
-        LET = 1,
+        OBSTACLE = 1,
     };
 
 
     struct Node {
-        cocos2d::Point pos;
+        Vec2Int pos;
         TILE_TYPE tile = TILE_TYPE::GROUND;
         std::vector<Node *> neighbors;
 
@@ -28,8 +30,8 @@ namespace pathfinder {
             fLocalGoal = std::numeric_limits<float>::infinity();
         }
 
-        float distance(const Node* other) {
-            return pos.distance(other->pos);
+        float distanceSquared(const Node* other) {
+            return pos.distanceSquared(other->pos);
         }
     };
 }
