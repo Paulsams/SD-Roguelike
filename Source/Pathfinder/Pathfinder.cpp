@@ -2,7 +2,7 @@
 
 namespace pathfinder {
 
-    std::deque<cocos2d::Point> Pathfinder::findPath(Graph& graph, Node* start, Node* end) const {
+       std::deque<cocos2d::Point> Pathfinder::findPath(Graph& graph, Node* start, Node* end) {
         if (!start || !end)
             throw std::invalid_argument("start or end is null");
 
