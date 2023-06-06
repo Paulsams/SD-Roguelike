@@ -1,16 +1,15 @@
 ﻿#pragma once
+
 #include "IMovement.h"
-#include "math/Vec2.h"
-#include "WorldSystem/World.h"
+#include "Utils/Common.h"
 
 class MoveDirection : public IMovement
 {
 public:
-    explicit MoveDirection(World* world);
+    explicit MoveDirection();
     
-    void move(cocos2d::Node* object) override;
-    void setDirection(cocos2d::Vec2 direction);
+    void move(cocos2d::Node* object, World* world) override;
+    void setDirection(Vec2Int direction);
 private:
-    cocos2d::Vec2 m_direction;
-    World* m_world;
+    Vec2Int m_direction;
 };

@@ -154,9 +154,6 @@ tests/cpp-tests/Resources/audio
 /*/*/*/*/prebuilt-mk/Android.mk
 *.xcscmblueprint
 
-# Ignore engine
-cocos2d/*
-
 # Ingore generated VS file
 *.vcxproj*
 *.sln
