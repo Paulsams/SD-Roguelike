@@ -127,6 +127,7 @@ list(APPEND GAME_HEADER
     Include/Utils/Direction.h
     Include/Utils/EventsSystem.h
     Include/Utils/Common.h
+    Include/WorldSystem/WorldTileConfig.h
     )
 
 if(ANDROID)

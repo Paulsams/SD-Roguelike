@@ -54,11 +54,13 @@ bool GameScene::init(Camera* camera)
         return false;
 
     m_camera = camera;
-    
+
+    m_worldTileConfig = std::make_shared<WorldTileConfig>("Resources/World.json");
+
     m_gameLoop = std::make_shared<GameLoop>();
 //    m_world = World::create(ReadFileWorldBuilder().setPath("TileMap.tmx").build());
     m_world = World::create(RandomGeneratorWorldBuilder().setPath("Template.tmx").setWidth(100).setHeight(100).setIterCount(5).build());
-    m_world->setScale(2);
+    m_world->setScale(0.25);
     this->addChild(m_world);
 
     m_player = Player::create();
