@@ -66,6 +66,9 @@ list(APPEND GAME_SOURCE
     Source/ItemsSystem/Weapon.cpp
 
     Source/WorldSystem/BaseEntity.cpp
+
+    Source/Pathfinder/Pathfinder.cpp
+
     Source/WorldSystem/World.cpp
     Source/WorldSystem/ReadFileWorldBuilder.cpp
     Source/WorldSystem/RandomGeneratorWorldBuilder.cpp
@@ -103,6 +106,9 @@ list(APPEND GAME_HEADER
     Include/ItemsSystem/Weapon.h
 
     Include/WorldSystem/BaseEntity.h
+    
+    Include/Pathfinder/Pathfinder.h
+
     Include/WorldSystem/World.h
     Include/WorldSystem/ReadFileWorldBuilder.h
     Include/WorldSystem/RandomGeneratorWorldBuilder.h
