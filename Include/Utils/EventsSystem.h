@@ -2,6 +2,8 @@
 
 #include <functional>
 #include <list>
+#include <ranges>
+#include <algorithm>
 
 template <typename... Args>
 class FunctionHandler
@@ -195,7 +197,7 @@ public:
 
 	void erase(const T& value)
 	{
-		auto finded = std::ranges::find(m_collection, value);
+		auto finded = std::find(m_collection.begin(), m_collection.end(), value);
 		m_collection.erase(finded);
 		removed(finded - m_collection.begin(), finded);
 	}
