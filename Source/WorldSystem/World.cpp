@@ -98,7 +98,7 @@ TileType World::getTileType(Vec2Int position) const
 World::World(Tilemap* tilemap)
     : m_movedEntityDelegate(CC_CALLBACK_2(World::onEntityMoved, this))
     , m_deletedEntityDelegate(CC_CALLBACK_1(World::onDeletedEntity, this))
-    , m_entities(std::make_shared<BaseEntity*[]>(tilemap->getMapSize().width * tilemap->getMapSize().height))
+    , m_entities(std::vector<BaseEntity*>(tilemap->getMapSize().width * tilemap->getMapSize().height))
     , m_tilemap(tilemap)
 {
     Node::setContentSize({m_tilemap->getMapSize().width * m_tilemap->getTileSize().width,

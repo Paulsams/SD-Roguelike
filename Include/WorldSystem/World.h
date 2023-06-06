@@ -59,7 +59,7 @@ private:
     
     TilemapLayer* m_background;
 
-    std::shared_ptr<BaseEntity*[]> m_entities;
+    std::vector<BaseEntity*> m_entities;
 
     Player* m_player = nullptr;
     Tilemap* m_tilemap;
