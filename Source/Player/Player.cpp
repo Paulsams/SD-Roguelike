@@ -51,6 +51,9 @@ Player::Player()
     m_statsContainer->add(Mana, playerManaStat);
 
     m_statsContainer->add(Level, std::make_shared<StatWithModificators>(0));
+
+    for (int i = 0; i < 12; ++i)
+        m_items.push_back(nullptr);
 }
 
 void Player::move(Direction direction)

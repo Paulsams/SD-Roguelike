@@ -5,5 +5,6 @@
 
 struct IAttackSearch
 {
-    bool isReachable(World* world, Vec2Int startPosition, Vec2Int endPosition) const;
+    virtual ~IAttackSearch() = default;
+    virtual bool isReachable(World* world, Vec2Int startPosition, Vec2Int endPosition) const = 0;
 };

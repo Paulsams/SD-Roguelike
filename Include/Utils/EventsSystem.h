@@ -168,3 +168,71 @@ private:
 	
 	handler_collection_type m_handlers;
 };
+
+template <typename T>
+class ObservableVector
+{
+public:
+	using oldValue = const T&;
+	using newValue = const T&;
+	
+	EventContainer<size_t, newValue> added;
+	EventContainer<size_t, newValue> removed;
+	EventContainer<size_t, oldValue, newValue> changed;
+	EventContainer<size_t, size_t> swapped;
+
+	void push_back(const T& value)
+	{
+		m_collection.push_back(value);
+		added(m_collection.size() - 1, value);
+	}
+
+	void push_back(T&& value)
+	{
+		m_collection.push_back(std::move(value));
+		added(m_collection.size() - 1, m_collection[m_collection.size() - 1]);
+	}
+
+	void erase(const T& value)
+	{
+		auto finded = std::ranges::find(m_collection, value);
+		m_collection.erase(finded);
+		removed(finded - m_collection.begin(), finded);
+	}
+
+	void eraseAt(size_t index)
+	{
+		const T& value = m_collection[index];
+		m_collection.erase(m_collection.begin() + index);
+		removed(index, value);
+	}
+
+	const T& operator[] (size_t index) const
+	{
+		return m_collection[index];
+	}
+
+	void setAt(size_t index, const T& value)
+	{
+		const T& old = m_collection[index];
+		m_collection[index] = value;
+		changed(index, old, value);
+	}
+
+	void setAt(size_t index, T&& value)
+	{
+		const T& old = m_collection[index];
+		m_collection[index] = std::move(value);
+		changed(index, old, value);
+	}
+
+	void swap(size_t firstIndex, size_t secondIndex)
+	{
+		std::swap(m_collection[firstIndex], m_collection[secondIndex]);
+	}
+
+	const std::vector<T>& getCollection() const { return m_collection; }
+	
+private:
+	std::vector<T> m_collection;
+};

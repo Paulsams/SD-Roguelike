@@ -40,10 +40,11 @@ Point World::getSpawnPoint() const
     return m_spawnPoint;
 }
 
-// bool World::tryGetEntity(Vec2Int position, std::shared_ptr<const BaseEntity>& entity)
-// {
-//     //entity = m_entities[position.x + position.y * m_tilemap->getMapSize()]
-// }
+bool World::tryGetEntity(Vec2Int position, std::shared_ptr<const BaseEntity>& entity)
+{
+    entity = m_entities[position.x + position.y * getSize().width];
+    return static_cast<bool>(entity);
+}
 
 Size World::getSize() const
 {

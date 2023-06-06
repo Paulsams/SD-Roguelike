@@ -1,9 +1,10 @@
 ﻿#pragma once
 
+#include "Stats/IHaveStats.h"
 #include "Utils/Common.h"
 #include "Utils/EventsSystem.h"
 
-class BaseEntity
+class BaseEntity : public IHaveStats
 {
 public:
     using oldPosition = Vec2Int;

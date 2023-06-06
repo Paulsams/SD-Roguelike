@@ -1,12 +1,9 @@
 #pragma once
 #include <memory>
 
-#include "3d/CCAnimationCurve.h"
 #include "Utils/EventsSystem.h"
 #include "Stats/Modificators/IStatModificator.h"
-
-template<class T, class U>
-concept Derived = std::is_base_of_v<U, T>;
+#include "Utils/Common.h"
 
 class IStat
 {

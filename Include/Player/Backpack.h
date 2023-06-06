@@ -2,11 +2,11 @@
 #include <vector>
 
 #include "ItemsSystem/Accessory.h"
+#include "ItemsSystem/IDealingDamage.h"
 #include "ItemsSystem/Weapon.h"
 
-class Backpack // : public IAttack
+class Backpack : public IDealingDamage
 {
-public:
     
     
 private:

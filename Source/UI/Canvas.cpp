@@ -7,6 +7,7 @@
 #include "UI/StepCounter.h"
 #include "GameLoop/GameLoop.h"
 #include "Stats/StatsContainer.h"
+#include "UI/InventoryView.h"
 #include "UI/StatBar.h"
 #include "ui/UIHBox.h"
 #include "ui/UIImageView.h"
@@ -73,7 +74,7 @@ bool Canvas::init()
     marginParameter->setMargin(marginFromBar);
     marginParameter->setGravity(LinearLayoutParameter::LinearGravity::CENTER_HORIZONTAL);
 
-    const std::shared_ptr<StatsContainer> playerStats = m_player->getStats();
+    const std::shared_ptr<IStatsContainer> playerStats = m_player->getStats();
     
     std::shared_ptr<IStat> playerHpStat;
     if (playerStats->tryGet(Health, playerHpStat))
@@ -98,6 +99,10 @@ bool Canvas::init()
     const auto stepCounter = StepCounter::create(m_gameLoop->currentStep);
     stepCounter->setContentSize({widthRightPanel, 30.0f});
     box->addChild(stepCounter);
+
+    const auto inventoryView = InventoryView::create(m_player->getInventory(),
+        {widthRightPanel, 420.0f} , {10.0f, 10.0f});
+    box->addChild(inventoryView);
 
     return true;
 }

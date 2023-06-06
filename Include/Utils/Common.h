@@ -11,6 +11,9 @@
 using Tilemap = cocos2d::TMXTiledMap;
 using TilemapLayer = cocos2d::TMXLayer;
 
+template<class T, class U>
+concept Derived = std::is_base_of_v<U, T>;
+
 struct Vec2Int
 {
     Vec2Int() = default;
@@ -28,6 +31,10 @@ struct Vec2Int
         y = other.y;
         return *this;
     }
+    
+    Vec2Int(int64_t _x, int64_t _y) : x(_x), y(_y) { }
+
+    operator cocos2d::Vec2() const { return cocos2d::Vec2{static_cast<float>(x), static_cast<float>(y)}; }
 
     inline Vec2Int operator+(const Vec2Int& v) const
     {
@@ -104,7 +111,40 @@ struct Vec2Int
         y -= v.y;
     }
 
-    Vec2Int(int64_t _x, int64_t _y) : x(_x), y(_y) {}
+    friend bool operator<(const Vec2Int& lhs, const Vec2Int& rhs)
+    {
+        if (lhs.x < rhs.x)
+            return true;
+        if (rhs.x < lhs.x)
+            return false;
+        return lhs.y < rhs.y;
+    }
+
+    friend bool operator<=(const Vec2Int& lhs, const Vec2Int& rhs)
+    {
+        return rhs >= lhs;
+    }
+
+    friend bool operator>(const Vec2Int& lhs, const Vec2Int& rhs)
+    {
+        return rhs < lhs;
+    }
+
+    friend bool operator>=(const Vec2Int& lhs, const Vec2Int& rhs)
+    {
+        return !(lhs < rhs);
+    }
+
+    friend bool operator==(const Vec2Int& lhs, const Vec2Int& rhs)
+    {
+        return lhs.x == rhs.x
+            && lhs.y == rhs.y;
+    }
+
+    friend bool operator!=(const Vec2Int& lhs, const Vec2Int& rhs)
+    {
+        return !(lhs == rhs);
+    }
 
     int64_t x = 0;
     int64_t y = 0;

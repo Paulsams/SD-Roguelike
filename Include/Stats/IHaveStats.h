@@ -4,5 +4,5 @@
 struct IHaveStats
 {
     virtual ~IHaveStats() = default;
-    virtual const std::shared_ptr<StatsContainer> getStats() const = 0;
+    virtual const std::shared_ptr<IStatsContainer> getStats() const = 0;
 };
