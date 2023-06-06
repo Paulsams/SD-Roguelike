@@ -1,11 +1,11 @@
 #pragma once
 
-#include "rapidjson/rapidjson.h"
+#include "json/rapidjson.h"
 #include "json/document.h"
-#include "rapidjson/filereadstream.h"
-#include "rapidjson/writer.h"
-#include "rapidjson/ostreamwrapper.h"
-#include "rapidjson/istreamwrapper.h"
+#include "json/filereadstream.h"
+#include "json/writer.h"
+#include "json/ostreamwrapper.h"
+#include "json/istreamwrapper.h"
 
 #include <ranges>
 #include <string>
