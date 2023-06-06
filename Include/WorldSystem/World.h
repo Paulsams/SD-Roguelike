@@ -43,10 +43,11 @@ public:
 
     TileType getTileType(Vec2Int position) const;
 
-    // std::vector<cocos2d::Point> searchPath(cocos2d::Vec2Int start, cocos2d::Vec2Int finish)
-    // {
-    //     m_pathfindingAlgorithm.search(graph, Node(), Node());
-    // }
+     std::vector<cocos2d::Point> searchPath(Vec2Int start, Vec2Int finish)
+     {
+         //m_pathfindingAlgorithm.search(graph, Node(), Node());
+         return {};
+     }
 
 private:
     explicit World(Tilemap* tilemap);

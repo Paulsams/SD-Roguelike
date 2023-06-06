@@ -9,6 +9,7 @@ namespace mob
 
     Mob::Mob(World* world, const MobInfo& info):
         BaseEntity(world),
+        m_visionRange(info.visionRange),
         m_strategy(info.strategy()),
         m_behaviour(info.startBehaviour()),
         m_statsContainer(std::make_shared<StatsContainer>())
@@ -30,5 +31,9 @@ namespace mob
 
     const std::shared_ptr<IStatsContainer> Mob::getStats() const {
         return m_statsContainer;
+    }
+
+    int Mob::getVisionRange() const {
+        return m_visionRange;
     }
 }

@@ -38,14 +38,14 @@ namespace mob {
         };
     public:
         std::unordered_map<int , MobInfo> normals = {
-                {10 , MobInfo(100, createStrategyWithNormal, createAggressiveBehaviour)},
+                {10 , MobInfo(100, 10, createStrategyWithNormal, createAggressiveBehaviour)},
         };
 
         std::unordered_map<int, MobInfo> elites = {
-                {10 , MobInfo(100, createStrategyWithNormal, createAggressiveBehaviour)},
+                {10 , MobInfo(100, 5, createStrategyWithNormal, createAggressiveBehaviour)},
         };
         std::unordered_map<int, MobInfo> bosses = {
-                {10, MobInfo(100, createStrategyWithNormal, createAggressiveBehaviour)},
+                {10, MobInfo(100, 2, createStrategyWithNormal, createAggressiveBehaviour)},
         };
 
     };
