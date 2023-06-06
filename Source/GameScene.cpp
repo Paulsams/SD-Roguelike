@@ -1,8 +1,6 @@
 #include "GameScene.h"
-#include "Movement/MoveDirection.h"
 #include "UI/Canvas.h"
 #include "WorldSystem/World.h"
-#include "WorldSystem/ReadFileWorldBuilder.h"
 #include "WorldSystem/RandomGeneratorWorldBuilder.h"
 
 using namespace cocos2d;
@@ -61,24 +59,23 @@ bool GameScene::init(Camera* camera)
     m_world->setScale(2);
     this->addChild(m_world);
 
-    m_player = Player::create();
+    m_player = Player::create(m_world);
     m_gameLoop->add(m_player);
 
-    m_world->addPlayer(m_player);
-    m_player->setWorld(m_world);
-    m_player->setPosition(m_world->getSpawnPoint());
     m_world->addChild(m_player);
+    m_world->addPlayer(m_player);
+    m_player->setPositionInWorld(m_world->getSpawnPoint());
 
     m_canvas = Canvas::create(m_world, m_player, m_gameLoop);
     m_canvas->setContentSize(Director::getInstance()->getWinSize());
     this->addChild(m_canvas, 1);
 
     Size winSize = Director::getInstance()->getWinSize();
-    Point viewPoint = getViewPointCenter(m_player->getPosition());
+    Point viewPoint = getViewPointCenter(m_player->getPosition() * m_world->getScale());
     m_world->updateCullingRect(Rect(viewPoint, winSize));
     m_camera->setPosition(viewPoint);
 
-    m_player->moved += [this]()
+    m_player->moved += [this](Vec2Int, Vec2Int)
     {
         static constexpr int moveCameraTag = 10;
         static constexpr float moveCameraTime = 0.4f;
@@ -113,8 +110,10 @@ Point GameScene::getViewPointCenter(Point position) const
     position.x += Canvas::widthRightPanel / 2;
     
     Point viewPoint = position - Point(winSize.width / 2, winSize.height / 2);
-    viewPoint.x = std::clamp(viewPoint.x, 0.0f, mapSize.width * tileSize.width - winSize.width + Canvas::widthRightPanel);
-    viewPoint.y = std::clamp(viewPoint.y, 0.0f, mapSize.height * tileSize.height - winSize.height);
+    viewPoint.x = std::clamp(viewPoint.x, 0.0f, mapSize.width * tileSize.width * m_world->getScale() -
+        winSize.width + Canvas::widthRightPanel);
+    viewPoint.y = std::clamp(viewPoint.y, 0.0f,
+        (mapSize.height * tileSize.height * m_world->getScale() - winSize.height));
     
     return viewPoint;
 }

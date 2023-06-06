@@ -9,5 +9,5 @@ struct IItem
     
     virtual std::string getName() const = 0;
     virtual std::string getDescription() const = 0;
-    virtual cocos2d::Sprite* createNewSprite() const = 0;
+    virtual cocos2d::Rect getRectSpriteInTileset() const = 0;
 };

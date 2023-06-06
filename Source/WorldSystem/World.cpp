@@ -35,12 +35,32 @@ bool World::init()
     return true;
 }
 
-Point World::getSpawnPoint() const
+void World::addEntity(BaseEntity* entity)
 {
-    return m_spawnPoint;
+    Vec2Int positionInWorld = entity->getPositionInWorld();
+    size_t index = positionInWorld.x + positionInWorld.y * getSize().width;
+
+    if (m_entities[index])
+    {
+        log("This cell is already occupied by the entity");
+        return;
+    }
+    
+    m_entities[index] = entity;
+    entity->moved += m_movedEntityDelegate;
+    entity->deleted += m_deletedEntityDelegate;
 }
 
-bool World::tryGetEntity(Vec2Int position, std::shared_ptr<const BaseEntity>& entity)
+void World::removeEntity(BaseEntity* entity)
+{
+    const Vec2Int positionInWorld = entity->getPositionInWorld();
+    const size_t index = positionInWorld.x + positionInWorld.y * getSize().width;
+    entity->moved -= m_movedEntityDelegate;
+    entity->deleted -= m_deletedEntityDelegate;
+    m_entities[index] = nullptr;
+}
+
+bool World::tryGetEntity(Vec2Int position, const BaseEntity*& entity) const
 {
     entity = m_entities[position.x + position.y * getSize().width];
     return static_cast<bool>(entity);
@@ -66,10 +86,31 @@ const Player* World::getNearestPlayer(Vec2) const
     return m_player;
 }
 
+TileType World::getTileType(Vec2Int position) const
+{
+    Size size = getSize();
+    if (position.x < 0 || position.x >= size.width || position.y < 0 || position.y >= size.height)
+        return TileType::OUT_OF_BOUNDS;
+
+    return TileType::GROUND;
+}
+
 World::World(Tilemap* tilemap)
-    : m_entities(tilemap->getMapSize().width * tilemap->getMapSize().height)
+    : m_movedEntityDelegate(CC_CALLBACK_2(World::onEntityMoved, this))
+    , m_deletedEntityDelegate(CC_CALLBACK_1(World::onDeletedEntity, this))
+    , m_entities(std::make_shared<BaseEntity*[]>(tilemap->getMapSize().width * tilemap->getMapSize().height))
     , m_tilemap(tilemap)
 {
     Node::setContentSize({m_tilemap->getMapSize().width * m_tilemap->getTileSize().width,
         m_tilemap->getMapSize().height * m_tilemap->getTileSize().height});
+}
+
+void World::onEntityMoved(BaseEntity::oldPosition oldPosition, BaseEntity::newPosition newPosition)
+{
+    
+}
+
+void World::onDeletedEntity(BaseEntity* entity)
+{
+    removeEntity(entity);
 }

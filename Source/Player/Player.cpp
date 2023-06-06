@@ -1,14 +1,13 @@
 #include "Player/Player.h"
 
-#include "Movement/MoveDirection.h"
 #include "Stats/Modificators/BoundsModificator.h"
 #include "Stats/Modificators/StatWithModificators.h"
 
 using namespace cocos2d;
 
-Player* Player::create()
+Player* Player::create(World* world)
 {
-    Player* player = new (std::nothrow) Player();
+    Player* player = new (std::nothrow) Player(world);
     if (player && player->init())
     {
         player->autorelease();
@@ -22,22 +21,43 @@ void Player::update() { }
 
 bool Player::init()
 {
-    if (m_sprite == nullptr)
+    static const Size size = {32, 32};
+
+    constexpr int templatePeopleId = 2210 - 1;
+    constexpr int clothesId = 2149 - 1;
+    constexpr int helmetId = 1957 - 1;
+    
+    m_templatePeople = Sprite::create(Paths::toGameTileset);
+    m_templatePeople->setTextureRect(Rect(Vec2{templatePeopleId % 64, templatePeopleId / 64} * size.width, size));
+
+    m_clothes = Sprite::create(Paths::toGameTileset);
+    m_clothes->setTextureRect(Rect(Vec2{clothesId % 64, clothesId / 64} * size.width, size));
+    
+    m_helmet = Sprite::create(Paths::toGameTileset);
+    m_helmet->setTextureRect(Rect(Vec2{helmetId % 64, helmetId / 64} * size.width, size));
+    
+    if (!m_helmet || !m_clothes || !m_templatePeople)
     {
         log("The player couldn't find the sprite");
         return false;
     }
+    
+    m_templatePeople->setAnchorPoint(Vec2::ZERO);
+    Node::addChild(m_templatePeople, 4);
 
-    Node::addChild(m_sprite);
+    m_clothes->setAnchorPoint(Vec2::ZERO);
+    Node::addChild(m_clothes, 3);
+    
+    m_helmet->setAnchorPoint(Vec2::ZERO);
+    Node::addChild(m_helmet, 2);
 
     return true;
 }
 
-Player::Player()
-    : m_moveDelegate(CC_CALLBACK_1(Player::move, this))
+Player::Player(World* world)
+    : BaseEntity(world)
+    , m_moveDelegate(CC_CALLBACK_1(Player::move, this))
     , m_input(this)
-    , m_sprite(Sprite::create("Player.png"))
-    , m_movement(std::make_shared<MoveDirection>())
     , m_statsContainer(std::make_shared<StatsContainer>())
 {
     m_input.moved += m_moveDelegate;
@@ -58,8 +78,8 @@ Player::Player()
 
 void Player::move(Direction direction)
 {
-    m_movement->setDirection(direction.getVector());
-    m_movement->move(this, m_world);
-
-    moved();
+    Vec2Int newPosition = getPositionInWorld() + direction.getVector();
+    TileType tileType = getWorld()->getTileType(newPosition);
+    if (tileType == TileType::GROUND)
+        setPositionInWorld(newPosition);
 }

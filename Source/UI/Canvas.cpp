@@ -101,7 +101,8 @@ bool Canvas::init()
     box->addChild(stepCounter);
 
     const auto inventoryView = InventoryView::create(m_player->getInventory(),
-        {widthRightPanel, 420.0f} , {10.0f, 10.0f});
+        {widthRightPanel - 10.0f, 420.0f} , {10.0f, 10.0f});
+    inventoryView->setLayoutParameter(marginParameter);
     box->addChild(inventoryView);
 
     return true;

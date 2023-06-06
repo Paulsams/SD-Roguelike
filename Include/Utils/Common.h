@@ -14,6 +14,13 @@ using TilemapLayer = cocos2d::TMXLayer;
 template<class T, class U>
 concept Derived = std::is_base_of_v<U, T>;
 
+struct Paths
+{
+    inline static const std::string toUITileset = "Tileset.png";
+    inline static const std::string toGameTileset = "Tileset.png";
+    inline static const std::string toIconFrame = "IconFrame.png";
+};
+
 struct Vec2Int
 {
     Vec2Int() = default;

@@ -3,5 +3,5 @@
 class Accessory
 {
 public:
-    
+    // Accessory(Player)
 };

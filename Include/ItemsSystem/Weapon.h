@@ -5,7 +5,6 @@ class Weapon
 {
 public:
 
-
 private:
     std::shared_ptr<AttackHandler> m_attackHandler;
 };

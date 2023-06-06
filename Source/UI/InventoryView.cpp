@@ -2,6 +2,8 @@
 
 #include "2d/CCMenuItem.h"
 #include "ui/UIButton.h"
+#include "ui/UIImageView.h"
+#include "Utils/Common.h"
 
 using namespace cocos2d;
 using namespace cocos2d::ui;
@@ -21,10 +23,12 @@ InventoryView* InventoryView::create(Inventory& observableItems, Size contentSiz
 class MenuItemForInventory : public MenuItem
 {
 public:
-    static MenuItemForInventory* create(const ccMenuCallback& callback)
+    static MenuItemForInventory* create(Size size, const ccMenuCallback& callback)
     {
         MenuItemForInventory* menuItem = new (std::nothrow) MenuItemForInventory();
-        if (menuItem && menuItem->initWithCallback(callback))
+        menuItem->setContentSize(size);
+        
+        if (menuItem && menuItem->init() && menuItem->initWithCallback(callback))
         {
             menuItem->autorelease();
             return menuItem;
@@ -40,30 +44,46 @@ public:
         
         if (item)
         {
-            m_itemIcon = item->createNewSprite();
+            m_itemIcon->setTextureRect(item->getRectSpriteInTileset());
             addChild(m_itemIcon);
         }
-        
+        m_itemIcon->setEnabled(static_cast<bool>(item));
     }
     
     void selected() override
     {
         MenuItem::selected();
+        setColor(Color3B::GRAY);
+    }
+
+    void unselected() override
+    {
+        MenuItem::unselected();
+        setColor(Color3B::WHITE);
     }
 
     bool init() override
     {
-        Sprite* frame = Sprite::create("IconFrame.png");
-        frame->setAnchorPoint(Vec2::ZERO);
-        frame->addChild(frame);
+        m_frame = ImageView::create(Paths::toIconFrame);
+        m_frame->ignoreContentAdaptWithSize(false);
+        m_frame->setContentSize(getContentSize());
+        m_frame->setAnchorPoint(Vec2::ZERO);
+        this->addChild(m_frame);
+
+        m_itemIcon = ImageView::create(Paths::toUITileset);
+        m_itemIcon->setEnabled(false);
+        m_itemIcon->ignoreContentAdaptWithSize(false);
+        m_itemIcon->setAnchorPoint(Vec2::ZERO);
+        this->addChild(m_itemIcon);
         
         return true;
     }
     
 private:
     MenuItemForInventory() = default;
-
-    Sprite* m_itemIcon;
+    
+    ImageView* m_frame;
+    ImageView* m_itemIcon;
 };
 
 bool InventoryView::initWithContentSize(Size contentSize)
@@ -78,16 +98,8 @@ bool InventoryView::initWithContentSize(Size contentSize)
 
     for (const std::shared_ptr<IItem>& item : m_observableItems.getCollection())
     {
-        Sprite* sprite = Sprite::create("Player.png");
-        if (item)
-            sprite = item->createNewSprite();
-        MenuItemForInventory* menuItem = MenuItemForInventory::create(
-            [sprite](Ref* ref) { sprite->setColor(Color3B::RED); });
-        menuItem->setContentSize(itemSize);
-        sprite->setAnchorPoint(Vec2::ZERO);
-        sprite->setContentSize(itemSize);
-        //menuItem->setEnabled(false);
-        menuItem->addChild(sprite);
+        MenuItemForInventory* menuItem = MenuItemForInventory::create(itemSize, nullptr);
+        menuItem->setItem(item);
 
         menuItems.pushBack(menuItem);
     }

@@ -65,8 +65,7 @@ list(APPEND GAME_SOURCE
 
     Source/ItemsSystem/Weapon.cpp
 
-    Source/Movement/MoveDirection.cpp
-
+    Source/WorldSystem/BaseEntity.cpp
     Source/WorldSystem/World.cpp
     Source/WorldSystem/ReadFileWorldBuilder.cpp
     Source/WorldSystem/RandomGeneratorWorldBuilder.cpp
@@ -94,6 +93,7 @@ list(APPEND GAME_HEADER
     Include/Player/Player.h
     Include/Player/PlayerInput.h
 
+    Include/ItemsSystem/Accessory.h
     Include/ItemsSystem/AttackData.h
     Include/ItemsSystem/AttackHandler.h
     Include/ItemsSystem/AttackSearchFromDFS.h
@@ -102,9 +102,7 @@ list(APPEND GAME_HEADER
     Include/ItemsSystem/IVisualAttack.h
     Include/ItemsSystem/Weapon.h
 
-    Include/Movement/IMovement.h
-    Include/Movement/MoveDirection.h
-
+    Include/WorldSystem/BaseEntity.h
     Include/WorldSystem/World.h
     Include/WorldSystem/ReadFileWorldBuilder.h
     Include/WorldSystem/RandomGeneratorWorldBuilder.h

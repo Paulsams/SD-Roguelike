@@ -13,14 +13,13 @@ public:
 
     void attack(World* world, Vec2Int position) const
     {
-        std::shared_ptr<const BaseEntity> entity;
+        const BaseEntity* entity;
         std::shared_ptr<IStat> healthStat;
         for (const auto& [range, attack] : m_ranges)
         {
             const Vec2Int endPosition = position + range;
             if (attack->isPossibleAttack(world->getTileType(endPosition)))
             {
-                // мейби партикл кинуть какой-нибудь?
                 if (world->tryGetEntity(endPosition, entity) &&
                     attack->getSearch()->isReachable(world, position, endPosition) &&
                     entity->getStats()->tryGet(Health, healthStat))
