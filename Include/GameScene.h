@@ -5,6 +5,7 @@
 #include "Player/Player.h"
 #include "UI/Canvas.h"
 #include "WorldSystem/World.h"
+#include "WorldSystem/WorldTileConfig.h"
 
 class GameScene : public cocos2d::Layer
 {
@@ -20,6 +21,8 @@ private:
     static constexpr float cameraZ = 10.0f;
     
     std::shared_ptr<GameLoop> m_gameLoop;
+
+    std::shared_ptr<WorldTileConfig> m_worldTileConfig;
 
     World* m_world = nullptr;
     Player* m_player = nullptr;
