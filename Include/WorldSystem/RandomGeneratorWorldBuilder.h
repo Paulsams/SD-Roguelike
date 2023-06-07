@@ -3,10 +3,7 @@
 #include "Utils/Common.h"
 #include "WorldSystem/WorldTileConfig.h"
 
-
-#include "2d/CCFastTMXTiledMap.h"
 #include "2d/CCTMXTiledMap.h"
-#include "2d/CCFastTMXLayer.h"
 #include "2d/CCTMXLayer.h"
 
 #include <set>
