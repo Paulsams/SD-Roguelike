@@ -45,6 +45,9 @@ AppPackages
 BundleArtifacts
 .vs/
 
+!cocos2d/**/[Dd]ebug/
+!cocos2d/**/[Rr]elease/
+
 # Ignore files build by ndk and eclipse
 libs/
 bin/
