@@ -19,8 +19,7 @@ jobs:
         config:
           - {
             name: "Windows",
-            os: windows-2019,
-            build_type: "Debug",
+            os: windows-latest,
             cc: "cl",
             cxx: "cl",
             generators: "Visual Studio 16 2019"
@@ -28,7 +27,6 @@ jobs:
           - {
             name: "Ubuntu",
             os: ubuntu-latest,
-            build_type: "Debug",
             cc: "clang",
             cxx: "clang++",
             generators: "Ninja"
@@ -49,6 +47,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install ninja-build cmake
           sudo apt-get install build-essential libgtk-3-dev
+          sudo apt install libglew-dev
           ninja --version
           cmake --version
           clang --version
