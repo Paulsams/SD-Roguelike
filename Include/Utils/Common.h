@@ -2,12 +2,9 @@
 
 #include <cstdint>
 
-#include "2d/CCFastTMXTiledMap.h"
 #include "2d/CCTMXTiledMap.h"
 #include "math/Vec2.h"
 
-//using Tilemap = cocos2d::FastTMXTiledMap;
-//using TilemapLayer = cocos2d::FastTMXLayer;
 using Tilemap = cocos2d::TMXTiledMap;
 using TilemapLayer = cocos2d::TMXLayer;
 
@@ -166,6 +163,14 @@ struct Vec2Int
     friend bool operator!=(const Vec2Int& lhs, const Vec2Int& rhs)
     {
         return !(lhs == rhs);
+    }
+
+    static std::size_t hash_value(const Vec2Int& obj)
+    {
+        std::size_t seed = 0x02BEF05A;
+        seed ^= (seed << 6) + (seed >> 2) + 0x1DBA603F + static_cast<std::size_t>(obj.x);
+        seed ^= (seed << 6) + (seed >> 2) + 0x224CB762 + static_cast<std::size_t>(obj.y);
+        return seed;
     }
 
     int64_t x = 0;
