@@ -94,7 +94,7 @@ public:
 
         const rapidjson::Value& jsonLevels = doc["Level"];
         for (auto it = jsonLevels.Begin(); it != jsonLevels.End(); ++it)
-            m_levels.emplace_back(*it);
+            m_levels.emplace_back(std::make_shared<LevelTileConfig>(*it));
 
 //        rapidjson::OStreamWrapper out(std::cout);
 //        rapidjson::Writer<rapidjson::OStreamWrapper> writer(out);
@@ -102,8 +102,8 @@ public:
 //        std::cout << std::endl;
     }
 
-    [[nodiscard]] const std::vector<LevelTileConfig>& getLevelsTileConfig() const { return m_levels; }
+    [[nodiscard]] const std::vector<std::shared_ptr<LevelTileConfig>>& getLevelsTileConfig() const { return m_levels; }
 
 private:
-    std::vector<LevelTileConfig> m_levels;
+    std::vector<std::shared_ptr<LevelTileConfig>> m_levels;
 };
