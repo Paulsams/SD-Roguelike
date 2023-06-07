@@ -10,12 +10,16 @@
 #include "2d/CCTMXLayer.h"
 
 #include <set>
+#include <random>
 #include <cstring>
 
 class RandomGeneratorWorldBuilder
 {
 public:
-    RandomGeneratorWorldBuilder() = default;
+    RandomGeneratorWorldBuilder()
+        : m_rd()
+        , m_gen(m_rd())
+    {}
 
     [[nodiscard]] Tilemap* build() const;
 
@@ -98,12 +102,6 @@ private:
         int64_t m_height = 0;
     };
 
-    struct Chest
-    {
-        Vec2Int m_pos;
-        std::vector<std::pair<int, int>> m_drop;
-    };
-
     struct Room
     {
         explicit Room(const Container& cont);
@@ -122,7 +120,7 @@ private:
         std::vector<Vec2Int> m_passiveMobs;
 
         std::vector<Vec2Int> m_decorations;
-        std::vector<Chest> m_chests;
+        std::vector<Vec2Int> m_chests;
     };
 
     struct Tree
@@ -147,9 +145,12 @@ private:
     void drawRooms(TilemapLayer* layer, const std::shared_ptr<Tree>& tree) const;
     void drawCorridors(TilemapLayer* layer, const std::shared_ptr<Tree>& tree) const;
 
+    void drawGround(TilemapLayer* layer, const std::vector<Container>& containers) const;
 
     [[nodiscard]] std::vector<Room> generateRooms(const std::shared_ptr<Tree>& tree) const;
-    [[nodiscard]] std::vector<Room> generateCorridors(const std::shared_ptr<Tree>& tree) const;
+    [[nodiscard]] std::vector<Container> generateCorridors(const std::shared_ptr<Tree>& tree) const;
+
+    void fillRoomVec2int(Room& room, std::vector<Vec2Int>& mobs, int64_t counter, int64_t tryCounter) const;
 
     void fillSpawnRoom(Room& room) const;
     void fillBossRooms(std::vector<Room>& rooms, size_t spawnRoom) const;
@@ -167,11 +168,26 @@ private:
      *  Spawn room -> the smallest room
      *  Bosses rooms -> the farthest rooms from spawn
     */
+    std::random_device m_rd;
+    mutable std::mt19937 m_gen;
+
     double m_normalRoomRatio = 0.7;
     double m_treasureRoomRatio = 0.05;
 
-    double m_minRoomFillBound = 0.1;
+    double m_minRoomFillBound = 0.05;
     double m_maxRoomFillBound = 0.2;
+
+    double m_normalRoomTreasureMean = 0.5;
+    double m_eliteRoomTreasureMean = 1;
+    double m_bossRoomTreasureMean = 3;
+    double m_treasureRoomTreasureMean = 5;
+
+    double m_normalGroundRatio = 0.7;
+
+    static constexpr int m_meanCorridorWidth = 3;
+    static constexpr int m_sigmaCorridorWidth = 1;
+
+    const std::vector<int> m_bonfires = {782, 783, 784, 785, 786, 787, 788, 789};
 
     double m_widthRatio = 0.45;
     double m_heightRatio = 0.45;
@@ -186,6 +202,4 @@ private:
     int64_t m_iterCount = 0;
 
     bool m_discardByRatio = true;
-
-    const std::vector<int> m_bonfires = {782, 783, 784, 785, 786, 787, 788, 789};
 };
