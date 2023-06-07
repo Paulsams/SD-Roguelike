@@ -27,8 +27,8 @@ jobs:
           - {
             name: "Ubuntu",
             os: ubuntu-latest,
-            cc: "clang",
-            cxx: "clang++",
+            cc: "gcc-10",
+            cxx: "g++-10",
             generators: "Ninja"
           }
     steps:
