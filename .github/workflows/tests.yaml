@@ -62,7 +62,7 @@ jobs:
 
       - name: Configure windows
         if: matrix.config.name == 'Windows'
-        run: cmake -B ./build -A Win32 -G "${{matrix.config.generators}}" -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+        run: cmake -B ./build -AWin32 -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
       - name: Configure ubuntu
         if: matrix.config.name == 'Ubuntu'
