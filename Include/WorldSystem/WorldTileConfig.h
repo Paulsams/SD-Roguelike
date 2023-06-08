@@ -32,14 +32,14 @@ public:
         m_name = jsonValue["Title"].GetString();
         ReadArray(jsonValue["Ground"], m_ground);
         ReadArray(jsonValue["RareGround"], m_rareGround);
-        ReadArray(jsonValue["Wall"], m_walls);
-        ReadArray(jsonValue["RareWall"], m_rareWalls);
-        ReadArray(jsonValue["Decoration"], m_obstacles);
-        ReadArray(jsonValue["NormalMob"], m_normalMobs);
-        ReadArray(jsonValue["EliteMob"], m_eliteMobs);
-        ReadArray(jsonValue["BossMob"], m_bossMobs);
-        ReadArray(jsonValue["PassiveMob"], m_passiveMobs);
-        ReadArray(jsonValue["Chest"], m_chests);
+        ReadArray(jsonValue["Walls"], m_walls);
+        ReadArray(jsonValue["RareWalls"], m_rareWalls);
+        ReadArray(jsonValue["Decorations"], m_obstacles);
+        ReadArray(jsonValue["NormalMobs"], m_normalMobs);
+        ReadArray(jsonValue["EliteMobs"], m_eliteMobs);
+        ReadArray(jsonValue["BossMobs"], m_bossMobs);
+        ReadArray(jsonValue["PassiveMobs"], m_passiveMobs);
+        ReadArray(jsonValue["Chests"], m_chests);
     }
 
     [[nodiscard]] const std::string& getName() const { return m_name; }

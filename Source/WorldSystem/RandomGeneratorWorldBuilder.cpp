@@ -53,6 +53,33 @@ Tilemap* RGWB::generateWorld() const
     drawGround(layer, corridors);
     drawGround(layer, roomsGround);
 
+//    cocos2d::Vector<cocos2d::TMXObjectGroup*>& objectGroups = tileMap->getObjectGroups();
+//    for (cocos2d::TMXObjectGroup* og : objectGroups)
+//    {
+//        og->release();
+//    }
+//
+//    cocos2d::TMXObjectGroup* decorationsObjectGroup = new cocos2d::TMXObjectGroup();
+//    decorationsObjectGroup->setGroupName("Decorations");
+//    std::vector<cocos2d::Value> decorationsObjects;
+//    for (const Room& room : rooms)
+//    {
+//        for (Vec2Int pos : room.m_decorations)
+//        {
+//            cocos2d::ValueMap currDecoration;
+//            currDecoration["x"] = pos.x * 32;
+//        }
+//    }
+//    decorationsObjectGroup->setObjects();
+//
+//
+//    for (cocos2d::TMXObjectGroup* og : objectGroups)
+//    {
+//        std::cout << og->getGroupName() << std::endl;
+//        for (const auto& [k, v] : og->getObject("Pipa")) {
+//            std::cout << "\t" << k << std::endl;
+//        }
+//    }
     return tileMap;
 }
 

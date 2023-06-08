@@ -25,7 +25,7 @@ bool World::init()
     m_graph = std::make_shared<pathfinder::Graph>(m_tilemap->getMapSize(), m_background->getTiles(),
         [](uint32_t gid){ return pathfinder::TILE_TYPE::GROUND;  });
 
-    const TMXObjectGroup* objectGroup = m_tilemap->getObjectGroup("Objects");
+    const TMXObjectGroup* objectGroup = m_tilemap->getObjectGroup("UtilsObjects");
     
     if(objectGroup == nullptr) {
         log("tile map has no objects object layer");
