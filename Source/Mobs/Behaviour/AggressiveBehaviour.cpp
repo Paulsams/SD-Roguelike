@@ -3,7 +3,7 @@
 namespace mob {
 
     void AggressiveBehaviour::update(Mob* mob)  {
-        auto playerPos = mob->getWorld()->getNearestPlayer(mob->getPositionInWorld());
+        auto playerPos = mob->getWorld()->getNearestPlayer(mob->getPositionOnMap());
         
     }
 }

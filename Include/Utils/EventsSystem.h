@@ -183,6 +183,11 @@ public:
 	EventContainer<size_t, oldValue, newValue> changed;
 	EventContainer<size_t, size_t> swapped;
 
+	size_t size() const
+	{
+		return m_collection.size();
+	}
+	
 	void push_back(const T& value)
 	{
 		m_collection.push_back(value);

@@ -1,7 +1,12 @@
 #include "GameScene.h"
+
+#include "ItemsSystem/AttackSearch/AttackSearchFromDFS.h"
+#include "ItemsSystem/DealingDamage/SimpleDamage.h"
 #include "UI/Canvas.h"
+#include "WorldSystem/FunctionVisitorEntities.h"
 #include "WorldSystem/World.h"
 #include "WorldSystem/RandomGeneratorWorldBuilder.h"
+#include "WorldSystem/ReadFileWorldBuilder.h"
 
 using namespace cocos2d;
 
@@ -46,6 +51,23 @@ GameScene* GameScene::create(Camera* camera)
     return nullptr;
 }
 
+TilemapConfig getTilemapConfig(const LevelTileConfig& levelConfig)
+{
+    std::unordered_map<int, TileType> tiles;
+    for (auto tile : levelConfig.getGround())
+        tiles.insert({tile, TileType::GROUND});
+    for (auto tile : levelConfig.getRareGround())
+        tiles.insert({tile, TileType::GROUND});
+    for (auto tile : levelConfig.getWalls())
+        tiles.insert({tile, TileType::OBSTACLE});
+    for (auto tile : levelConfig.getRareWalls())
+        tiles.insert({tile, TileType::OBSTACLE});
+    for (auto tile : levelConfig.getObstacles())
+        tiles.insert({tile, TileType::OBSTACLE});
+    tiles.insert({0, TileType::OBSTACLE});
+    return {tiles};
+}
+
 bool GameScene::init(Camera* camera)
 {
     if (!Layer::init())
@@ -55,18 +77,42 @@ bool GameScene::init(Camera* camera)
 
     m_worldTileConfig = std::make_shared<WorldTileConfig>("Resources/World.json");
 
+    const TilemapConfig tilemapConfig = getTilemapConfig(m_worldTileConfig->getLevelsTileConfig()[0]);
+    
     m_gameLoop = std::make_shared<GameLoop>();
-//    m_world = World::create(ReadFileWorldBuilder().setPath("TileMap.tmx").build());
-    m_world = World::create(RandomGeneratorWorldBuilder().setPath("Template.tmx").setConfig(m_worldTileConfig).setWidth(100).setHeight(100).setIterCount(5).build());
-    m_world->setScale(0.31f);
+    m_world = World::create(ReadFileWorldBuilder().setPath("Custom.tmx").build(), tilemapConfig);
+    //m_world = World::create(RandomGeneratorWorldBuilder().setPath("Template.tmx").setConfig(m_worldTileConfig).setWidth(100).setHeight(100).setIterCount(5).build(),
+        // tilemapConfig);
+    m_world->setScale(1.5f);
     this->addChild(m_world);
+
+    AttackInfo::PossibleAttackDelegate dontHitObstacle =
+        [](TileType tileType) { return tileType == TileType::GROUND; };
+    
+    AttackInfo::PossibleAttackFromEntity hitOnlyEnemies = FunctionVisitorEntitiesBuilder<bool>().
+        setMob([](mob::Mob*) { return true; }).build();
+
+    std::vector<Vec2Int> oneDistanceRanges = {{0, 1}};
+
+    const auto delegateDamage = std::make_shared<DelegateDamage>();
+
+    const auto defaultAttackInfo = std::make_shared<AttackInfo>(dontHitObstacle, hitOnlyEnemies,
+        nullptr, std::make_shared<AttackSearchFromDFS>());
+
+    const auto defaultAttack = AttackHandlerBuilder().addAttackData(oneDistanceRanges,
+        std::make_shared<AttackWithDamage>(defaultAttackInfo, delegateDamage)).build();
+
+    Weapon* defaultWeapon = Weapon::create(m_world, World::getRectFromGid(2943), WEAPON, defaultAttack,
+        delegateDamage);
+    defaultWeapon->setPositionOnMap({3, 3});
+    m_world->addEntity(defaultWeapon);
 
     m_player = Player::create(m_world);
     m_gameLoop->add(m_player);
 
     m_world->addChild(m_player);
     m_world->addPlayer(m_player);
-    m_player->setPositionInWorld(m_world->getSpawnPoint());
+    m_player->setPositionOnMap(m_world->getSpawnPoint());
 
     m_canvas = Canvas::create(m_world, m_player, m_gameLoop);
     m_canvas->setContentSize(Director::getInstance()->getWinSize());
@@ -114,7 +160,7 @@ Point GameScene::getViewPointCenter(Point position) const
     Point viewPoint = position - Point(winSize.width / 2, winSize.height / 2);
     viewPoint.x = std::clamp(viewPoint.x, 0.0f, mapSize.width * tileSize.width * m_world->getScale() -
         winSize.width + Canvas::widthRightPanel);
-    viewPoint.y = std::clamp(viewPoint.y, 0.0f,
+    viewPoint.y = std::clamp(viewPoint.y, -Canvas::heightBackpack,
         (mapSize.height * tileSize.height * m_world->getScale() - winSize.height));
     
     return viewPoint;

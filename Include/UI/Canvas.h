@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "PlayerItemsOnUI.h"
 #include "StepCounter.h"
 #include "2d/CCNode.h"
 #include "WorldSystem/World.h"
@@ -8,6 +9,7 @@ class Canvas : public cocos2d::Node
 {
 public:
     static constexpr float widthRightPanel = 300.0f;
+    static constexpr float heightBackpack = 100.0f;
     
     static Canvas* create(World* world, Player* player, std::shared_ptr<GameLoop> gameLoop);
 
@@ -21,4 +23,5 @@ private:
     Player* m_player;
     std::shared_ptr<GameLoop> m_gameLoop;
     std::shared_ptr<ui::StepCounter> m_stepCounter;
+    std::shared_ptr<PlayerItemsOnUI> m_allItemsPlayer;
 };

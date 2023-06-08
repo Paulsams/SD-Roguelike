@@ -5,7 +5,7 @@
 namespace pathfinder {
     class PathfinderAStar : public IPathfindingAlgorithm {
 
-        inline static double heuristic(Node* lhs, Node* rhs) {
+        inline static float heuristic(Node* lhs, Node* rhs) {
             return lhs->distanceSquared(rhs);
         }
         

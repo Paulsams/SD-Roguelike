@@ -14,11 +14,26 @@ using TilemapLayer = cocos2d::TMXLayer;
 template<class T, class U>
 concept Derived = std::is_base_of_v<U, T>;
 
+using SpriteWithRect = std::pair<std::string, cocos2d::Rect>;
+
 struct Paths
 {
-    inline static const std::string toUITileset = "Tileset.png";
-    inline static const std::string toGameTileset = "Tileset.png";
-    inline static const std::string toIconFrame = "IconFrame.png";
+    static const std::string toUITileset;
+    static const std::string toGameTileset;
+    static const std::string toIconFrame;
+
+    static const SpriteWithRect toAllInventoryCell;
+    static const std::pair<std::string, cocos2d::Rect> toWeaponInventoryCell;
+    static const std::pair<std::string, cocos2d::Rect> toSpellInventoryCell;
+    static const std::pair<std::string, cocos2d::Rect> toAccessoryInventoryCell;
+};
+
+struct Colors
+{
+    static const cocos2d::Color3B background;
+    static const cocos2d::Color3B midground;
+    static const cocos2d::Color3B backgroundForStatBar;
+    static const cocos2d::Color3B backgroundForStat;
 };
 
 struct Vec2Int
@@ -39,7 +54,7 @@ struct Vec2Int
         return *this;
     }
     
-    Vec2Int(int64_t _x, int64_t _y) : x(_x), y(_y) { }
+    Vec2Int(int _x, int _y) : x(_x), y(_y) { }
 
     operator cocos2d::Vec2() const { return cocos2d::Vec2{static_cast<float>(x), static_cast<float>(y)}; }
 
@@ -176,6 +191,6 @@ struct Vec2Int
         return seed;
     }
 
-    int64_t x = 0;
-    int64_t y = 0;
+    int x = 0;
+    int y = 0;
 };
