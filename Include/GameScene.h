@@ -15,7 +15,7 @@ public:
     cocos2d::Point getViewPointCenter(cocos2d::Point position) const;
 
     static GameScene* create(cocos2d::Camera* camera);
-    
+
 private:
     static constexpr float aspectRatio = 1000.0f;
     static constexpr float cameraZ = 10.0f;

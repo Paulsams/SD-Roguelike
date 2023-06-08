@@ -17,7 +17,10 @@ Player* Player::create(World* world)
     return nullptr;
 }
 
-void Player::update() { }
+void Player::update()
+{
+    
+}
 
 bool Player::init()
 {
@@ -56,11 +59,13 @@ bool Player::init()
 
 Player::Player(World* world)
     : BaseEntity(world)
-    , m_moveDelegate(CC_CALLBACK_1(Player::move, this))
+    , m_moveDelegate(CC_CALLBACK_1(Player::onMove, this))
+    , m_interactedDelegate(CC_CALLBACK_0(Player::onInteracted, this))
     , m_input(this)
     , m_statsContainer(std::make_shared<StatsContainer>())
 {
     m_input.moved += m_moveDelegate;
+    m_input.interacted += m_interactedDelegate;
 
     const auto playerHpStat = std::make_shared<StatWithModificators>(100.0f);
     playerHpStat->addModificator(std::make_shared<BoundsModificator>(MinMax(0, 100.0f)));
@@ -72,14 +77,31 @@ Player::Player(World* world)
 
     m_statsContainer->add(Level, std::make_shared<StatWithModificators>(0));
 
+    m_interactedVisitor = FunctionVisitorEntitiesBuilder<void>().setItem([this](BaseItem* item)
+    {
+        item->pickUp(this);
+        const std::vector<BaseItem*> items = m_items.getCollection();
+        m_items.setAt(std::ranges::find(items, nullptr) - items.begin(), item);
+    }).build();
+
     for (int i = 0; i < 12; ++i)
         m_items.push_back(nullptr);
 }
 
-void Player::move(Direction direction)
+void Player::onMove(Direction direction)
 {
-    Vec2Int newPosition = getPositionInWorld() + direction.getVector();
+    Vec2Int newPosition = getPositionOnMap() + direction.getVector();
     TileType tileType = getWorld()->getTileType(newPosition);
     if (tileType == TileType::GROUND)
-        setPositionInWorld(newPosition);
+        setPositionOnMap(newPosition);
+}
+
+void Player::onInteracted()
+{
+    for (BaseEntity* entity : getWorld()->getEntitiesFromCell(getPositionOnMap()))
+    {
+        entity->acceptVisit(m_interactedVisitor);
+        if (m_interactedVisitor->isCalled())
+            break;
+    }
 }

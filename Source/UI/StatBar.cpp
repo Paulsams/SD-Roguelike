@@ -4,7 +4,6 @@
 
 #include "2d/CCLabel.h"
 #include "Stats/Modificators/BoundsModificator.h"
-#include "UI/Colors.h"
 #include "ui/UILoadingBar.h"
 
 using namespace cocos2d;

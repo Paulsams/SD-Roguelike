@@ -18,7 +18,7 @@ private:
     const FunctionHandler<IStat::oldValue, IStat::currentValue, IStat::changedValue> m_changeStatDelegate;
 
     explicit StatBar(std::shared_ptr<IStat> stat);
-    ~StatBar() override;
+    ~StatBar();
 
     std::string getTextView() const;
 

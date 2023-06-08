@@ -17,10 +17,14 @@ void PlayerInput::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event) con
     
     switch (keyCode)
     {
-    case EventKeyboard::KeyCode::KEY_X:
+    case EventKeyboard::KeyCode::KEY_SPACE:
         attacked();
         break;
-    default: ;
+    case EventKeyboard::KeyCode::KEY_E:
+        interacted();
+        break;
+    default:
+        break;
     }
 }
 

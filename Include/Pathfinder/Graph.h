@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Node.h"
 #include <functional>
 
@@ -25,7 +26,7 @@ namespace pathfinder {
 
     public:
 
-        Graph(cocos2d::Size worldSize, uint32_t* tiles, std::function<TILE_TYPE(uint32_t)> fToTileType) : worldSize(worldSize) {
+        Graph(cocos2d::Size worldSize, uint32_t* tiles, std::function<TileType (int)> fToTileType) : worldSize(worldSize) {
             int totalSize = worldSize.width * worldSize.height;
             nodes.resize(totalSize);
             visited.resize(totalSize, false);
@@ -34,11 +35,11 @@ namespace pathfinder {
 
         }
 
-        void initNodes(uint32_t* tiles, const std::function<TILE_TYPE(uint32_t)>& fToTileType) {
+        void initNodes(uint32_t* tiles, const std::function<TileType (int)>& fToTileType) {
             int width = worldSize.width, height = worldSize.height;
             for(int x = 0; x < width; ++x) {
                 for (int y = 0; y < height; ++y) {
-                    Node curNode(cocos2d::Point(x, y), fToTileType(tiles[y * width + x]));
+                    Node curNode(Vec2Int(x, y), fToTileType(tiles[(height - 1 - y) * width + x/*y * width + x*/]));
                     for (auto[yy, xx]: direction) {
                         if (y > 0 && y < height - 1 && x > 0 && x < width - 1)
                             curNode.neighbors.push_back(&nodes[(y - yy) * width + (x + xx)]);

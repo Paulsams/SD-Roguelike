@@ -1,12 +1,12 @@
+#include <utility>
+
 #include "Stats/Modificators/BoundsModificator.h"
 #include "Mobs/Mob.h"
 
-#include <utility>
-
+#include "Stats/Modificators/StatWithModificators.h"
 
 namespace mob
 {
-
     Mob::Mob(World* world, const MobInfo& info):
         BaseEntity(world),
         m_strategy(info.strategy()),
@@ -14,7 +14,7 @@ namespace mob
         m_statsContainer(std::make_shared<StatsContainer>())
     {
         const auto playerHpStat = std::make_shared<StatWithModificators>(info.health);
-        playerHpStat->addModificator(std::make_shared<BoundsModificator>(MinMax(0, 100.0f)));
+        playerHpStat->addModificator(std::make_shared<BoundsModificator>(MinMax(0, info.health)));
         m_statsContainer->add(Health, playerHpStat);
     }
 

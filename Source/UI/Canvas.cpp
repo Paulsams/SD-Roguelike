@@ -3,14 +3,15 @@
 #include <utility>
 
 #include "cocos2d.h"
-#include "UI/Colors.h"
 #include "UI/StepCounter.h"
 #include "GameLoop/GameLoop.h"
 #include "Stats/StatsContainer.h"
 #include "UI/InventoryView.h"
+#include "UI/PlayerItemsOnUI.h"
 #include "UI/StatBar.h"
 #include "ui/UIHBox.h"
 #include "ui/UIImageView.h"
+#include "ui/UIRelativeBox.h"
 #include "ui/UIVBox.h"
 
 using namespace cocos2d;
@@ -31,19 +32,19 @@ Canvas* Canvas::create(World* world, Player* player, std::shared_ptr<GameLoop> g
 
 bool Canvas::init()
 {
-    const Size contentSize = Director::getInstance()->getWinSize();
-    setContentSize(contentSize);
+    const Size winSize = Director::getInstance()->getWinSize();
+    setContentSize(winSize);
 
-    const auto box = VBox::create({widthRightPanel, contentSize.height});
-    box->setPosition({contentSize.width - widthRightPanel, 0.0f});
-    box->setBackGroundColorType(Layout::BackGroundColorType::SOLID);
-    box->setBackGroundColor(Colors::background);
-    this->addChild(box);
+    const auto rightBox = VBox::create({widthRightPanel, winSize.height});
+    rightBox->setPosition({winSize.width - widthRightPanel, 0.0f});
+    rightBox->setBackGroundColorType(Layout::BackGroundColorType::SOLID);
+    rightBox->setBackGroundColor(Colors::background);
+    this->addChild(rightBox);
 
     const auto playerBox = HBox::create({widthRightPanel, 100.0f});
     playerBox->setBackGroundColorType(Layout::BackGroundColorType::SOLID);
     playerBox->setBackGroundColor(Colors::midground);
-    box->addChild(playerBox);
+    rightBox->addChild(playerBox);
 
     const auto playerIconLayout = Layout::create();
     playerIconLayout->setContentSize({playerBox->getContentSize().height, playerBox->getContentSize().height});
@@ -66,8 +67,8 @@ bool Canvas::init()
     playerStatsBox->setBackGroundColor(Colors::backgroundForStatBar);
     playerBox->addChild(playerStatsBox);
     playerBox->addChild(playerIconLayout);
-    
-    const auto marginFromBar = Margin(0.0f, 10.0f, 10.0f, 10.0f);
+
+    auto marginFromBar = Margin(0.0f, 10.0f, 10.0f, 10.0f);
     const auto marginSizeOffset = Size(marginFromBar.left + marginFromBar.right,
                                        marginFromBar.top + marginFromBar.bottom);
     LinearLayoutParameter* marginParameter = LinearLayoutParameter::create();
@@ -98,12 +99,65 @@ bool Canvas::init()
     
     const auto stepCounter = StepCounter::create(m_gameLoop->currentStep);
     stepCounter->setContentSize({widthRightPanel, 30.0f});
-    box->addChild(stepCounter);
+    rightBox->addChild(stepCounter);
 
-    const auto inventoryView = InventoryView::create(m_player->getInventory(),
-        {widthRightPanel - 10.0f, 420.0f} , {10.0f, 10.0f});
+    const Size cellInventorySize = {90.0f, 90.0f};
+    const Size padding = {10.0f, 10.0f};
+
+    auto inventoryView = InventoryView<BaseItem>::create(m_player->getInventory(),
+        {SPELL, WEAPON, ACCESSORY}, Paths::toAllInventoryCell, cellInventorySize, 3, padding);
     inventoryView->setLayoutParameter(marginParameter);
-    box->addChild(inventoryView);
+    rightBox->addChild(inventoryView);
+
+    const float cellMargin = 5.0f;
+    Margin horizontalMargin = {cellMargin, 0.0f, cellMargin, 0.0f};
+    Margin verticalMargin = {0.0f, cellMargin, 0.0f, cellMargin};
+
+    const auto backpackBox = RelativeBox::create({winSize.width - widthRightPanel, heightBackpack});
+    backpackBox->setPosition(Vec2::ZERO);
+    backpackBox->setBackGroundColorType(Layout::BackGroundColorType::SOLID);
+    backpackBox->setBackGroundColor(Colors::background);
+    this->addChild(backpackBox);
+
+    const auto leftParameter = RelativeLayoutParameter::create();
+    leftParameter->setAlign(RelativeLayoutParameter::RelativeAlign::PARENT_LEFT_CENTER_VERTICAL);
+    leftParameter->setMargin({horizontalMargin.left, verticalMargin.top,
+                                horizontalMargin.right, verticalMargin.bottom});
+    
+    Backpack& backpack = m_player->getBackpack();
+    auto backpackSpellsView = InventoryView<Weapon>::create(backpack.getSpells(),
+        {SPELL}, Paths::toSpellInventoryCell, cellInventorySize, backpack.getSpells().size(), padding);
+    backpackSpellsView->setLayoutParameter(leftParameter);
+    backpackBox->addChild(backpackSpellsView);
+
+    const auto horizontalParameter = LinearLayoutParameter::create();
+    horizontalParameter->setGravity(LinearLayoutParameter::LinearGravity::CENTER_HORIZONTAL);
+    horizontalParameter->setMargin(horizontalMargin);
+
+    auto backpackWeaponView = InventoryView<Weapon>::create(backpack.getWeapons(),
+    {WEAPON}, Paths::toWeaponInventoryCell, cellInventorySize, 3, padding);
+    backpackWeaponView->setLayoutParameter(horizontalParameter);
+    
+    auto backpackAccessoriesView = InventoryView<Accessory>::create(backpack.getAccessories(),
+        {ACCESSORY}, Paths::toAccessoryInventoryCell, cellInventorySize,
+        backpack.getAccessories().size(), padding);
+    backpackAccessoriesView->setLayoutParameter(horizontalParameter);
+
+    const auto rightParameter = RelativeLayoutParameter::create();
+    rightParameter->setAlign(RelativeLayoutParameter::RelativeAlign::PARENT_RIGHT_CENTER_VERTICAL);
+    rightParameter->setMargin(verticalMargin);
+
+    const Size sizeForWeaponWithAccessories = {backpackWeaponView->getContentSize().width +
+        backpackAccessoriesView->getContentSize().width + cellMargin * 3, backpackBox->getContentSize().height - cellMargin * 2};
+    const auto backpackWeaponWithAccessoriesBox = HBox::create(sizeForWeaponWithAccessories);
+    backpackWeaponWithAccessoriesBox->setLayoutParameter(rightParameter);
+    
+    backpackWeaponWithAccessoriesBox->addChild(backpackWeaponView);
+    backpackWeaponWithAccessoriesBox->addChild(backpackAccessoriesView);
+    
+    backpackBox->addChild(backpackWeaponWithAccessoriesBox);
+    
+    m_allItemsPlayer = std::make_shared<PlayerItemsOnUI>(inventoryView, backpackWeaponView, backpackAccessoriesView, backpackSpellsView);
 
     return true;
 }

@@ -2,10 +2,10 @@
 
 #include "WorldSystem/World.h"
 
-void BaseEntity::setPositionInWorld(Vec2Int position)
+void BaseEntity::setPositionOnMap(Vec2Int position)
 {
     Vec2Int oldPosition = position;
     m_position = position;
-    setPosition(m_world->convertToWorldSpace(position));
+    setPosition(m_world->convertToMapSpace(position));
     moved(oldPosition, m_position);
 }

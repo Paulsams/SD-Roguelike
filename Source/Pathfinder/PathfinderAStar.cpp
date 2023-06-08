@@ -28,7 +28,7 @@ namespace pathfinder {
             graph.setVisitedNode(curNode);
 
             for(auto neighbor: curNode->neighbors) {
-                if (!graph.getVisitedNode(neighbor) && neighbor->tile != TILE_TYPE::OBSTACLE) {
+                if (!graph.getVisitedNode(neighbor) && neighbor->tile != TileType::OBSTACLE) {
                     queue.push(neighbor);
                 }
 
@@ -45,7 +45,7 @@ namespace pathfinder {
         std::vector<Vec2Int> path;
         path.push_back(end->pos);
         Node* parent = nullptr;
-        while (!(parent = graph.getParentNode(end))) {
+        while (parent != graph.getParentNode(end)) {
             path.push_back(parent->pos);
             end = parent;
         }

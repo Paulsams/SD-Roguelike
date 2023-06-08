@@ -32,19 +32,19 @@ public:
         return *this;
     }
 
-    RandomGeneratorWorldBuilder& setHeight(int64_t height)
+    RandomGeneratorWorldBuilder& setHeight(int height)
     {
         m_height = height;
         return *this;
     }
 
-    RandomGeneratorWorldBuilder& setWidth(int64_t width)
+    RandomGeneratorWorldBuilder& setWidth(int width)
     {
         m_width = width;
         return *this;
     }
 
-    RandomGeneratorWorldBuilder& setIterCount(int64_t iterCount)
+    RandomGeneratorWorldBuilder& setIterCount(int iterCount)
     {
         m_iterCount = iterCount;
         return *this;
@@ -90,20 +90,20 @@ private:
     struct Container
     {
         Container() = default;
-        Container(Vec2Int pos, int64_t w, int64_t h);
-        Container(int64_t x, int64_t y, int64_t w, int64_t h);
+        Container(Vec2Int pos, int w, int h);
+        Container(int x, int y, int w, int h);
 
         Vec2Int m_pos;
         Vec2Int m_center;
-        int64_t m_width = 0;
-        int64_t m_height = 0;
+        int m_width = 0;
+        int m_height = 0;
     };
 
     struct Room
     {
         explicit Room(const Container& cont);
 
-        static constexpr long long s_partDiv = 4;
+        static constexpr int s_partDiv = 4;
 
         Container m_cont;
 
@@ -138,16 +138,13 @@ private:
     size_t getFarthestRoom(const std::vector<Room>& in, const std::vector<size_t>& base) const;
 
     /// drawing
-    void drawBackground(TilemapLayer* layer) const;
-    void drawRooms(TilemapLayer* layer, const std::shared_ptr<Tree>& tree) const;
-    void drawCorridors(TilemapLayer* layer, const std::shared_ptr<Tree>& tree) const;
-
-    void drawGround(TilemapLayer* layer, const std::vector<Container>& containers) const;
+    void drawWalls(TilemapLayer* layer) const;
+    void drawGround(TilemapLayer* wallsLayer, TilemapLayer* groundLayer, const std::vector<Container>& ground) const;
 
     [[nodiscard]] std::vector<Room> generateRooms(const std::shared_ptr<Tree>& tree) const;
     [[nodiscard]] std::vector<Container> generateCorridors(const std::shared_ptr<Tree>& tree) const;
 
-    void fillRoomVec2int(Room& room, std::vector<Vec2Int>& mobs, int64_t counter, int64_t tryCounter) const;
+    void fillRoomVec2int(Room& room, std::vector<Vec2Int>& mobs, int counter, int tryCounter) const;
 
     void fillSpawnRoom(Room& room) const;
     void fillBossRooms(std::vector<Room>& rooms, size_t spawnRoom) const;
@@ -171,7 +168,7 @@ private:
     double m_normalRoomRatio = 0.7;
     double m_treasureRoomRatio = 0.05;
 
-    double m_minRoomFillBound = 0.05;
+    double m_minRoomFillBound = 0.025;
     double m_maxRoomFillBound = 0.2;
 
     double m_normalRoomTreasureMean = 0.5;
@@ -179,7 +176,7 @@ private:
     double m_bossRoomTreasureMean = 3;
     double m_treasureRoomTreasureMean = 5;
 
-    double m_normalGroundRatio = 0.7;
+    double m_normalTileRatio = 0.7;
 
     static constexpr int m_meanCorridorWidth = 3;
     static constexpr int m_sigmaCorridorWidth = 1;
@@ -193,10 +190,10 @@ private:
 
     std::shared_ptr<LevelTileConfig> m_config;
 
-    int64_t m_height = 0;
-    int64_t m_width = 0;
+    int m_height = 0;
+    int m_width = 0;
 
-    int64_t m_iterCount = 0;
+    int m_iterCount = 0;
 
     bool m_discardByRatio = true;
 };

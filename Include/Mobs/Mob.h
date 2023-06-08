@@ -1,14 +1,10 @@
 #pragma once
 #include <memory>
 
-#include "Stats/Modificators/StatWithModificators.h"
-#include "Mobs/Behaviour/IMobBehaviour.h"
-#include "Mobs/Strategy/IMobStrategy.h"
-#include "Mobs/Factory/MobInfo.h"
-#include "ItemsSystem/AttackHandler.h"
+#include "Factory/MobInfo.h"
 #include "GameLoop/IUpdatable.h"
-#include "WorldSystem/World.h"
-#include "Stats/IHaveStats.h"
+#include "WorldSystem/BaseEntity.h"
+#include "WorldSystem/IVisitorEntities.h"
 
 namespace mob {
 
@@ -22,8 +18,10 @@ namespace mob {
         void update() override;
         void changeBehaviour(std::shared_ptr<IMobBehaviour>);
         const std::shared_ptr<IStatsContainer> getStats() const override;
+        
+        void acceptVisit(std::shared_ptr<IVisitorEntities> visitor) override { visitor->visitMob(this); }
+
     private:
-        World* m_world;
         std::shared_ptr<IMobStrategy> m_strategy;
         std::shared_ptr<IMobBehaviour> m_behaviour;
         std::shared_ptr<StatsContainer> m_statsContainer;

@@ -71,10 +71,9 @@ list(APPEND GAME_SOURCE
     Source/Mobs/Strategy/Normal.cpp
     Source/Mobs/Behaviour/AggressiveBehaviour.cpp
 
-    Source/WorldSystem/BaseEntity.cpp
-
     Source/Pathfinder/PathfinderAStar.cpp
 
+    Source/WorldSystem/BaseEntity.cpp
     Source/WorldSystem/World.cpp
     Source/WorldSystem/ReadFileWorldBuilder.cpp
     Source/WorldSystem/RandomGeneratorWorldBuilder.cpp
@@ -82,11 +81,13 @@ list(APPEND GAME_SOURCE
     Source/Stats/StatsContainer.cpp
 
     Source/Stats/Modificators/StatWithModificators.cpp
+    
+    Source/Utils/Common.cpp
 
     Source/UI/Canvas.cpp
-    Source/UI/InventoryView.cpp
-    Source/UI/StepCounter.cpp
+    Source/UI/MenuItemForInventory.cpp
     Source/UI/StatBar.cpp
+    Source/UI/StepCounter.cpp
     )
 
 list(APPEND GAME_HEADER
@@ -103,13 +104,19 @@ list(APPEND GAME_HEADER
     Include/Player/PlayerInput.h
 
     Include/ItemsSystem/Accessory.h
-    Include/ItemsSystem/AttackData.h
+    Include/ItemsSystem/AttackWithDamage.h
     Include/ItemsSystem/AttackHandler.h
-    Include/ItemsSystem/AttackSearchFromDFS.h
-    Include/ItemsSystem/IAttackSearch.h
-    Include/ItemsSystem/IItem.h
+    Include/ItemsSystem/BaseItem.h
     Include/ItemsSystem/IVisualAttack.h
     Include/ItemsSystem/Weapon.h
+    
+    Include/ItemsSystem/AttackSearch/AttackSearchFromDFS.h
+    Include/ItemsSystem/AttackSearch/IAttackSearch.h
+    
+    Include/ItemsSystem/DealingDamage/DamageFromFunction.h
+    Include/ItemsSystem/DealingDamage/DelegateDamage.h
+    Include/ItemsSystem/DealingDamage/IDealingDamage.h
+    Include/ItemsSystem/DealingDamage/SimpleDamage.h
 
     Include/Mobs/Mob.h
     Include/Mobs/Strategy/BaseStateStrategy.h
@@ -133,11 +140,6 @@ list(APPEND GAME_HEADER
     Include/Pathfinder/PathfinderAStar.h
     Include/Pathfinder/IPathfindingAlgorithm.h
 
-    Include/WorldSystem/BaseEntity.h
-    Include/WorldSystem/World.h
-    Include/WorldSystem/ReadFileWorldBuilder.h
-    Include/WorldSystem/RandomGeneratorWorldBuilder.h
-
     Include/Stats/IHaveStats.h
     Include/Stats/IStat.h
     Include/Stats/IStatsContainer.h
@@ -148,14 +150,24 @@ list(APPEND GAME_HEADER
     Include/Stats/Modificators/StatWithModificators.h
 
     Include/UI/Canvas.h
-    Include/UI/Colors.h
     Include/UI/InventoryView.h
-    Include/UI/StepCounter.h
+    Include/UI/MenuItemForInventory.h
+    Include/UI/PlayerItemsOnUI.h
     Include/UI/StatBar.h
+    Include/UI/StepCounter.h
 
     Include/Utils/Direction.h
     Include/Utils/EventsSystem.h
     Include/Utils/Common.h
+    
+    Include/WorldSystem/BaseEntity.h
+    Include/WorldSystem/Chest.h
+    Include/WorldSystem/Decoration.h
+    Include/WorldSystem/FunctionVisitorEntities.h
+    Include/WorldSystem/RandomGeneratorWorldBuilder.h
+    Include/WorldSystem/ReadFileWorldBuilder.h
+    Include/WorldSystem/IVisitorEntities.h
+    Include/WorldSystem/World.h
     Include/WorldSystem/WorldTileConfig.h
     )
 
