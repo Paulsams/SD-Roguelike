@@ -1,6 +1,44 @@
 ﻿#include "WorldSystem/DamageIndicatorsSystems.h"
 
+#include <Utils/FontsTTF.h>
+
 #include "WorldSystem/World.h"
+
+DamageIndicator* DamageIndicator::create()
+{
+    auto* damageIndicator = new (std::nothrow) DamageIndicator();
+    if (damageIndicator && damageIndicator->init())
+    {
+        damageIndicator->autorelease();
+        return damageIndicator;
+    }
+    CC_SAFE_DELETE(damageIndicator);
+    return nullptr;
+}
+
+bool DamageIndicator::init()
+{
+    m_sprite = cocos2d::Sprite::create(Paths::whiteCell.first);
+    m_sprite->setTextureRect(Paths::whiteCell.second);
+    m_sprite->setAnchorPoint(cocos2d::Vec2::ZERO);
+    this->addChild(m_sprite);
+
+    m_label = cocos2d::Label::createWithTTF("", FontsTTF::onUI, 20);
+    m_label->setPosition(m_sprite->getContentSize() / 2);
+    this->addChild(m_label);
+        
+    return true;
+}
+
+void DamageIndicator::setColorAndDamage(cocos2d::Color3B color, std::optional<float> damage) const
+{
+    m_sprite->setColor(color);
+    m_label->setString(damage ? std::to_string(static_cast<int>(damage.value())) : "");
+}
+
+DamageIndicator::DamageIndicator()
+    : m_sprite(nullptr)
+    , m_label(nullptr) { }
 
 DamageIndicatorsSystems* DamageIndicatorsSystems::create(World* world)
 {
@@ -14,20 +52,21 @@ DamageIndicatorsSystems* DamageIndicatorsSystems::create(World* world)
     return nullptr;
 }
 
-void DamageIndicatorsSystems::draw(Vec2Int position)
+void DamageIndicatorsSystems::draw(Vec2Int position, cocos2d::Color3B color, std::optional<float> damage)
 {
-    cocos2d::Sprite* sprite = m_indicators.get();
-    sprite->setVisible(true);
-    sprite->setPosition(m_world->convertToMapSpace(position));
-    m_showedObjects.push_back(sprite);
+    DamageIndicator* indicator = m_indicators.get();
+    indicator->setVisible(true);
+    indicator->setPosition(m_world->convertToMapSpace(position));
+    indicator->setColorAndDamage(color, damage);
+    m_showedObjects.push_back(indicator);
 }
 
 void DamageIndicatorsSystems::reset()
 {
-    for (cocos2d::Sprite* obj : m_showedObjects)
+    for (DamageIndicator* indicator : m_showedObjects)
     {
-        m_indicators.release(obj);
-        obj->setVisible(false);
+        m_indicators.release(indicator);
+        indicator->setVisible(false);
     }
     m_showedObjects.clear();
 }
@@ -40,12 +79,8 @@ void DamageIndicatorsSystems::update()
 DamageIndicatorsSystems::DamageIndicatorsSystems(World* world)
     : m_indicators([this]()
         {
-            cocos2d::Sprite* sprite = cocos2d::Sprite::create(Paths::whiteCell.first);
-            sprite->setTextureRect(Paths::whiteCell.second);
-            sprite->setAnchorPoint(cocos2d::Vec2::ZERO);
-            sprite->setColor(cocos2d::Color3B::RED);
-            this->addChild(sprite);
-            
-            return sprite;
+            DamageIndicator* damageIndicator = DamageIndicator::create();
+            this->addChild(damageIndicator);
+            return damageIndicator;
         })
     , m_world(world) { }

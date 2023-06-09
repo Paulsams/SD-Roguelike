@@ -2,9 +2,9 @@
 #include <memory>
 #include <utility>
 
+#include "Damage.h"
 #include "IVisualAttack.h"
 #include "AttackSearch/IAttackSearch.h"
-#include "DealingDamage/IDealingDamage.h"
 #include "Pathfinder/Node.h"
 #include "WorldSystem/FunctionVisitorEntities.h"
 
@@ -14,7 +14,7 @@ struct AttackInfo
     using PossibleAttackFromEntity = std::shared_ptr<FunctionVisitorEntities<bool>>;
     
     AttackInfo(const PossibleAttackDelegate& possibleAttack,
-        const PossibleAttackFromEntity& possibleAttackFromEntity,
+        PossibleAttackFromEntity possibleAttackFromEntity,
         std::shared_ptr<IVisualAttack> visualAttack, std::shared_ptr<IAttackSearch> attackSearch)
     : m_possibleAttack(possibleAttack)
     , m_possibleAttackFromEntity(possibleAttackFromEntity)
@@ -36,11 +36,15 @@ private:
 
 struct AttackWithDamage
 {
-    AttackWithDamage(std::shared_ptr<AttackInfo> attackInfo, std::shared_ptr<IDealingDamage> dealingDamage)
+    AttackWithDamage(std::shared_ptr<AttackInfo> attackInfo, std::shared_ptr<Damage> damage)
         : m_attackInfo(std::move(attackInfo))
-        , m_dealingDamage(std::move(dealingDamage)) { }
+        , m_damage(damage) { }
+
+    AttackWithDamage(std::shared_ptr<AttackInfo> attackInfo, Damage&& damage)
+        : m_attackInfo(std::move(attackInfo))
+        , m_damage(std::make_shared<Damage>(damage)) { }
     
-    std::shared_ptr<IDealingDamage> getDealingDamage() const { return m_dealingDamage; }
+    std::shared_ptr<const Damage> getDamage() const { return m_damage; }
     bool isPossibleAttack(TileType tileType) const { return m_attackInfo->isPossibleAttack(tileType); }
     bool isPossibleAttackFromEntity(BaseEntity* entity) const { return m_attackInfo->isPossibleAttackFromEntity(entity); }
     std::shared_ptr<IVisualAttack> getVisual() const { return m_attackInfo->getVisual(); } 
@@ -48,5 +52,5 @@ struct AttackWithDamage
 
 private:
     std::shared_ptr<AttackInfo> m_attackInfo;
-    std::shared_ptr<IDealingDamage> m_dealingDamage;
+    std::shared_ptr<Damage> m_damage;
 };

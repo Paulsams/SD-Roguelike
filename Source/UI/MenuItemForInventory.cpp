@@ -26,7 +26,7 @@ void MenuItemForInventory::setItem(BaseItem* item)
     m_itemIcon->setVisible(isValidItem);
     if (isValidItem)
         m_itemIcon->setTextureRect(item->getRectSpriteInTileset());
-    m_backgroundItemIcon->setOpacity(isValidItem ? 50 : 128);
+    m_backgroundItemIcon->setOpacity(isValidItem ? 40 : 128);
 }
 
 void MenuItemForInventory::choice()
@@ -69,15 +69,14 @@ bool MenuItemForInventory::initWithSprite(const SpriteWithRect& sprite)
     m_backgroundItemIcon->setOpacity(128);
     m_backgroundItemIcon->setColor(Color3B::GRAY);
     m_backgroundItemIcon->setContentSize(getContentSize() * 0.7f);
-    m_backgroundItemIcon->setPosition(m_backgroundItemIcon->getContentSize() / 4.0f);
-    m_backgroundItemIcon->setAnchorPoint(Vec2::ZERO);
+    m_backgroundItemIcon->setPosition(getContentSize() / 2);
     this->addChild(m_backgroundItemIcon);
 
     m_itemIcon = ImageView::create(Paths::toUITileset);
     m_itemIcon->setVisible(false);
-    m_itemIcon->setContentSize(getContentSize());
+    m_itemIcon->setContentSize(getContentSize() * 0.8f);
+    m_itemIcon->setPosition(getContentSize() / 2);
     m_itemIcon->ignoreContentAdaptWithSize(false);
-    m_itemIcon->setAnchorPoint(Vec2::ZERO);
     this->addChild(m_itemIcon);
         
     return true;

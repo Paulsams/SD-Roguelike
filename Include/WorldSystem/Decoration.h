@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <Stats/Modificators/BoundsModificator.h>
+
 #include "2d/CCSprite.h"
 #include "Stats/Modificators/StatWithModificators.h"
 #include "WorldSystem/BaseEntity.h"
@@ -38,11 +40,14 @@ private:
         : BaseEntity(world)
         , m_stats(std::make_shared<StatsContainer>())
     {
-        std::shared_ptr<StatWithModificators> healthStat = std::make_shared<StatWithModificators>(1.0f);
+        static constexpr float health = 1.0f;
+        
+        std::shared_ptr<StatWithModificators> healthStat = std::make_shared<StatWithModificators>(health);
+        healthStat->addModificator(std::make_shared<BoundsModificator>(MinMax(0, health)));
         m_stats->add(Health, healthStat);
         healthStat->changed += [this](IStat::oldValue, IStat::currentValue current, IStat::changedValue)
         {
-            if (current == 0.0f)
+            if (current <= 0.0f)
                 destroyEntity();
         };
     }

@@ -11,10 +11,6 @@ namespace mob {
     class IMobStrategy;
 
     class Mob : public IUpdatable, public BaseEntity {
-        Mob() = delete;
-    public:
-        Mob(World* world, const MobInfo& info);
-
         void update() override;
         void changeBehaviour(std::shared_ptr<IMobBehaviour>);
         const std::shared_ptr<IStatsContainer> getStats() const override;
@@ -22,9 +18,11 @@ namespace mob {
         void acceptVisit(std::shared_ptr<IVisitorEntities> visitor) override { visitor->visitMob(this); }
 
     private:
+        Mob(World* world, const MobInfo& info);
+        
         std::shared_ptr<IMobStrategy> m_strategy;
         std::shared_ptr<IMobBehaviour> m_behaviour;
-        std::shared_ptr<StatsContainer> m_statsContainer;
+        std::shared_ptr<StatsContainer> m_stats;
     };
 
 }

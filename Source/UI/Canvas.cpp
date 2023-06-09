@@ -39,33 +39,11 @@ bool Canvas::init()
     rightBox->setBackGroundColorType(Layout::BackGroundColorType::SOLID);
     rightBox->setBackGroundColor(Colors::background);
     this->addChild(rightBox);
-
-    const auto playerBox = HBox::create({widthRightPanel, 100.0f});
-    playerBox->setBackGroundColorType(Layout::BackGroundColorType::SOLID);
-    playerBox->setBackGroundColor(Colors::midground);
-    rightBox->addChild(playerBox);
-
-    const auto playerIconLayout = Layout::create();
-    playerIconLayout->setContentSize({playerBox->getContentSize().height, playerBox->getContentSize().height});
-
-    const auto playerIconFrame = ImageView::create("IconFrame.png");
-    playerIconFrame->ignoreContentAdaptWithSize(false);
-    playerIconFrame->setContentSize(playerIconLayout->getContentSize());
-    playerIconFrame->setAnchorPoint(Vec2::ZERO);
-    playerIconLayout->addChild(playerIconFrame);
-
-    const auto playerIcon = ImageView::create("Player.png");
-    playerIcon->ignoreContentAdaptWithSize(false);
-    playerIcon->setContentSize(playerIconLayout->getContentSize());
-    playerIcon->setAnchorPoint(Vec2::ZERO);
-    playerIconLayout->addChild(playerIcon);
     
-    const auto playerStatsBox = VBox::create({widthRightPanel - playerIconLayout->getContentSize().width,
-        playerBox->getContentSize().height});
+    const auto playerStatsBox = VBox::create({widthRightPanel, 120.0f});
     playerStatsBox->setBackGroundColorType(Layout::BackGroundColorType::SOLID);
     playerStatsBox->setBackGroundColor(Colors::backgroundForStatBar);
-    playerBox->addChild(playerStatsBox);
-    playerBox->addChild(playerIconLayout);
+    rightBox->addChild(playerStatsBox);
 
     auto marginFromBar = Margin(0.0f, 10.0f, 10.0f, 10.0f);
     const auto marginSizeOffset = Size(marginFromBar.left + marginFromBar.right,
@@ -80,8 +58,8 @@ bool Canvas::init()
     if (playerStats->tryGet(Health, playerHpStat))
     {
         const auto playerHp = StatBar::create(marginParameter,
-            Size(playerStatsBox->getContentSize().width - 40.0f, 50.0f) - marginSizeOffset,
-            "health-bar.png",
+            Size(playerStatsBox->getContentSize().width - 10.0f, playerStatsBox->getContentSize().height / 2) - marginSizeOffset,
+            "HealthBar.png",
             playerHpStat);
         playerStatsBox->addChild(playerHp);
     }
@@ -90,8 +68,8 @@ bool Canvas::init()
     if (playerStats->tryGet(Mana, playerManaStat))
     {
         const auto playerMana = StatBar::create(marginParameter,
-            Size(playerStatsBox->getContentSize().width - 40.0f, 50.0f) - marginSizeOffset,
-            "health-bar.png",
+            Size(playerStatsBox->getContentSize().width - 10.0f, playerStatsBox->getContentSize().height / 2) - marginSizeOffset,
+            "ManaBar.png",
             playerManaStat);
         playerStatsBox->addChild(playerMana);
     }

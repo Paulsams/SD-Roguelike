@@ -18,11 +18,6 @@ Player* Player::create(World* world)
     return nullptr;
 }
 
-void Player::update()
-{
-    
-}
-
 bool Player::init()
 {
     static const Size size = {32, 32};
@@ -56,6 +51,18 @@ bool Player::init()
     Node::addChild(m_helmet, 2);
 
     return true;
+}
+
+void Player::update()
+{
+    if (m_choicedDirection.has_value())
+    {
+        DamageIndicatorsSystems* damageIndicators = getWorld()->getDamageIndicatorsForPlayer();
+        if (const Weapon* currentWeapon = m_backpack.getCurrentWeapon())
+            currentWeapon->drawIndicators(damageIndicators, getPositionOnMap(), m_choicedDirection.value());
+    }
+
+    m_statsContainer->get(Mana)->changeValueBy(1);
 }
 
 Player::Player(World* world)
@@ -96,13 +103,7 @@ void Player::onMove(Direction direction)
         Vec2Int newPosition = getPositionOnMap() + direction.getVector();
         TileType tileType = getWorld()->getTileType(newPosition);
         if (tileType == TileType::GROUND)
-        {
             setPositionOnMap(newPosition);
-            DamageIndicatorsSystems* damageIndicators = getWorld()->getDamageIndicatorsForPlayer();
-            if (const Weapon* currentWeapon = m_backpack.getCurrentWeapon())
-                currentWeapon->drawIndicators(damageIndicators, getPositionOnMap(), direction);
-        }
-
         return;
     }
 
@@ -121,6 +122,7 @@ void Player::onAttacked()
         return;
     
     currentWeapon->attack(getPositionOnMap(), m_choicedDirection.value());
+    attacked();
 }
 
 void Player::onInteracted()

@@ -3,9 +3,8 @@
 
 #include "ItemsSystem/Accessory.h"
 #include "ItemsSystem/Weapon.h"
-#include "ItemsSystem/DealingDamage/DamageFromFunction.h"
 
-class Backpack
+class Backpack : public IDamageModificator
 {
     // Я не придумал, как это решать. Если я сделаю InverntoryView шаблонным, то потом начинаются проблемы
     // с тем, чтобы передать InverntoryView куда-либо имея в шаблоне не конретный Item,
@@ -68,10 +67,9 @@ public:
     {
         return m_weapon.get()[0];
     }
-
-    float getDamage(const BaseEntity* otherEntity) const
+    
+    float modify(float damage, BaseEntity* entity) const override
     {
-        float damage = m_weapon.get()[0]->getDamage(otherEntity);
         return damage;
     }
 
@@ -80,15 +78,11 @@ private:
         ObservableVector<Weapon*>::newValue newValue)
     {
         if (oldValue)
-            oldValue->setDealingDamage(nullptr);
+            oldValue->setModificatorDamage(nullptr);
         if (newValue)
-            newValue->setDealingDamage(std::make_shared<DamageFromFunction>([this](const BaseEntity* otherEntity)
-            {
-                float damage = m_weapon.get()[0]->getDamage(otherEntity);
-                return damage;
-            }));
+            newValue->setModificatorDamage(this);
     }
-    
+
     FunctionHandler<size_t, ObservableVector<Weapon*>::oldValue, ObservableVector<Weapon*>::newValue> m_changedDelegate;
     
     HandlerItems<Weapon*> m_weapon;

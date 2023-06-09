@@ -1,9 +1,7 @@
 #include "GameScene.h"
 
-#include "ItemsSystem/AttackSearch/AttackSearchFromDFS.h"
-#include "ItemsSystem/DealingDamage/SimpleDamage.h"
+#include "ItemsSystem/Attacks.h"
 #include "UI/Canvas.h"
-#include "WorldSystem/FunctionVisitorEntities.h"
 #include "WorldSystem/World.h"
 #include "WorldSystem/RandomGeneratorWorldBuilder.h"
 #include "WorldSystem/ReadFileWorldBuilder.h"
@@ -73,30 +71,15 @@ bool GameScene::init(Camera* camera)
 
     this->addChild(m_world);
 
-    AttackInfo::PossibleAttackDelegate dontHitObstacle =
-        [](TileType tileType) { return tileType == TileType::GROUND || tileType == TileType::DECORATION; };
-    
-    AttackInfo::PossibleAttackFromEntity hitMobsAndDecorations = FunctionVisitorEntitiesBuilder<bool>().
-        setMob([](mob::Mob*) { return true; }).setDecoration([](Decoration*) { return true; }).build();
-
-    const std::vector<Vec2Int> oneDistanceRange = {{1, 0}};
-
-    const auto delegateDamage = std::make_shared<DelegateDamage>();
-    const auto defaultAttackInfo = std::make_shared<AttackInfo>(dontHitObstacle, hitMobsAndDecorations,
-        nullptr, std::make_shared<AttackSearchFromDFS>());
-
-    const auto defaultAttack = AttackHandlerBuilder().addAttackData(oneDistanceRange,
-        std::make_shared<AttackWithDamage>(defaultAttackInfo, delegateDamage)).build();
-
-    Weapon* defaultWeapon = Weapon::create(m_world, World::getRectFromGid(2943), WEAPON, defaultAttack,
-        delegateDamage, std::make_shared<SimpleDamage>(1.0f));
+    Weapon* defaultWeapon = Attacks::createWeapon(m_world, Attacks::defaultWeapon);
     defaultWeapon->setPositionOnMap({3, 3});
     m_world->addEntity(defaultWeapon);
 
-    m_player = Player::create(m_world);
-    m_gameLoop->add(m_player);
+    Weapon* axe_1 = Attacks::createWeapon(m_world, Attacks::axe_1);
+    axe_1->setPositionOnMap({4, 5});
+    m_world->addEntity(axe_1);
 
-    m_world->addChild(m_player);
+    m_player = Player::create(m_world);
     m_world->addPlayer(m_player);
     m_player->setPositionOnMap(m_world->getSpawnPoint());
 
@@ -130,6 +113,11 @@ bool GameScene::init(Camera* camera)
             winSize * (1.0f + coefficientOffsetSize)));
 
         this->m_gameLoop->step();
+    };
+
+    m_player->attacked += [this]()
+    {
+        m_gameLoop->step();
     };
     
     return true;

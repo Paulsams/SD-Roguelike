@@ -11,11 +11,11 @@ namespace mob
         BaseEntity(world),
         m_strategy(info.strategy()),
         m_behaviour(info.startBehaviour()),
-        m_statsContainer(std::make_shared<StatsContainer>())
+        m_stats(std::make_shared<StatsContainer>())
     {
         const auto playerHpStat = std::make_shared<StatWithModificators>(info.health);
         playerHpStat->addModificator(std::make_shared<BoundsModificator>(MinMax(0, info.health)));
-        m_statsContainer->add(Health, playerHpStat);
+        m_stats->add(Health, playerHpStat);
     }
 
     void Mob::update() {
@@ -29,6 +29,6 @@ namespace mob
     }
 
     const std::shared_ptr<IStatsContainer> Mob::getStats() const {
-        return m_statsContainer;
+        return m_stats;
     }
 }

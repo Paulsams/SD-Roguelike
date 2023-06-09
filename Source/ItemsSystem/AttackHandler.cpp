@@ -20,9 +20,11 @@ void AttackHandler::attack(World* world, Vec2Int position, Direction direction) 
                 const bool isReachable = attack->getSearch()->isReachable(world, position, endPosition);
                 if (isPossibleAttack && isReachable && entity->getStats()->tryGet(Health, healthStat))
                 {
-                    healthStat->changeValueBy(-attack->getDealingDamage()->getDamage(entity));
+                    float damage = attack->getDamage()->get(entity);
+                    healthStat->changeValueBy(-damage);
                     if (const std::shared_ptr<IVisualAttack> visualAttack = attack->getVisual())
                         visualAttack->draw(world, endPosition);
+                    break;
                 }
             }
         }
@@ -45,11 +47,29 @@ bool AttackHandler::isPossibleAttack(World* world, Vec2Int position, Vec2Int loc
     return false;
 }
 
-void AttackHandler::drawIndicators(DamageIndicatorsSystems* indicators, Vec2Int position, Direction direction) const
+void AttackHandler::drawIndicators(World* world, DamageIndicatorsSystems* indicators,
+    Vec2Int position, Direction direction) const
 {
+    std::shared_ptr<IStat> healthStat;
+    std::optional<float> damage;
     for (auto [range, attack] : m_ranges)
     {
-        Vec2Int rotatedRange = direction.rotate(range);
-        indicators->draw(position + rotatedRange);
+        const Vec2Int endPosition = position + direction.rotate(range);
+        if (attack->isPossibleAttack(world->getTileType(endPosition)))
+        {
+            for (BaseEntity* entity : world->getEntitiesFromCell(endPosition))
+            {
+                const bool isPossibleAttack = attack->isPossibleAttackFromEntity(entity);
+                const bool isReachable = attack->getSearch()->isReachable(world, position, endPosition);
+                if (isPossibleAttack && isReachable && entity->getStats()->tryGet(Health, healthStat))
+                {
+                    damage.emplace(attack->getDamage()->get(entity));
+                    break;
+                }
+            }
+        }
+        
+        indicators->draw(endPosition, damage.has_value() ? cocos2d::Color3B::RED :cocos2d::Color3B::GREEN, damage);
+        damage.reset();
     }
 }

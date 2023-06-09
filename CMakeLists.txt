@@ -64,6 +64,7 @@ list(APPEND GAME_SOURCE
     Source/Player/PlayerInput.cpp
 
     Source/ItemsSystem/AttackHandler.cpp
+    Source/ItemsSystem/Attacks.cpp
     Source/ItemsSystem/Weapon.cpp
 
     Source/Mobs/Mob.cpp
@@ -109,17 +110,14 @@ list(APPEND GAME_HEADER
     Include/ItemsSystem/Accessory.h
     Include/ItemsSystem/AttackWithDamage.h
     Include/ItemsSystem/AttackHandler.h
+    Include/ItemsSystem/Attacks.h
     Include/ItemsSystem/BaseItem.h
+    Include/ItemsSystem/Damage.h
     Include/ItemsSystem/IVisualAttack.h
     Include/ItemsSystem/Weapon.h
     
     Include/ItemsSystem/AttackSearch/AttackSearchFromDFS.h
     Include/ItemsSystem/AttackSearch/IAttackSearch.h
-    
-    Include/ItemsSystem/DealingDamage/DamageFromFunction.h
-    Include/ItemsSystem/DealingDamage/DelegateDamage.h
-    Include/ItemsSystem/DealingDamage/IDealingDamage.h
-    Include/ItemsSystem/DealingDamage/SimpleDamage.h
 
     Include/Mobs/Mob.h
     Include/Mobs/Strategy/BaseStateStrategy.h

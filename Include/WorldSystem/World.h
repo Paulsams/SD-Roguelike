@@ -67,6 +67,8 @@ public:
 private:
     explicit World(Tilemap* tilemap);
 
+    void updateTileType(Vec2Int position) const;
+
     size_t getIndexFromVec2(Vec2Int position) const { return position.x + position.y * getSize().width; }
 
     void onEntityMoved(BaseEntity::oldPosition oldPosition, BaseEntity::newPosition newPosition);

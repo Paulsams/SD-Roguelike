@@ -88,16 +88,18 @@ void World::addEntity(BaseEntity* entity)
 
 void World::removeEntity(BaseEntity* entity)
 {
-    const Vec2Int positionInWorld = entity->getPositionOnMap();
+    const Vec2Int positionOnMap = entity->getPositionOnMap();
     entity->moved -= m_movedEntityDelegate;
     entity->deleted -= m_deletedEntityDelegate;
-    std::vector<BaseEntity*> entitiesOnCurrentCell = m_entities[getIndexFromVec2(positionInWorld)];
+    std::vector<BaseEntity*>& entitiesOnCurrentCell = m_entities[getIndexFromVec2(positionOnMap)];
     entitiesOnCurrentCell.erase(std::ranges::find(entitiesOnCurrentCell, entity));
+    updateTileType(positionOnMap);
 }
 
 void World::addPlayer(Player* player)
 {
     m_player = player;
+    this->addChild(player);
 }
 
 const Player* World::getNearestPlayer(Vec2) const
@@ -117,6 +119,7 @@ TileType World::getTileType(Vec2Int position) const
 void World::update()
 {
     m_damageIndicatorsPlayer->update();
+    m_player->update();
 }
 
 World::World(Tilemap* tilemap)
@@ -131,6 +134,27 @@ World::World(Tilemap* tilemap)
         m_tilemap->getMapSize().height * m_tilemap->getTileSize().height});
 }
 
+void World::updateTileType(Vec2Int position) const
+{
+    static std::shared_ptr<FunctionVisitorEntities<TileType>> visitor = FunctionVisitorEntitiesBuilder<TileType>().
+        setDecoration([](Decoration*){ return TileType::DECORATION; }).build();
+    
+    std::vector<BaseEntity*> entities = m_entities[getIndexFromVec2(position)];
+    TileType tileType = TileType::GROUND;
+    for (BaseEntity* entity : entities)
+    {
+        entity->acceptVisit(visitor);
+        std::optional<TileType> returnTileType = visitor->getReturnValue();
+        if (returnTileType.has_value())
+        {
+            tileType = returnTileType.value();
+            break;
+        }
+    }
+    
+    m_graph->getNodeByPos(position)->tile = tileType;;
+}
+
 void World::onEntityMoved(BaseEntity::oldPosition oldPosition, BaseEntity::newPosition newPosition)
 {
     
@@ -138,7 +162,8 @@ void World::onEntityMoved(BaseEntity::oldPosition oldPosition, BaseEntity::newPo
 
 void World::onDeletedEntity(BaseEntity* entity)
 {
-    const Vec2Int positionInWorld = entity->getPositionOnMap();
-    std::vector<BaseEntity*> entitiesOnCurrentCell = m_entities[getIndexFromVec2(positionInWorld)];
+    const Vec2Int positionOnMap = entity->getPositionOnMap();
+    std::vector<BaseEntity*>& entitiesOnCurrentCell = m_entities[getIndexFromVec2(positionOnMap)];
     entitiesOnCurrentCell.erase(std::ranges::find(entitiesOnCurrentCell, entity));
+    updateTileType(positionOnMap);
 }

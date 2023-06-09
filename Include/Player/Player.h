@@ -8,7 +8,7 @@
 #include "WorldSystem/BaseEntity.h"
 #include "WorldSystem/FunctionVisitorEntities.h"
 
-class Player : public BaseEntity, public IUpdatable
+class Player : public BaseEntity
 {
 public:
     static Player* create(World* world);
@@ -20,12 +20,14 @@ public:
 
     bool init() override;
     
-    void update() override;
-    
+    void update();
     void acceptVisit(std::shared_ptr<IVisitorEntities> visitor) override { visitor->visitPlayer(this); }
+
+    EventContainer<> attacked;
 
 private:
     Player(World* world);
+    
     void onMove(Direction direction);
     void onAttacked();
     void onInteracted();
