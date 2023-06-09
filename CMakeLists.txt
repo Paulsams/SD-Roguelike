@@ -72,6 +72,8 @@ list(APPEND GAME_SOURCE
     Source/Mobs/Strategy/StrategyWithStates.cpp
     Source/Mobs/Strategy/Normal.cpp
     Source/Mobs/Behaviour/AggressiveBehaviour.cpp
+        Source/Mobs/Behaviour/CowardlyBehaviour.cpp
+        Source/Mobs/Behaviour/PassiveBehaviour.cpp
 
     Source/Pathfinder/PathfinderAStar.cpp
 

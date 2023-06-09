@@ -4,9 +4,9 @@
 namespace mob {
 
     class CowardlyBehaviour: public IMobBehaviour {
+        std::shared_ptr<AttackHandler> m_attack;
     public:
-        void update(Mob* mob) override {
-
-        }
+        CowardlyBehaviour(std::shared_ptr<AttackHandler> attack): m_attack(attack) {}
+        void update(Mob* mob) override;
     };
 }

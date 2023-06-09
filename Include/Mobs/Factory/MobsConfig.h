@@ -3,6 +3,7 @@
 #include "Mobs/Behaviour/AggressiveBehaviour.h"
 #include "Mobs/Strategy/StrategyWithStates.h"
 #include "Mobs/Behaviour/CowardlyBehaviour.h"
+#include "Mobs/Behaviour/PassiveBehaviour.h"
 #include "Mobs/Strategy/Normal.h"
 #include "Mobs/Factory/MobInfo.h"
 #include <unordered_map>
@@ -32,20 +33,30 @@ namespace mob {
             return std::make_shared<StrategyWithStates>(std::move(stateContainer));
         };
 
-        std::function<std::shared_ptr<IMobBehaviour>()> createAggressiveBehaviour = [&] () {
+        std::function<std::shared_ptr<IMobBehaviour>()> createAggressiveBehaviour = [](){
             std::shared_ptr<AttackHandler> attack = nullptr;
             return std::make_shared<AggressiveBehaviour>(attack);
         };
+
+        std::function<std::shared_ptr<IMobBehaviour>()> createCowardlyBehaviour = [](){
+            std::shared_ptr<AttackHandler> attack = nullptr;
+            return std::make_shared<CowardlyBehaviour>(attack);
+        };
+
+        std::function<std::shared_ptr<IMobBehaviour>()> createPassiveBehaviour = [](){
+            return std::make_shared<PassiveBehaviour>();
+        };
+
     public:
         std::unordered_map<int , MobInfo> normals = {
-                {10 , MobInfo(100, createStrategyWithNormal, createAggressiveBehaviour)},
+                {10 , MobInfo(100, 10, createStrategyWithNormal, createAggressiveBehaviour)},
         };
 
         std::unordered_map<int, MobInfo> elites = {
-                {10 , MobInfo(100, createStrategyWithNormal, createAggressiveBehaviour)},
+                {10 , MobInfo(100, 5, createStrategyWithNormal, createAggressiveBehaviour)},
         };
         std::unordered_map<int, MobInfo> bosses = {
-                {10, MobInfo(100, createStrategyWithNormal, createAggressiveBehaviour)},
+                {10, MobInfo(100, 2, createStrategyWithNormal, createAggressiveBehaviour)},
         };
 
     };
