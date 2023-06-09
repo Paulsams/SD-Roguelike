@@ -172,6 +172,7 @@ void ImageView::setTextureRect(const Rect &rect)
         if (sprite)
         {
             sprite->setTextureRect(rect);
+            _imageRendererAdaptDirty = true;
         }
         else
         {

@@ -8,7 +8,8 @@
 enum class TileType {
     GROUND = 0,
     OBSTACLE = 1,
-    OUT_OF_BOUNDS = 2,
+    DECORATION = 2,
+    OUT_OF_BOUNDS = 3,
 };
 
 namespace pathfinder {

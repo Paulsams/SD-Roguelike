@@ -20,9 +20,11 @@ struct Paths
     static const std::string toIconFrame;
 
     static const SpriteWithRect toAllInventoryCell;
-    static const std::pair<std::string, cocos2d::Rect> toWeaponInventoryCell;
-    static const std::pair<std::string, cocos2d::Rect> toSpellInventoryCell;
-    static const std::pair<std::string, cocos2d::Rect> toAccessoryInventoryCell;
+    static const SpriteWithRect toWeaponInventoryCell;
+    static const SpriteWithRect toSpellInventoryCell;
+    static const SpriteWithRect toAccessoryInventoryCell;
+
+    static const SpriteWithRect whiteCell;
 };
 
 struct Colors

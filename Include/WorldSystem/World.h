@@ -1,7 +1,8 @@
 #pragma once
 
 #include "BaseEntity.h"
-#include "WorldTileConfig.h"
+#include "DamageIndicatorsSystems.h"
+#include "GameLoop/IUpdatable.h"
 #include "Pathfinder/Graph.h"
 #include "Pathfinder/IPathfindingAlgorithm.h"
 #include "Utils/Common.h"
@@ -17,19 +18,7 @@ enum EnemyType
     BOSS,
 };
 
-class TilemapConfig
-{
-public:
-    TilemapConfig(std::unordered_map<int, TileType> tiles)
-        : m_tiles(tiles) { }
-    
-    TileType getTileGround(int gid) const { return m_tiles.at(gid); }
-
-private:
-    std::unordered_map<int, TileType> m_tiles;
-};
-
-class World : public cocos2d::Node
+class World : public cocos2d::Node, public IUpdatable
 {
 public:
     static World* create(Tilemap* tilemap);
@@ -69,7 +58,12 @@ public:
         return m_pathfinding->findPath(*m_graph, m_graph->getNodeByPos(start),
             m_graph->getNodeByPos(finish));
     }
+    
+    void update() override;
 
+    DamageIndicatorsSystems* getDamageIndicatorsForPlayer() const { return m_damageIndicatorsPlayer; }
+    DamageIndicatorsSystems* getDamageIndicatorsForEnemies() const { return m_damageIndicatorsEnemies; }
+    
 private:
     explicit World(Tilemap* tilemap);
 
@@ -79,6 +73,7 @@ private:
     FunctionHandler<BaseEntity::oldPosition, BaseEntity::newPosition> m_movedEntityDelegate;
 
     void onDeletedEntity(BaseEntity* entity);
+
     FunctionHandler<BaseEntity*> m_deletedEntityDelegate;
     
     TilemapLayer* m_ground;
@@ -90,6 +85,8 @@ private:
     Tilemap* m_tilemap;
     Vec2Int m_spawnPoint;
     std::shared_ptr<pathfinder::Graph> m_graph;
+    DamageIndicatorsSystems* m_damageIndicatorsPlayer;
+    DamageIndicatorsSystems* m_damageIndicatorsEnemies;
 
     std::shared_ptr<IPathfindingAlgorithm> m_pathfinding;
 };

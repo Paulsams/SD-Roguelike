@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include <functional>
+#include <optional>
 
-#include "Decoration.h"
 #include "IVisitorEntities.h"
 
 template<typename ReturnType>
@@ -21,7 +21,7 @@ public:
     std::optional<ReturnType> getReturnValue()
     {
         std::optional<ReturnType> copied = m_returnType;
-        copied.reset();
+        m_returnType.reset();
         return copied;
     }
 

@@ -63,33 +63,33 @@ bool GameScene::init(Camera* camera)
     m_gameLoop = std::make_shared<GameLoop>();
 
 //    m_world = World::create(ReadFileWorldBuilder().setPath("TileMap.tmx").build());
-    m_world = World::create(RandomGeneratorWorldBuilder().setPath("Template.tmx").setConfig(m_worldTileConfig->getLevelsTileConfig().at(0)).setWidth(100).setHeight(100).setIterCount(5).build());
-    m_world->setScale(0.31f);
+    // m_world = World::create(RandomGeneratorWorldBuilder().setPath("Template.tmx").setConfig(m_worldTileConfig->getLevelsTileConfig().at(0)).setWidth(100).setHeight(100).setIterCount(5).build());
+    // m_world->setScale(0.31f);
 
-//    m_world = World::create(ReadFileWorldBuilder().setPath("Custom.tmx").build());
+    m_world = World::create(ReadFileWorldBuilder().setPath("Custom.tmx").build());
     //m_world = World::create(RandomGeneratorWorldBuilder().setPath("Template.tmx").setConfig(m_worldTileConfig).setWidth(100).setHeight(100).setIterCount(5).build());
-//    m_world->setScale(1.5f);
+    m_world->setScale(1.5f);
+    m_gameLoop->add(m_world);
 
     this->addChild(m_world);
 
     AttackInfo::PossibleAttackDelegate dontHitObstacle =
-        [](TileType tileType) { return tileType == TileType::GROUND; };
+        [](TileType tileType) { return tileType == TileType::GROUND || tileType == TileType::DECORATION; };
     
-    AttackInfo::PossibleAttackFromEntity hitOnlyEnemies = FunctionVisitorEntitiesBuilder<bool>().
-        setMob([](mob::Mob*) { return true; }).build();
+    AttackInfo::PossibleAttackFromEntity hitMobsAndDecorations = FunctionVisitorEntitiesBuilder<bool>().
+        setMob([](mob::Mob*) { return true; }).setDecoration([](Decoration*) { return true; }).build();
 
-    std::vector<Vec2Int> oneDistanceRanges = {{0, 1}};
+    const std::vector<Vec2Int> oneDistanceRange = {{1, 0}};
 
     const auto delegateDamage = std::make_shared<DelegateDamage>();
-
-    const auto defaultAttackInfo = std::make_shared<AttackInfo>(dontHitObstacle, hitOnlyEnemies,
+    const auto defaultAttackInfo = std::make_shared<AttackInfo>(dontHitObstacle, hitMobsAndDecorations,
         nullptr, std::make_shared<AttackSearchFromDFS>());
 
-    const auto defaultAttack = AttackHandlerBuilder().addAttackData(oneDistanceRanges,
+    const auto defaultAttack = AttackHandlerBuilder().addAttackData(oneDistanceRange,
         std::make_shared<AttackWithDamage>(defaultAttackInfo, delegateDamage)).build();
 
     Weapon* defaultWeapon = Weapon::create(m_world, World::getRectFromGid(2943), WEAPON, defaultAttack,
-        delegateDamage);
+        delegateDamage, std::make_shared<SimpleDamage>(1.0f));
     defaultWeapon->setPositionOnMap({3, 3});
     m_world->addEntity(defaultWeapon);
 

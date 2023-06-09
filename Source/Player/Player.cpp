@@ -1,5 +1,6 @@
-#include "Player/Player.h"
+#include <optional>
 
+#include "Player/Player.h"
 #include "Stats/Modificators/BoundsModificator.h"
 #include "Stats/Modificators/StatWithModificators.h"
 
@@ -60,11 +61,14 @@ bool Player::init()
 Player::Player(World* world)
     : BaseEntity(world)
     , m_moveDelegate(CC_CALLBACK_1(Player::onMove, this))
+    , m_attackedDelegate(CC_CALLBACK_0(Player::onAttacked, this))
     , m_interactedDelegate(CC_CALLBACK_0(Player::onInteracted, this))
     , m_input(this)
     , m_statsContainer(std::make_shared<StatsContainer>())
+    , m_items(12)
 {
     m_input.moved += m_moveDelegate;
+    m_input.attacked += m_attackedDelegate;
     m_input.interacted += m_interactedDelegate;
 
     const auto playerHpStat = std::make_shared<StatWithModificators>(100.0f);
@@ -83,17 +87,40 @@ Player::Player(World* world)
         const std::vector<BaseItem*> items = m_items.getCollection();
         m_items.setAt(std::ranges::find(items, nullptr) - items.begin(), item);
     }).build();
-
-    for (int i = 0; i < 12; ++i)
-        m_items.push_back(nullptr);
 }
 
 void Player::onMove(Direction direction)
 {
-    Vec2Int newPosition = getPositionOnMap() + direction.getVector();
-    TileType tileType = getWorld()->getTileType(newPosition);
-    if (tileType == TileType::GROUND)
-        setPositionOnMap(newPosition);
+    if (m_choicedDirection.has_value() && m_choicedDirection.value() == direction)
+    {
+        Vec2Int newPosition = getPositionOnMap() + direction.getVector();
+        TileType tileType = getWorld()->getTileType(newPosition);
+        if (tileType == TileType::GROUND)
+        {
+            setPositionOnMap(newPosition);
+            DamageIndicatorsSystems* damageIndicators = getWorld()->getDamageIndicatorsForPlayer();
+            if (const Weapon* currentWeapon = m_backpack.getCurrentWeapon())
+                currentWeapon->drawIndicators(damageIndicators, getPositionOnMap(), direction);
+        }
+
+        return;
+    }
+
+    DamageIndicatorsSystems* damageIndicators = getWorld()->getDamageIndicatorsForPlayer();
+    damageIndicators->reset();
+    if (const Weapon* currentWeapon = m_backpack.getCurrentWeapon())
+        currentWeapon->drawIndicators(damageIndicators, getPositionOnMap(), direction);
+    
+    m_choicedDirection.emplace(direction);
+}
+
+void Player::onAttacked()
+{
+    const Weapon* currentWeapon = m_backpack.getCurrentWeapon();
+    if (!currentWeapon || !m_choicedDirection.has_value())
+        return;
+    
+    currentWeapon->attack(getPositionOnMap(), m_choicedDirection.value());
 }
 
 void Player::onInteracted()

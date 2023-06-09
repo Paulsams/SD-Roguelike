@@ -1,5 +1,7 @@
 ﻿#include "UI/MenuItemForInventory.h"
 
+#include "UI/InventoryView.h"
+
 using namespace cocos2d;
 using namespace cocos2d::ui;
 
@@ -21,16 +23,16 @@ void MenuItemForInventory::setItem(BaseItem* item)
 {
     m_item = item;
     const bool isValidItem = static_cast<bool>(item);
+    m_itemIcon->setVisible(isValidItem);
     if (isValidItem)
         m_itemIcon->setTextureRect(item->getRectSpriteInTileset());
-    m_itemIcon->setVisible(isValidItem);
     m_backgroundItemIcon->setOpacity(isValidItem ? 50 : 128);
 }
 
 void MenuItemForInventory::choice()
 {
-    setColor(Color3B::GRAY);
-    m_frame->setColor(Color3B::GRAY);
+    setColor(Color3B::RED);
+    m_frame->setColor(Color3B::RED);
 }
 
 void MenuItemForInventory::unchoice()

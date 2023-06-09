@@ -5,7 +5,6 @@
 #include "cocos2d.h"
 #include "UI/StepCounter.h"
 #include "GameLoop/GameLoop.h"
-#include "Stats/StatsContainer.h"
 #include "UI/InventoryView.h"
 #include "UI/PlayerItemsOnUI.h"
 #include "UI/StatBar.h"
@@ -15,7 +14,7 @@
 #include "ui/UIVBox.h"
 
 using namespace cocos2d;
-using namespace cocos2d::ui;
+using namespace cocos2d::ui; 
 using namespace ::ui;
 
 Canvas* Canvas::create(World* world, Player* player, std::shared_ptr<GameLoop> gameLoop)
@@ -104,7 +103,7 @@ bool Canvas::init()
     const Size cellInventorySize = {90.0f, 90.0f};
     const Size padding = {10.0f, 10.0f};
 
-    auto inventoryView = InventoryView<BaseItem>::create(m_player->getInventory(),
+    auto inventoryView = InventoryView::create(m_player->getInventory(),
         {SPELL, WEAPON, ACCESSORY}, Paths::toAllInventoryCell, cellInventorySize, 3, padding);
     inventoryView->setLayoutParameter(marginParameter);
     rightBox->addChild(inventoryView);
@@ -125,8 +124,8 @@ bool Canvas::init()
                                 horizontalMargin.right, verticalMargin.bottom});
     
     Backpack& backpack = m_player->getBackpack();
-    auto backpackSpellsView = InventoryView<Weapon>::create(backpack.getSpells(),
-        {SPELL}, Paths::toSpellInventoryCell, cellInventorySize, backpack.getSpells().size(), padding);
+    auto backpackSpellsView = InventoryView::create(backpack.getObservableSpells(),
+        {SPELL}, Paths::toSpellInventoryCell, cellInventorySize, backpack.getObservableSpells().size(), padding);
     backpackSpellsView->setLayoutParameter(leftParameter);
     backpackBox->addChild(backpackSpellsView);
 
@@ -134,13 +133,13 @@ bool Canvas::init()
     horizontalParameter->setGravity(LinearLayoutParameter::LinearGravity::CENTER_HORIZONTAL);
     horizontalParameter->setMargin(horizontalMargin);
 
-    auto backpackWeaponView = InventoryView<Weapon>::create(backpack.getWeapons(),
+    auto backpackWeaponView = InventoryView::create(backpack.getObservableWeapons(),
     {WEAPON}, Paths::toWeaponInventoryCell, cellInventorySize, 3, padding);
     backpackWeaponView->setLayoutParameter(horizontalParameter);
     
-    auto backpackAccessoriesView = InventoryView<Accessory>::create(backpack.getAccessories(),
+    auto backpackAccessoriesView = InventoryView::create(backpack.getObservableAccessories(),
         {ACCESSORY}, Paths::toAccessoryInventoryCell, cellInventorySize,
-        backpack.getAccessories().size(), padding);
+        backpack.getObservableAccessories().size(), padding);
     backpackAccessoriesView->setLayoutParameter(horizontalParameter);
 
     const auto rightParameter = RelativeLayoutParameter::create();

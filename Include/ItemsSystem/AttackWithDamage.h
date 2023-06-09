@@ -2,10 +2,10 @@
 #include <memory>
 #include <utility>
 
+#include "IVisualAttack.h"
 #include "AttackSearch/IAttackSearch.h"
 #include "DealingDamage/IDealingDamage.h"
-#include "WorldSystem/World.h"
-#include "ItemsSystem/IVisualAttack.h"
+#include "Pathfinder/Node.h"
 #include "WorldSystem/FunctionVisitorEntities.h"
 
 struct AttackInfo

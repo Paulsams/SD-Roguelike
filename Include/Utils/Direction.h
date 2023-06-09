@@ -54,6 +54,16 @@ struct Direction
         }
     }
 
+    friend bool operator==(const Direction& lhs, const Direction& rhs)
+    {
+        return lhs.type == rhs.type;
+    }
+
+    friend bool operator!=(const Direction& lhs, const Direction& rhs)
+    {
+        return !(lhs == rhs);
+    }
+
 private:
     static DirectionType getDirectionFromVector(cocos2d::Vec2 vector)
     {

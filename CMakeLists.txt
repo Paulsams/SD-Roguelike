@@ -63,6 +63,7 @@ list(APPEND GAME_SOURCE
     Source/Player/Player.cpp
     Source/Player/PlayerInput.cpp
 
+    Source/ItemsSystem/AttackHandler.cpp
     Source/ItemsSystem/Weapon.cpp
 
     Source/Mobs/Mob.cpp
@@ -73,21 +74,23 @@ list(APPEND GAME_SOURCE
 
     Source/Pathfinder/PathfinderAStar.cpp
 
+    Source/Stats/StatsContainer.cpp
+    Source/Stats/Modificators/StatWithModificators.cpp
+
+    Source/UI/Canvas.cpp
+    Source/UI/InventoryView.cpp
+    Source/UI/MenuItemForInventory.cpp
+    Source/UI/PlayerItemsOnUI.cpp
+    Source/UI/StatBar.cpp
+    Source/UI/StepCounter.cpp
+    
+    Source/Utils/Common.cpp
+    
     Source/WorldSystem/BaseEntity.cpp
+    Source/WorldSystem/DamageIndicatorsSystems.cpp
     Source/WorldSystem/World.cpp
     Source/WorldSystem/ReadFileWorldBuilder.cpp
     Source/WorldSystem/RandomGeneratorWorldBuilder.cpp
-
-    Source/Stats/StatsContainer.cpp
-
-    Source/Stats/Modificators/StatWithModificators.cpp
-    
-    Source/Utils/Common.cpp
-
-    Source/UI/Canvas.cpp
-    Source/UI/MenuItemForInventory.cpp
-    Source/UI/StatBar.cpp
-    Source/UI/StepCounter.cpp
     )
 
 list(APPEND GAME_HEADER
@@ -159,9 +162,11 @@ list(APPEND GAME_HEADER
     Include/Utils/Direction.h
     Include/Utils/EventsSystem.h
     Include/Utils/Common.h
+    Include/Utils/PoolObjects.h
     
     Include/WorldSystem/BaseEntity.h
     Include/WorldSystem/Chest.h
+    Include/WorldSystem/DamageIndicatorsSystems.h
     Include/WorldSystem/Decoration.h
     Include/WorldSystem/FunctionVisitorEntities.h
     Include/WorldSystem/RandomGeneratorWorldBuilder.h

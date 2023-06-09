@@ -8,7 +8,8 @@
 class MenuItemForInventory final : public cocos2d::MenuItem
 {
 public:
-    static MenuItemForInventory* create(cocos2d::Size size, const SpriteWithRect& sprite, const cocos2d::ccMenuCallback& callback);
+    static MenuItemForInventory* create(cocos2d::Size size,
+        const SpriteWithRect& sprite, const cocos2d::ccMenuCallback& callback);
     
     void setItem(BaseItem* item);
 
@@ -18,7 +19,7 @@ public:
     void selected() override;
 
     bool initWithSprite(const SpriteWithRect& sprite);
-    BaseItem* getItem() { return m_item; }
+    BaseItem* getItem() const { return m_item; }
 
 private:
     MenuItemForInventory() = default;

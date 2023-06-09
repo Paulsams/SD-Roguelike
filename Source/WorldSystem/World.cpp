@@ -47,9 +47,8 @@ bool World::initWithConfig()
     const TMXObjectGroup* bossMobsGroup = m_tilemap->getObjectGroup("NormalMobs");
     const TMXObjectGroup* chestsGroup = m_tilemap->getObjectGroup("Chests");
     const TMXObjectGroup* decorationsGroup = m_tilemap->getObjectGroup("Decorations");
-
-//    if(!objectsGroup || !enemiesGroup || !chestsGroup || !decorationsGroup) {
-    if (!objectsGroup || !decorationsGroup)
+    
+    if (!objectsGroup)
     {
         log("Tile map has no needed objects layer");
         return false;
@@ -67,8 +66,11 @@ bool World::initWithConfig()
         Vec2Int position = readPositionFromTile(decorationMap, tileSize);
         decoration->setPositionOnMap(readPositionFromTile(decorationMap, tileSize));
         addEntity(decoration);
-        m_graph->getNodeByPos(position)->tile = TileType::OBSTACLE;
+        m_graph->getNodeByPos(position)->tile = TileType::DECORATION;
     }
+
+    m_damageIndicatorsPlayer = DamageIndicatorsSystems::create(this);
+    this->addChild(m_damageIndicatorsPlayer);
 
     return true;
 }
@@ -90,7 +92,7 @@ void World::removeEntity(BaseEntity* entity)
     entity->moved -= m_movedEntityDelegate;
     entity->deleted -= m_deletedEntityDelegate;
     std::vector<BaseEntity*> entitiesOnCurrentCell = m_entities[getIndexFromVec2(positionInWorld)];
-    entitiesOnCurrentCell.erase(std::find(entitiesOnCurrentCell.begin(), entitiesOnCurrentCell.end(), entity));
+    entitiesOnCurrentCell.erase(std::ranges::find(entitiesOnCurrentCell, entity));
 }
 
 void World::addPlayer(Player* player)
@@ -112,6 +114,11 @@ TileType World::getTileType(Vec2Int position) const
     return m_graph->getNodeByPos(position)->tile;
 }
 
+void World::update()
+{
+    m_damageIndicatorsPlayer->update();
+}
+
 World::World(Tilemap* tilemap)
     : m_movedEntityDelegate(CC_CALLBACK_2(World::onEntityMoved, this))
     , m_deletedEntityDelegate(CC_CALLBACK_1(World::onDeletedEntity, this))
@@ -131,5 +138,7 @@ void World::onEntityMoved(BaseEntity::oldPosition oldPosition, BaseEntity::newPo
 
 void World::onDeletedEntity(BaseEntity* entity)
 {
-    removeEntity(entity);
+    const Vec2Int positionInWorld = entity->getPositionOnMap();
+    std::vector<BaseEntity*> entitiesOnCurrentCell = m_entities[getIndexFromVec2(positionInWorld)];
+    entitiesOnCurrentCell.erase(std::ranges::find(entitiesOnCurrentCell, entity));
 }

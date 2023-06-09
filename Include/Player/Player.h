@@ -3,11 +3,10 @@
 
 #include "Backpack.h"
 #include "PlayerInput.h"
-#include "Utils/Direction.h"
-#include "Utils/EventsSystem.h"
 #include "GameLoop/IUpdatable.h"
-#include "Stats/IHaveStats.h"
 #include "ItemsSystem/BaseItem.h"
+#include "WorldSystem/BaseEntity.h"
+#include "WorldSystem/FunctionVisitorEntities.h"
 
 class Player : public BaseEntity, public IUpdatable
 {
@@ -28,9 +27,11 @@ public:
 private:
     Player(World* world);
     void onMove(Direction direction);
+    void onAttacked();
     void onInteracted();
     
     FunctionHandler<Direction> m_moveDelegate;
+    FunctionHandler<> m_attackedDelegate;
     FunctionHandler<> m_interactedDelegate;
 
     std::shared_ptr<FunctionVisitorEntitiesReturnVoid> m_interactedVisitor;
@@ -42,4 +43,6 @@ private:
     Backpack m_backpack;
     std::shared_ptr<StatsContainer> m_statsContainer;
     ObservableVector<BaseItem*> m_items;
+
+    std::optional<Direction> m_choicedDirection;
 };

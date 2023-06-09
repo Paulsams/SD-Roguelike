@@ -26,6 +26,12 @@ public:
 protected:
     explicit BaseEntity(World* world)
         : m_world(world) { }
+
+    void destroyEntity()
+    {
+        deleted(this);
+        getParent()->removeChild(this);
+    }
     
 private:
     Vec2Int m_position;

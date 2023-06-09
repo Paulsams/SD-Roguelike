@@ -16,6 +16,9 @@ inline const SpriteWithRect Paths::toAccessoryInventoryCell = {toUITileset,
 inline const SpriteWithRect Paths::toSpellInventoryCell = {toUITileset,
     cocos2d::Rect{cocos2d::Vec2{1495 % 64, 1495 / 64} * 32, {32, 32}}};
 
+inline const SpriteWithRect Paths::whiteCell = {toUITileset,
+    cocos2d::Rect(cocos2d::Vec2{32, 32}, {32, 32})};
+
 inline const cocos2d::Color3B Colors::background{166, 166, 166};
 inline const cocos2d::Color3B Colors::midground{100, 100, 100};
 inline const cocos2d::Color3B Colors::backgroundForStatBar{130, 130, 130};

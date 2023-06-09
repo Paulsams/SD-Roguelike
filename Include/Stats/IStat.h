@@ -9,10 +9,10 @@ class IStat
 {
 public:
     using oldValue = float;
-    using changedValue = float;
     using currentValue = float;
-    
-    EventContainer<oldValue, currentValue, currentValue> changed; 
+    using changedValue = float;
+
+    EventContainer<oldValue, currentValue, changedValue> changed; 
     
     virtual ~IStat() = default;
     virtual float getValue() const = 0;
