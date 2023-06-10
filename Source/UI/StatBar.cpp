@@ -10,20 +10,6 @@
 using namespace cocos2d;
 using namespace cocos2d::ui;
 
-StatBar* StatBar::create(LinearLayoutParameter* marginParameter, Size contentSize,
-                         const std::string& pathToImage, std::shared_ptr<IStat> stat)
-{
-    StatBar* statBar = new (std::nothrow) StatBar(stat);
-    
-    if (statBar && statBar->Layout::init() && statBar->postInit(marginParameter, contentSize, pathToImage))
-    {
-        statBar->autorelease();
-        return statBar;
-    }
-    CC_SAFE_DELETE(statBar);
-    return nullptr;
-}
-
 bool StatBar::postInit(LinearLayoutParameter* marginParameter, Size contentSize, const std::string& pathToImage)
 {
     if (!m_stat->tryGet(m_boundsStat))
@@ -40,20 +26,35 @@ bool StatBar::postInit(LinearLayoutParameter* marginParameter, Size contentSize,
     frame->setAnchorPoint(Vec2::ZERO);
     this->addChild(frame, 0);
 
-    m_bar = LoadingBar::create(pathToImage, m_stat->getValue());
+    m_bar = LoadingBar::create(pathToImage, m_boundsStat->getValueFromPercent(m_stat->getValue()));
     m_bar->ignoreContentAdaptWithSize(false);
     m_bar->setContentSize(contentSize);
     m_bar->setAnchorPoint(Vec2::ZERO);
     this->addChild(m_bar, 1);
-
-    m_label = Label::createWithTTF(getTextView(), FontsTTF::onUI, 17);
+    
+    m_label = Label::createWithTTF(getTextView(), FontsTTF::onUI, textSize);
     m_label->setContentSize(contentSize);
     m_label->setPosition(contentSize / 2);
+    m_label->setScale(contentSize.height / textSize / coefficientScaleTextSize);
     this->addChild(m_label, 2);
 
     m_stat->changed += m_changeStatDelegate;
 
     return true;
+}
+
+StatBar* StatBar::create(LinearLayoutParameter* marginParameter, Size contentSize,
+                         const std::string& pathToImage, std::shared_ptr<IStat> stat)
+{
+    StatBar* statBar = new (std::nothrow) StatBar(stat);
+    
+    if (statBar && statBar->Layout::init() && statBar->postInit(marginParameter, contentSize, pathToImage))
+    {
+        statBar->autorelease();
+        return statBar;
+    }
+    CC_SAFE_DELETE(statBar);
+    return nullptr;
 }
 
 StatBar::StatBar(std::shared_ptr<IStat> stat)

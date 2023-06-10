@@ -5,9 +5,10 @@ namespace mob {
 
     class BaseMobAbstractFactory {
     public:
-        virtual Mob createNormal(int) = 0;
-        virtual Mob createElite(int) = 0;
-        virtual Mob createBoss(int) = 0;
+        virtual Mob* createNormal(World*, int) = 0;
+        virtual Mob* createElite(World*, int) = 0;
+        virtual Mob* createBoss(World*, int) = 0;
+        virtual Mob* createPassive(World*, int) = 0;
 
         virtual ~BaseMobAbstractFactory() = default;
     };

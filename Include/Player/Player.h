@@ -19,7 +19,7 @@ public:
     Backpack& getBackpack() { return m_backpack; }
 
     bool init() override;
-    
+
     void update();
     void acceptVisit(std::shared_ptr<IVisitorEntities> visitor) override { visitor->visitPlayer(this); }
 
@@ -27,6 +27,8 @@ public:
 
 private:
     Player(World* world);
+    
+    void updateDamageIndicator() const;
     
     void onMove(Direction direction);
     void onAttacked();

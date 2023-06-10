@@ -2,6 +2,7 @@
 #include<optional>
 
 #include "ItemsSystem/Accessory.h"
+#include "ItemsSystem/Attacks.h"
 #include "ItemsSystem/Weapon.h"
 
 class Backpack : public IDamageModificator
@@ -50,13 +51,20 @@ class Backpack : public IDamageModificator
     };
     
 public:
-    Backpack()
+    Backpack(Weapon* defaultWeapon)
         : m_changedDelegate(CC_CALLBACK_3(Backpack::onChangeWeapon, this))
         , m_weapon(1)
         , m_accessories(3)
         , m_spells(4)
+        , m_defaultWeapon(defaultWeapon)
     {
         m_weapon.changed += m_changedDelegate;
+        m_defaultWeapon->retain();
+    }
+
+    ~Backpack()
+    {
+        m_defaultWeapon->release();
     }
 
     ObservableVector<BaseItem*>& getObservableWeapons() { return m_weapon.observableCollection; }
@@ -65,22 +73,27 @@ public:
 
     Weapon* getCurrentWeapon() const
     {
-        return m_weapon.get()[0];
+        Weapon* weapon = m_weapon.get()[0];
+        return weapon ? weapon : m_defaultWeapon;
     }
     
     float modify(float damage, BaseEntity* entity) const override
     {
+        // TODO: Модифицировать с помощью акксесуаров
         return damage;
     }
 
+    EventContainer<> changedCurrentWeapon;
+
 private:
-    void onChangeWeapon(size_t index, ObservableVector<Weapon*>::oldValue oldValue,
+    void onChangeWeapon(size_t, ObservableVector<Weapon*>::oldValue oldValue,
         ObservableVector<Weapon*>::newValue newValue)
     {
         if (oldValue)
             oldValue->setModificatorDamage(nullptr);
         if (newValue)
             newValue->setModificatorDamage(this);
+        changedCurrentWeapon();
     }
 
     FunctionHandler<size_t, ObservableVector<Weapon*>::oldValue, ObservableVector<Weapon*>::newValue> m_changedDelegate;
@@ -88,4 +101,6 @@ private:
     HandlerItems<Weapon*> m_weapon;
     HandlerItems<Accessory*> m_accessories;
     HandlerItems<Weapon*> m_spells;
+    
+    Weapon* m_defaultWeapon;
 };

@@ -8,7 +8,7 @@ using namespace cocos2d;
 
 Player* Player::create(World* world)
 {
-    Player* player = new (std::nothrow) Player(world);
+    auto* player = new (std::nothrow) Player(world);
     if (player && player->init())
     {
         player->autorelease();
@@ -55,13 +55,7 @@ bool Player::init()
 
 void Player::update()
 {
-    if (m_choicedDirection.has_value())
-    {
-        DamageIndicatorsSystems* damageIndicators = getWorld()->getDamageIndicatorsForPlayer();
-        if (const Weapon* currentWeapon = m_backpack.getCurrentWeapon())
-            currentWeapon->drawIndicators(damageIndicators, getPositionOnMap(), m_choicedDirection.value());
-    }
-
+    updateDamageIndicator();
     m_statsContainer->get(Mana)->changeValueBy(1);
 }
 
@@ -71,12 +65,15 @@ Player::Player(World* world)
     , m_attackedDelegate(CC_CALLBACK_0(Player::onAttacked, this))
     , m_interactedDelegate(CC_CALLBACK_0(Player::onInteracted, this))
     , m_input(this)
+    , m_backpack(Attacks::createWeapon(world, Attacks::defaultWeapon))
     , m_statsContainer(std::make_shared<StatsContainer>())
     , m_items(12)
 {
     m_input.moved += m_moveDelegate;
     m_input.attacked += m_attackedDelegate;
     m_input.interacted += m_interactedDelegate;
+
+    m_backpack.changedCurrentWeapon += std::bind(&Player::updateDamageIndicator, this);
 
     const auto playerHpStat = std::make_shared<StatWithModificators>(100.0f);
     playerHpStat->addModificator(std::make_shared<BoundsModificator>(MinMax(0, 100.0f)));
@@ -96,23 +93,44 @@ Player::Player(World* world)
     }).build();
 }
 
+void Player::updateDamageIndicator() const
+{
+    if (m_choicedDirection.has_value())
+    {
+        DamageIndicatorsSystems* damageIndicators = getWorld()->getDamageIndicatorsForPlayer();
+        damageIndicators->reset();
+        if (const Weapon* currentWeapon = m_backpack.getCurrentWeapon())
+            currentWeapon->drawIndicators(damageIndicators, getPositionOnMap(), m_choicedDirection.value());
+    }
+}
+
 void Player::onMove(Direction direction)
 {
+    static std::shared_ptr<FunctionVisitorEntitiesReturnVoid> visitor = FunctionVisitorEntitiesBuilder<void>()
+        .setDecoration([](Decoration*) { })
+        .setMob([](mob::Mob*){ })
+        .setChest([](Chest*){ })
+        .setPlayer([](Player*) { }).build();
+    
     if (m_choicedDirection.has_value() && m_choicedDirection.value() == direction)
     {
         Vec2Int newPosition = getPositionOnMap() + direction.getVector();
         TileType tileType = getWorld()->getTileType(newPosition);
         if (tileType == TileType::GROUND)
-            setPositionOnMap(newPosition);
+        {
+            for (BaseEntity* entity : getWorld()->getEntitiesFromCell(newPosition))
+            {
+                entity->acceptVisit(visitor);
+                if (visitor->isCalled())
+                    return;
+            }
+            setMovedPositionOnMap(newPosition);
+        }
         return;
     }
-
-    DamageIndicatorsSystems* damageIndicators = getWorld()->getDamageIndicatorsForPlayer();
-    damageIndicators->reset();
-    if (const Weapon* currentWeapon = m_backpack.getCurrentWeapon())
-        currentWeapon->drawIndicators(damageIndicators, getPositionOnMap(), direction);
     
     m_choicedDirection.emplace(direction);
+    updateDamageIndicator();
 }
 
 void Player::onAttacked()

@@ -19,6 +19,9 @@ struct Paths
     static const std::string toGameTileset;
     static const std::string toIconFrame;
 
+    static const std::string toHealthBar;
+    static const std::string toManaBar;
+
     static const SpriteWithRect toAllInventoryCell;
     static const SpriteWithRect toWeaponInventoryCell;
     static const SpriteWithRect toSpellInventoryCell;

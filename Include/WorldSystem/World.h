@@ -3,6 +3,7 @@
 #include "BaseEntity.h"
 #include "DamageIndicatorsSystems.h"
 #include "GameLoop/IUpdatable.h"
+#include "Mobs/Factory/BaseMobAbstractFactory.h"
 #include "Pathfinder/Graph.h"
 #include "Pathfinder/IPathfindingAlgorithm.h"
 #include "Utils/Common.h"
@@ -10,18 +11,10 @@
 class Player;
 class BaseEntity;
 
-enum EnemyType
-{
-    PASSIVE,
-    NORMAL,
-    ELITE,
-    BOSS,
-};
-
 class World : public cocos2d::Node, public IUpdatable
 {
 public:
-    static World* create(Tilemap* tilemap);
+    static World* create(Tilemap* tilemap, std::shared_ptr<mob::BaseMobAbstractFactory> mobFactory);
 
     bool initWithConfig();
 
@@ -41,9 +34,13 @@ public:
 //        m_background->setCullingRect(rect);
     }
 
-    cocos2d::Vec2 convertToMapSpace(Vec2Int nodePosition)
-        { return cocos2d::Vec2(nodePosition.x * m_tilemap->getTileSize().width,
-            nodePosition.y * m_tilemap->getTileSize().height) * m_tilemap->getScale(); }
+    cocos2d::Vec2 convertToMapSpace(Vec2Int cellPosition) const
+        { return cocos2d::Vec2(cellPosition.x * m_tilemap->getTileSize().width,
+                               cellPosition.y * m_tilemap->getTileSize().height) * m_tilemap->getScale(); }
+
+    Vec2Int convertToCellSpace(cocos2d::Vec2 position) const
+        { return Vec2Int(position.x / m_tilemap->getTileSize().width,
+                         position.y / m_tilemap->getTileSize().height); }
 
     static cocos2d::Rect getRectFromGid(int gid) { return cocos2d::Rect(
         Vec2Int{gid % 64, gid / 64} * 32, {32, 32}); }
@@ -65,15 +62,18 @@ public:
     DamageIndicatorsSystems* getDamageIndicatorsForEnemies() const { return m_damageIndicatorsEnemies; }
     
 private:
-    explicit World(Tilemap* tilemap);
+    explicit World(Tilemap* tilemap, std::shared_ptr<mob::BaseMobAbstractFactory> mobFactory);
+    
+    void spawnMobs(const cocos2d::TMXObjectGroup* group, cocos2d::Size tileSize,
+        std::function<mob::Mob*(mob::BaseMobAbstractFactory*, World*, int)> createFunc);
 
     void updateTileType(Vec2Int position) const;
-
     size_t getIndexFromVec2(Vec2Int position) const { return position.x + position.y * getSize().width; }
 
-    void onEntityMoved(BaseEntity::oldPosition oldPosition, BaseEntity::newPosition newPosition);
-    FunctionHandler<BaseEntity::oldPosition, BaseEntity::newPosition> m_movedEntityDelegate;
+    void onEntityMoved(BaseEntity* entity, BaseEntity::oldPosition oldPosition, BaseEntity::newPosition newPosition);
+    FunctionHandler<BaseEntity*, BaseEntity::oldPosition, BaseEntity::newPosition> m_movedEntityDelegate;
 
+    void internalRemoveEntity(BaseEntity* entity);
     void onDeletedEntity(BaseEntity* entity);
 
     FunctionHandler<BaseEntity*> m_deletedEntityDelegate;
@@ -81,6 +81,8 @@ private:
     TilemapLayer* m_ground;
     TilemapLayer* m_walls;
 
+    std::shared_ptr<mob::BaseMobAbstractFactory> m_mobFactory;
+    std::vector<mob::Mob*> m_mobs;
     std::vector<std::vector<BaseEntity*>> m_entities;
 
     Player* m_player = nullptr;
@@ -91,4 +93,6 @@ private:
     DamageIndicatorsSystems* m_damageIndicatorsEnemies;
 
     std::shared_ptr<IPathfindingAlgorithm> m_pathfinding;
+    
+    std::map<Vec2Int, BaseEntity*> m_movedEntities;
 };

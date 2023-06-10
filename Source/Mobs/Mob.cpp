@@ -7,16 +7,18 @@
 
 namespace mob
 {
-    Mob::Mob(World* world, const MobInfo& info):
-        BaseEntity(world),
-        m_visionRange(info.visionRange),
-        m_strategy(info.strategy()),
-        m_behaviour(info.startBehaviour()),
-        m_stats(std::make_shared<StatsContainer>())
+    Mob* Mob::create(World* world, cocos2d::Sprite* sprite, const MobInfo& info)
     {
-        const auto playerHpStat = std::make_shared<StatWithModificators>(info.health);
-        playerHpStat->addModificator(std::make_shared<BoundsModificator>(MinMax(0, info.health)));
-        m_stats->add(Health, playerHpStat);
+        auto* mob = new (std::nothrow) Mob(world, info);
+        if (mob && mob->init())
+        {
+            mob->setContentSize(sprite->getContentSize());
+            mob->addChild(sprite);
+            mob->autorelease();
+            return mob;
+        }
+        CC_SAFE_DELETE(mob);
+        return nullptr;
     }
 
     void Mob::update() {
@@ -35,5 +37,23 @@ namespace mob
 
     int Mob::getVisionRange() const {
         return m_visionRange;
+    }
+
+    Mob::Mob(World* world, const MobInfo& info)
+        : BaseEntity(world)
+        , m_visionRange(info.visionRange)
+        , m_strategy(info.strategy())
+        , m_behaviour(info.startBehaviour())
+        , m_stats(std::make_shared<StatsContainer>())
+    {
+        const auto mobHpStat = std::make_shared<StatWithModificators>(info.health);
+        mobHpStat->addModificator(std::make_shared<BoundsModificator>(MinMax(0, info.health)));
+        m_stats->add(Health, mobHpStat);
+
+        mobHpStat->changed += [this](IStat::oldValue, IStat::currentValue current, IStat::changedValue)
+        {
+            if (current <= 0.0f)
+                destroyEntity();
+        };
     }
 }

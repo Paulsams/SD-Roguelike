@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include <optional>
 
 #include <WorldSystem/BaseEntity.h>
 
@@ -13,7 +12,8 @@ class Damage
 {
 public:
     Damage(float m_damage)
-        : m_damage(m_damage) { }
+        : m_damage(m_damage)
+        , m_modificator(nullptr) { }
 
     void changeModificator(const IDamageModificator* modificator) { m_modificator = modificator; }
     void resetModificator() { m_modificator = nullptr; }

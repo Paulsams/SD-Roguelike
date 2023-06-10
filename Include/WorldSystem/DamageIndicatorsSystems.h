@@ -13,17 +13,21 @@ class World;
 class DamageIndicator : public cocos2d::Node
 {
 public:
-    static DamageIndicator* create();
+    static DamageIndicator* create(World* world);
     
     bool init() override;
 
     void setColorAndDamage(cocos2d::Color3B color, std::optional<float> damage) const;
+    void setVisible(bool visible) override;
+    void setPosition(const cocos2d::Vec2& position) override;
+    void setPosition(float x, float y) override;
 
 private:
-    DamageIndicator();
+    DamageIndicator(World* world);
 
     cocos2d::Sprite* m_sprite;
     cocos2d::Label* m_label;
+    World* m_world;
 };
 
 class DamageIndicatorsSystems : public cocos2d::Node, public IUpdatable

@@ -15,10 +15,13 @@ public:
 
     Vec2Int getPositionOnMap() const { return m_position; }
     World* getWorld() const { return m_world; }
+
+    void setPosition(const cocos2d::Vec2& position) override;
+    void setPosition(float x, float y) override;
+    void setMovedPositionOnMap(Vec2Int position);
+    void setPositionOnMapWithoutNotify(Vec2Int cellPosition);
     
-    void setPositionOnMap(Vec2Int position);
-    
-    EventContainer<oldPosition, newPosition> moved;
+    EventContainer<BaseEntity*, oldPosition, newPosition> moved;
     EventContainer<BaseEntity*> deleted;
 
     virtual void acceptVisit(std::shared_ptr<IVisitorEntities> visitor) = 0;

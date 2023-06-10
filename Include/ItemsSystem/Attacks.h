@@ -12,6 +12,7 @@ class Attacks
 {
 public:
     static const WeaponInfo defaultWeapon;
+    static const WeaponInfo stick_1;
     static const WeaponInfo axe_1;
 
     static Weapon* createWeapon(World* world, WeaponInfo info)

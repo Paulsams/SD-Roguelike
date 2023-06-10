@@ -59,7 +59,7 @@ bool Canvas::init()
     {
         const auto playerHp = StatBar::create(marginParameter,
             Size(playerStatsBox->getContentSize().width - 10.0f, playerStatsBox->getContentSize().height / 2) - marginSizeOffset,
-            "HealthBar.png",
+            Paths::toHealthBar,
             playerHpStat);
         playerStatsBox->addChild(playerHp);
     }
@@ -69,7 +69,7 @@ bool Canvas::init()
     {
         const auto playerMana = StatBar::create(marginParameter,
             Size(playerStatsBox->getContentSize().width - 10.0f, playerStatsBox->getContentSize().height / 2) - marginSizeOffset,
-            "ManaBar.png",
+            Paths::toManaBar,
             playerManaStat);
         playerStatsBox->addChild(playerMana);
     }

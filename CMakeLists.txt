@@ -68,7 +68,7 @@ list(APPEND GAME_SOURCE
     Source/ItemsSystem/Weapon.cpp
 
     Source/Mobs/Mob.cpp
-    Source/Mobs/Strategy/StateContainer.cpp
+    Source/Mobs/Strategy/StateMachine.cpp
     Source/Mobs/Strategy/StrategyWithStates.cpp
     Source/Mobs/Strategy/Normal.cpp
     Source/Mobs/Behaviour/AggressiveBehaviour.cpp
@@ -126,7 +126,7 @@ list(APPEND GAME_HEADER
     Include/Mobs/Strategy/IState.h
     Include/Mobs/Strategy/NothingStrategy.h
     Include/Mobs/Strategy/IMobStrategy.h
-    Include/Mobs/Strategy/StateContainer.h
+    Include/Mobs/Strategy/StateMachine.h
     Include/Mobs/Strategy/StrategyWithStates.h
     Include/Mobs/Strategy/Normal.h
     Include/Mobs/Behaviour/IMobBehaviour.h
@@ -159,10 +159,12 @@ list(APPEND GAME_HEADER
     Include/UI/StatBar.h
     Include/UI/StepCounter.h
 
+    Include/Utils/Common.h
     Include/Utils/Direction.h
     Include/Utils/EventsSystem.h
-    Include/Utils/Common.h
+    Include/Utils/FontsTTF.h
     Include/Utils/PoolObjects.h
+    Include/Utils/ValueNotifyChanged.h
     
     Include/WorldSystem/BaseEntity.h
     Include/WorldSystem/Chest.h

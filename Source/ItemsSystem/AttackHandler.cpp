@@ -34,14 +34,18 @@ void AttackHandler::attack(World* world, Vec2Int position, Direction direction) 
 bool AttackHandler::isPossibleAttack(World* world, Vec2Int position, Vec2Int localPosition) const
 {
     const auto direction = Direction(localPosition);
-    Vec2Int localRightPosition = -direction.rotate(localPosition);
+    const Vec2Int localRightPosition =
+        direction == UP || direction == DOWN ?
+        -direction.rotate(localPosition) :
+        direction.rotate(localPosition);
         
     const auto range = m_ranges.find(localRightPosition);
     if (range != m_ranges.end())
     {
         const Vec2Int endPosition = position + localPosition;
-        return range->second->isPossibleAttack(world->getTileType(endPosition)) &&
-            range->second->getSearch()->isReachable(world, position, endPosition);
+        const bool isPossible = range->second->isPossibleAttack(world->getTileType(endPosition));
+        const bool isReachable = range->second->getSearch()->isReachable(world, position, endPosition);
+        return isPossible && isReachable;
     }
 
     return false;

@@ -1,12 +1,11 @@
 ﻿#include "WorldSystem/DamageIndicatorsSystems.h"
 
 #include <Utils/FontsTTF.h>
-
 #include "WorldSystem/World.h"
 
-DamageIndicator* DamageIndicator::create()
+DamageIndicator* DamageIndicator::create(World* world)
 {
-    auto* damageIndicator = new (std::nothrow) DamageIndicator();
+    auto* damageIndicator = new (std::nothrow) DamageIndicator(world);
     if (damageIndicator && damageIndicator->init())
     {
         damageIndicator->autorelease();
@@ -23,10 +22,13 @@ bool DamageIndicator::init()
     m_sprite->setAnchorPoint(cocos2d::Vec2::ZERO);
     this->addChild(m_sprite);
 
-    m_label = cocos2d::Label::createWithTTF("", FontsTTF::onUI, 20);
-    m_label->setPosition(m_sprite->getContentSize() / 2);
-    this->addChild(m_label);
-        
+    m_label = cocos2d::Label::createWithTTF("", FontsTTF::onDamageIndicator, 140);
+    m_label->enableBold();
+    m_label->enableShadow();
+    m_label->setTextColor(cocos2d::Color4B::YELLOW);
+    m_label->setScale(0.2f);
+    m_world->addChild(m_label, 100);
+    
     return true;
 }
 
@@ -36,9 +38,27 @@ void DamageIndicator::setColorAndDamage(cocos2d::Color3B color, std::optional<fl
     m_label->setString(damage ? std::to_string(static_cast<int>(damage.value())) : "");
 }
 
-DamageIndicator::DamageIndicator()
+void DamageIndicator::setVisible(bool visible)
+{
+    Node::setVisible(visible);
+    m_label->setVisible(visible);
+}
+
+void DamageIndicator::setPosition(const cocos2d::Vec2& position)
+{
+    setPosition(position.x, position.y);
+}
+
+void DamageIndicator::setPosition(float x, float y)
+{
+    Node::setPosition(x, y);
+    m_label->setPosition(getPosition() + m_sprite->getContentSize() / 2);
+}
+
+DamageIndicator::DamageIndicator(World* world)
     : m_sprite(nullptr)
-    , m_label(nullptr) { }
+    , m_label(nullptr)
+    , m_world(world) { }
 
 DamageIndicatorsSystems* DamageIndicatorsSystems::create(World* world)
 {
@@ -77,9 +97,9 @@ void DamageIndicatorsSystems::update()
 }
 
 DamageIndicatorsSystems::DamageIndicatorsSystems(World* world)
-    : m_indicators([this]()
+    : m_indicators([this, world]()
         {
-            DamageIndicator* damageIndicator = DamageIndicator::create();
+            DamageIndicator* damageIndicator = DamageIndicator::create(world);
             this->addChild(damageIndicator);
             return damageIndicator;
         })
