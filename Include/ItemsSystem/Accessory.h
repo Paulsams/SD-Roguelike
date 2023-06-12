@@ -12,7 +12,6 @@ public:
 
     const std::shared_ptr<IStatsContainer> getStats() const override { return m_stats; }
     ItemTypeSlot getItemTypeFromSlot() const override { return ACCESSORY; }
-    void acceptVisit(std::shared_ptr<IVisitorEntities> visitor) override;
 
 private:
     std::shared_ptr<StatsContainer> m_stats;

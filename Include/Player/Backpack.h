@@ -20,15 +20,15 @@ class Backpack : public IDamageModificator
             : observableCollection(size)
             , m_changedDelegate(CC_CALLBACK_3(HandlerItems::onChange, this))
             , m_swappedDelegate(CC_CALLBACK_2(HandlerItems::onSwapped, this))
-            , m_items(std::vector<T>(size))
+            , m_items(std::vector<T*>(size))
         {
             observableCollection.changed += m_changedDelegate;
             observableCollection.swapped += m_swappedDelegate;
         }
 
-        const std::vector<T>& get() const { return m_items; }
+        const std::vector<T*>& get() const { return m_items; }
 
-        EventContainer<size_t, typename ObservableVector<T>::oldValue, typename ObservableVector<T>::newValue> changed;
+        EventContainer<size_t, typename ObservableVector<T*>::oldValue, typename ObservableVector<T*>::newValue> changed;
         EventContainer<size_t, size_t> swapped;
         ObservableVector<BaseItem*> observableCollection;
 
@@ -36,8 +36,8 @@ class Backpack : public IDamageModificator
         void onChange(size_t index, ObservableVector<BaseItem*>::oldValue,
             ObservableVector<BaseItem*>::newValue newValue)
         {
-            T oldValue = m_items[index];
-            m_items[index] = dynamic_cast<T>(newValue);
+            T* oldValue = m_items[index];
+            m_items[index] = dynamic_cast<T*>(newValue);
             changed(index, oldValue, m_items[index]);
         }
         
@@ -47,7 +47,7 @@ class Backpack : public IDamageModificator
         FunctionHandler<size_t, ObservableVector<BaseItem*>::oldValue, ObservableVector<BaseItem*>::newValue> m_changedDelegate;
         FunctionHandler<size_t, size_t> m_swappedDelegate;
 
-        std::vector<T> m_items;
+        std::vector<T*> m_items;
     };
     
 public:
@@ -98,9 +98,9 @@ private:
 
     FunctionHandler<size_t, ObservableVector<Weapon*>::oldValue, ObservableVector<Weapon*>::newValue> m_changedDelegate;
     
-    HandlerItems<Weapon*> m_weapon;
-    HandlerItems<Accessory*> m_accessories;
-    HandlerItems<Weapon*> m_spells;
+    HandlerItems<Weapon> m_weapon;
+    HandlerItems<Accessory> m_accessories;
+    HandlerItems<Weapon> m_spells;
     
     Weapon* m_defaultWeapon;
 };
