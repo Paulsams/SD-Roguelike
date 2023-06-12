@@ -76,8 +76,8 @@ list(APPEND GAME_SOURCE
     Source/Mobs/Strategy/StrategyWithStates.cpp
     Source/Mobs/Strategy/Normal.cpp
     Source/Mobs/Behaviour/AggressiveBehaviour.cpp
-        Source/Mobs/Behaviour/CowardlyBehaviour.cpp
-        Source/Mobs/Behaviour/PassiveBehaviour.cpp
+    Source/Mobs/Behaviour/CowardlyBehaviour.cpp
+    Source/Mobs/Behaviour/PassiveBehaviour.cpp
 
     Source/Pathfinder/PathfinderAStar.cpp
 
@@ -92,6 +92,7 @@ list(APPEND GAME_SOURCE
     Source/UI/StepCounter.cpp
     
     Source/Utils/Common.cpp
+    Source/Utils/TMXGenerator.cpp
     
     Source/WorldSystem/BaseEntity.cpp
     Source/WorldSystem/DamageIndicatorsSystems.cpp
@@ -168,6 +169,7 @@ list(APPEND GAME_HEADER
     Include/Utils/EventsSystem.h
     Include/Utils/FontsTTF.h
     Include/Utils/PoolObjects.h
+    Include/Utils/TMXGenerator.h
     Include/Utils/ValueNotifyChanged.h
     
     Include/WorldSystem/BaseEntity.h
