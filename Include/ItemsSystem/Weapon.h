@@ -17,9 +17,12 @@ public:
     const std::shared_ptr<IStatsContainer> getStats() const override { return m_statsContainer; }
     ItemTypeSlot getItemTypeFromSlot() const override { return m_itemTypeSlot; }
 
-    void drawIndicators(DamageIndicatorsSystems* indicators, Vec2Int position, Direction direction) const
+    void scheduleDrawIndicators(DamageIndicatorsSystems* indicators, Vec2Int position, Direction direction) const
     {
-        m_attackHandler->drawIndicators(getWorld(), indicators, position, direction);
+        indicators->scheduleDraw([this, position, direction](const std::function<void(DrawDamageInfo)>& drawFunc)
+        {
+            m_attackHandler->drawIndicators(getWorld(), position, direction, drawFunc);
+        });
     }
 
     void attack(Vec2Int position, Direction direction) const

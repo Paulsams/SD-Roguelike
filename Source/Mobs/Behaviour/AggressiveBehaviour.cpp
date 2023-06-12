@@ -3,7 +3,6 @@
 #include "Utils/Direction.h"
 
 namespace mob {
-
     void AggressiveBehaviour::update(Mob* mob)  {
         Vec2Int mobPos = mob->getPositionOnMap();
         const Player* player = mob->getWorld()->getNearestPlayer(mobPos);
@@ -11,22 +10,14 @@ namespace mob {
         if (m_attack->isPossibleAttack(mob->getWorld(), mobPos, playerPos - mobPos))
         {
             m_attack->attack(mob->getWorld(), mobPos, Direction(playerPos - mobPos));
-            DamageIndicatorsSystems* damageIndicators = mob->getWorld()->getDamageIndicatorsForEnemies();
-            m_attack->drawIndicators(mob->getWorld(), damageIndicators, mobPos, Direction(RIGHT));
-            m_attack->drawIndicators(mob->getWorld(), damageIndicators, mobPos, Direction(UP));
-            m_attack->drawIndicators(mob->getWorld(), damageIndicators, mobPos, Direction(LEFT));
-            m_attack->drawIndicators(mob->getWorld(), damageIndicators, mobPos, Direction(DOWN));
+            drawDamageIndicators(mob, mobPos);
         }
         else if (auto pathToPlayer = mob->getWorld()->findPath(mobPos, playerPos);
                       pathToPlayer.size() <= mob->getVisionRange())
         {
             mobPos = pathToPlayer.at(1);
-            mob->setMovedPositionOnMap(mobPos);
-            DamageIndicatorsSystems* damageIndicators = mob->getWorld()->getDamageIndicatorsForEnemies();
-            m_attack->drawIndicators(mob->getWorld(), damageIndicators, mobPos, Direction(RIGHT));
-            m_attack->drawIndicators(mob->getWorld(), damageIndicators, mobPos, Direction(UP));
-            m_attack->drawIndicators(mob->getWorld(), damageIndicators, mobPos, Direction(LEFT));
-            m_attack->drawIndicators(mob->getWorld(), damageIndicators, mobPos, Direction(DOWN));
+            mob->setScheduleMovePositionOnMap(mobPos);
+            drawDamageIndicators(mob, mobPos);
         }
         else
         {
@@ -35,8 +26,20 @@ namespace mob {
             const Vec2Int possiblePos = mobPos + Direction(direction).getVector();
             if (mob->getWorld()->getTileType(possiblePos) == TileType::GROUND)
             {
-                mob->setMovedPositionOnMap(possiblePos);
+                mob->setScheduleMovePositionOnMap(possiblePos);
             }
         }
+    }
+
+    void AggressiveBehaviour::drawDamageIndicators(Mob* mob, Vec2Int mobPos) const
+    {
+        DamageIndicatorsSystems* damageIndicators = mob->getWorld()->getDamageIndicatorsForMobs();
+        damageIndicators->scheduleDraw([this, mob, mobPos](const std::function<void(DrawDamageInfo)>& drawFunc)
+        {
+            m_attack->drawIndicators(mob->getWorld(), mobPos, Direction(RIGHT), drawFunc);
+            m_attack->drawIndicators(mob->getWorld(), mobPos, Direction(UP), drawFunc);
+            m_attack->drawIndicators(mob->getWorld(), mobPos, Direction(LEFT), drawFunc);
+            m_attack->drawIndicators(mob->getWorld(), mobPos, Direction(DOWN), drawFunc);
+        });
     }
 }

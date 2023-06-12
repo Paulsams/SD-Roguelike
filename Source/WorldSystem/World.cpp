@@ -63,6 +63,7 @@ bool World::initWithConfig()
     {
         const ValueMap& decorationMap = decorationObject.asValueMap();
         const int gid = decorationMap.at("gid").asInt();
+        
         const auto decoration = Decoration::create(this, getRectFromGid(gid - 1));
         const Vec2Int position = readPositionFromTile(decorationMap, tileSize);
         decoration->setPositionOnMapWithoutNotify(position);
@@ -70,26 +71,26 @@ bool World::initWithConfig()
         m_graph->getNodeByPos(position)->tile = TileType::DECORATION;
     }
     
-    spawnMobs(normalMobsGroup, tileSize, &mob::BaseMobAbstractFactory::createNormal);
-    spawnMobs(eliteMobsGroup, tileSize, &mob::BaseMobAbstractFactory::createElite);
-    spawnMobs(bossMobsGroup, tileSize, &mob::BaseMobAbstractFactory::createBoss);
-    spawnMobs(passiveMobsGroup, tileSize, &mob::BaseMobAbstractFactory::createPassive);
+    trySpawnMobs(normalMobsGroup, tileSize, &mob::BaseMobAbstractFactory::createNormal);
+    trySpawnMobs(eliteMobsGroup, tileSize, &mob::BaseMobAbstractFactory::createElite);
+    trySpawnMobs(bossMobsGroup, tileSize, &mob::BaseMobAbstractFactory::createBoss);
+    trySpawnMobs(passiveMobsGroup, tileSize, &mob::BaseMobAbstractFactory::createPassive);
 
-    m_damageIndicatorsPlayer = DamageIndicatorsSystems::create(this);
-    this->addChild(m_damageIndicatorsPlayer);
-
-    m_damageIndicatorsEnemies = DamageIndicatorsSystems::create(this);
-    this->addChild(m_damageIndicatorsEnemies);
+    m_damageIndicatorsMobs = DamageIndicatorsSystems::create(this);
+    this->addChild(m_damageIndicatorsMobs);
  
     return true;
 }
 
-void World::spawnMobs(const TMXObjectGroup* group, const Size tileSize,
+void World::trySpawnMobs(const TMXObjectGroup* group, const Size tileSize,
     std::function<mob::Mob*(mob::BaseMobAbstractFactory*, World*, int)> createFunc)
 {
-    for (const auto& decorationObject : group->getObjects())
+    if (group == nullptr)
+        return;
+    
+    for (const auto& mobObject : group->getObjects())
     {
-        const ValueMap& mobMap = decorationObject.asValueMap();
+        const ValueMap& mobMap = mobObject.asValueMap();
         const int gid = mobMap.at("gid").asInt();
         const auto mob = createFunc(m_mobFactory.get(), this, gid);
         const Vec2Int position = readPositionFromTile(mobMap, tileSize);
@@ -125,6 +126,10 @@ void World::addPlayer(Player* player)
 {
     m_player = player;
     addEntity(m_player);
+
+    DamageIndicatorsSystems* newIndicators = DamageIndicatorsSystems::create(this);
+    this->addChild(newIndicators);
+    m_playersDamageIndicators.insert({player, newIndicators});
 }
 
 const Player* World::getNearestPlayer(Vec2) const
@@ -143,14 +148,15 @@ TileType World::getTileType(Vec2Int position) const
 
 void World::update()
 {
-    m_damageIndicatorsPlayer->update();
-    m_damageIndicatorsEnemies->update();
-    
     m_movedEntities.clear();
     
     m_player->update();
     for (mob::Mob* mob : m_mobs)
         mob->update();
+
+    for (auto [player, damageIndicators] : m_playersDamageIndicators)
+        damageIndicators->update();
+    m_damageIndicatorsMobs->update();
 }
 
 World::World(Tilemap* tilemap, std::shared_ptr<mob::BaseMobAbstractFactory> mobFactory)
@@ -189,13 +195,15 @@ void World::updateTileType(Vec2Int position) const
 
 void World::onEntityMoved(BaseEntity* entity, BaseEntity::oldPosition oldPosition, BaseEntity::newPosition newPosition)
 {
+    static float moveTime = 0.1f;
+    
     if (!m_movedEntities.insert({newPosition, entity}).second)
         return;
 
     std::vector<BaseEntity*>& oldEntities = m_entities[getIndexFromVec2(oldPosition)];
     oldEntities.erase(std::ranges::find(oldEntities, entity));
     m_entities[getIndexFromVec2(newPosition)].push_back(entity);
-    entity->setPositionOnMapWithoutNotify(newPosition);
+    entity->moveOnMapTo(newPosition, moveTime);
 }
 
 void World::internalRemoveEntity(BaseEntity* entity)

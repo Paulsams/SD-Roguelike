@@ -17,6 +17,8 @@ public:
     static GameScene* create(cocos2d::Camera* camera);
 
 private:
+    void createPlayer();
+    
     static constexpr float aspectRatio = 1000.0f;
     static constexpr float cameraZ = 10.0f;
     

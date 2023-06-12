@@ -13,7 +13,7 @@ void BaseEntity::setPosition(float x, float y)
     Node::setPosition(x, y);
 }
 
-void BaseEntity::setMovedPositionOnMap(Vec2Int position)
+void BaseEntity::setScheduleMovePositionOnMap(Vec2Int position)
 {
     moved(this, m_position, position);
 }
@@ -21,4 +21,16 @@ void BaseEntity::setMovedPositionOnMap(Vec2Int position)
 void BaseEntity::setPositionOnMapWithoutNotify(Vec2Int cellPosition)
 {
     setPosition(m_world->convertToMapSpace(cellPosition));
+}
+
+void BaseEntity::moveOnMapTo(Vec2Int endPosition, float time)
+{
+    static constexpr int moveTag = 10;
+
+    stopActionByTag(moveTag);
+    
+    const auto moveTo = cocos2d::MoveTo::create(time, m_world->convertToMapSpace(endPosition));
+    moveTo->setTag(moveTag);
+    Node::runAction(moveTo);
+    m_position = endPosition;
 }

@@ -11,8 +11,8 @@ public:
 
     void attack(World* world, Vec2Int position, Direction direction) const;
     bool isPossibleAttack(World* world, Vec2Int position, Vec2Int localPosition) const;
-    void drawIndicators(World* world, DamageIndicatorsSystems* indicators,
-        Vec2Int position, Direction direction) const;
+    void drawIndicators(World* world, Vec2Int position, Direction direction,
+        std::function<void(DrawDamageInfo)> drawFunc) const;
 
 private:
     const std::map<Vec2Int, std::shared_ptr<AttackWithDamage>> m_ranges;

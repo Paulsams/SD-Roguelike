@@ -58,13 +58,13 @@ public:
     
     void update() override;
 
-    DamageIndicatorsSystems* getDamageIndicatorsForPlayer() const { return m_damageIndicatorsPlayer; }
-    DamageIndicatorsSystems* getDamageIndicatorsForEnemies() const { return m_damageIndicatorsEnemies; }
+    DamageIndicatorsSystems* getDamageIndicatorsForMobs() const { return m_damageIndicatorsMobs; }
+    DamageIndicatorsSystems* getDamageIndicatorsForPlayer(const Player* player) const { return m_playersDamageIndicators.at(player); }
     
 private:
     explicit World(Tilemap* tilemap, std::shared_ptr<mob::BaseMobAbstractFactory> mobFactory);
     
-    void spawnMobs(const cocos2d::TMXObjectGroup* group, cocos2d::Size tileSize,
+    void trySpawnMobs(const cocos2d::TMXObjectGroup* group, cocos2d::Size tileSize,
         std::function<mob::Mob*(mob::BaseMobAbstractFactory*, World*, int)> createFunc);
 
     void updateTileType(Vec2Int position) const;
@@ -89,8 +89,8 @@ private:
     Tilemap* m_tilemap;
     Vec2Int m_spawnPoint;
     std::shared_ptr<pathfinder::Graph> m_graph;
-    DamageIndicatorsSystems* m_damageIndicatorsPlayer;
-    DamageIndicatorsSystems* m_damageIndicatorsEnemies;
+    DamageIndicatorsSystems* m_damageIndicatorsMobs;
+    std::map<const Player*, DamageIndicatorsSystems*> m_playersDamageIndicators;
 
     std::shared_ptr<IPathfindingAlgorithm> m_pathfinding;
     

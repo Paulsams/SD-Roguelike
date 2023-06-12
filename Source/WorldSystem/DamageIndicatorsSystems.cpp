@@ -62,7 +62,7 @@ DamageIndicator::DamageIndicator(World* world)
 
 DamageIndicatorsSystems* DamageIndicatorsSystems::create(World* world)
 {
-    DamageIndicatorsSystems* damageIndicators = new (std::nothrow) DamageIndicatorsSystems(world);
+    auto damageIndicators = new (std::nothrow) DamageIndicatorsSystems(world);
     if (damageIndicators && damageIndicators->init())
     {
         damageIndicators->autorelease();
@@ -72,13 +72,9 @@ DamageIndicatorsSystems* DamageIndicatorsSystems::create(World* world)
     return nullptr;
 }
 
-void DamageIndicatorsSystems::draw(Vec2Int position, cocos2d::Color3B color, std::optional<float> damage)
+void DamageIndicatorsSystems::scheduleDraw(const std::function<void(std::function<void(DrawDamageInfo)>)>& scheduleDrawFunc)
 {
-    DamageIndicator* indicator = m_indicators.get();
-    indicator->setVisible(true);
-    indicator->setPosition(m_world->convertToMapSpace(position));
-    indicator->setColorAndDamage(color, damage);
-    m_showedObjects.push_back(indicator);
+    m_deferredDraws.push_back(scheduleDrawFunc);
 }
 
 void DamageIndicatorsSystems::reset()
@@ -94,6 +90,19 @@ void DamageIndicatorsSystems::reset()
 void DamageIndicatorsSystems::update()
 {
     reset();
+
+    for (const auto& drawFunc : m_deferredDraws)
+    {
+        drawFunc([this](const DrawDamageInfo& drawInfo)
+        {
+            DamageIndicator* indicator = m_indicators.get();
+            indicator->setVisible(true);
+            indicator->setPosition(m_world->convertToMapSpace(drawInfo.position));
+            indicator->setColorAndDamage(drawInfo.color, drawInfo.damage);
+            m_showedObjects.push_back(indicator);
+        });
+    }
+    m_deferredDraws.clear();
 }
 
 DamageIndicatorsSystems::DamageIndicatorsSystems(World* world)

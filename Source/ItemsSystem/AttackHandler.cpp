@@ -51,8 +51,9 @@ bool AttackHandler::isPossibleAttack(World* world, Vec2Int position, Vec2Int loc
     return false;
 }
 
-void AttackHandler::drawIndicators(World* world, DamageIndicatorsSystems* indicators,
-    Vec2Int position, Direction direction) const
+// В идеале бы такое через корутины можно было сделать, но что есть уж
+void AttackHandler::drawIndicators(World* world, Vec2Int position, Direction direction,
+    std::function<void(DrawDamageInfo)> drawFunc) const
 {
     std::shared_ptr<IStat> healthStat;
     std::optional<float> damage;
@@ -73,7 +74,7 @@ void AttackHandler::drawIndicators(World* world, DamageIndicatorsSystems* indica
             }
         }
         
-        indicators->draw(endPosition, damage.has_value() ? cocos2d::Color3B::RED :cocos2d::Color3B::GREEN, damage);
+        drawFunc({endPosition, damage.has_value() ? cocos2d::Color3B::RED :cocos2d::Color3B::GREEN, damage});
         damage.reset();
     }
 }

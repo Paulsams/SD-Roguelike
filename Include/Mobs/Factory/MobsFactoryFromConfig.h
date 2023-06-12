@@ -39,9 +39,9 @@ namespace mob {
             std::shared_ptr<IStat> healthStat;
             if (mob->getStats()->tryGet(Health, healthStat))
             {
-                StatBar* statBar = StatBar::create(nullptr, {40.0f, 15.0f},
+                StatBar* statBar = StatBar::create(nullptr, {40.0f, 20.0f},
                                                    Paths::toHealthBar, healthStat);
-                statBar->setPosition({-mob->getContentSize().width / 4, 30.0f});
+                statBar->setPosition({(mob->getContentSize().width - statBar->getContentSize().width) * 0.5f, 30.0f});
                 mob->addChild(statBar);
             }
             

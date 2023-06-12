@@ -21,7 +21,7 @@ namespace mob {
 
             if (const auto possiblePos = mobPos - direction.getVector();
                     mob->getWorld()->getTileType(possiblePos) == TileType::GROUND) {
-                mob->setMovedPositionOnMap(possiblePos);
+                mob->setScheduleMovePositionOnMap(possiblePos);
             }
         }
     }

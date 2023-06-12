@@ -18,8 +18,9 @@ public:
 
     void setPosition(const cocos2d::Vec2& position) override;
     void setPosition(float x, float y) override;
-    void setMovedPositionOnMap(Vec2Int position);
+    void setScheduleMovePositionOnMap(Vec2Int position);
     void setPositionOnMapWithoutNotify(Vec2Int cellPosition);
+    void moveOnMapTo(Vec2Int endPosition, float time);
     
     EventContainer<BaseEntity*, oldPosition, newPosition> moved;
     EventContainer<BaseEntity*> deleted;
