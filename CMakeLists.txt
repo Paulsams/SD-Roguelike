@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.18.3)
 
+if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.24.0")
+    cmake_policy(SET CMP0135 NEW)
+endif()
+
 set(APP_NAME roguelike)
 
 project(${APP_NAME})
@@ -254,3 +258,26 @@ if(LINUX OR WINDOWS)
     cocos_get_resource_path(APP_RES_DIR ${APP_NAME})
     cocos_copy_target_res(${APP_NAME} LINK_TO ${APP_RES_DIR} FOLDERS ${GAME_RES_FOLDER})
 endif()
+
+
+
+#enable google tests
+include(FetchContent)
+FetchContent_Declare(
+        googletest
+        URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
+)
+
+FetchContent_MakeAvailable(googletest)
+enable_testing()
+include(GoogleTest)
+
+set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ../tests)
+add_executable(baseTest tests/baseTest.cpp)
+
+target_link_libraries(
+        baseTest
+        PRIVATE
+        GTest::gtest_main
+)
+

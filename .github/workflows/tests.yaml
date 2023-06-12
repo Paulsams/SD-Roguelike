@@ -69,4 +69,12 @@ jobs:
         run: cmake -B ./build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
       - name: Build
-        run: cmake --build ./build --config ${{env.BUILD_TYPE}}
+        run: cmake --build ./build --config ${{env.BUILD_TYPE}} -j
+
+      - name: Base Test Windows
+        if: matrix.config.name == 'Windows'
+        run: tests/Debug/baseTest.exe
+
+      - name: Base Test Linux
+        if: matrix.config.name == 'Ubuntu'
+        run: tests/baseTest
