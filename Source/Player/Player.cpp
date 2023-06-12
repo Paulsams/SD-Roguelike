@@ -1,5 +1,6 @@
-#include "Player/Player.h"
+#include <optional>
 
+#include "Player/Player.h"
 #include "Stats/Modificators/BoundsModificator.h"
 #include "Stats/Modificators/StatWithModificators.h"
 
@@ -7,7 +8,7 @@ using namespace cocos2d;
 
 Player* Player::create(World* world)
 {
-    Player* player = new (std::nothrow) Player(world);
+    auto* player = new (std::nothrow) Player(world);
     if (player && player->init())
     {
         player->autorelease();
@@ -16,8 +17,6 @@ Player* Player::create(World* world)
     CC_SAFE_DELETE(player);
     return nullptr;
 }
-
-void Player::update() { }
 
 bool Player::init()
 {
@@ -54,13 +53,27 @@ bool Player::init()
     return true;
 }
 
+void Player::update()
+{
+    updateDamageIndicator();
+    m_statsContainer->get(Mana)->changeValueBy(1);
+}
+
 Player::Player(World* world)
     : BaseEntity(world)
-    , m_moveDelegate(CC_CALLBACK_1(Player::move, this))
+    , m_moveDelegate(CC_CALLBACK_1(Player::onMove, this))
+    , m_attackedDelegate(CC_CALLBACK_0(Player::onAttacked, this))
+    , m_interactedDelegate(CC_CALLBACK_0(Player::onInteracted, this))
     , m_input(this)
+    , m_backpack(Attacks::createWeapon(world, Attacks::defaultWeapon))
     , m_statsContainer(std::make_shared<StatsContainer>())
+    , m_items(12)
 {
     m_input.moved += m_moveDelegate;
+    m_input.attacked += m_attackedDelegate;
+    m_input.interacted += m_interactedDelegate;
+
+    m_backpack.changedCurrentWeapon += std::bind(&Player::updateDamageIndicator, this);
 
     const auto playerHpStat = std::make_shared<StatWithModificators>(100.0f);
     playerHpStat->addModificator(std::make_shared<BoundsModificator>(MinMax(0, 100.0f)));
@@ -72,14 +85,70 @@ Player::Player(World* world)
 
     m_statsContainer->add(Level, std::make_shared<StatWithModificators>(0));
 
-    for (int i = 0; i < 12; ++i)
-        m_items.push_back(nullptr);
+    m_interactedVisitor = FunctionVisitorEntitiesBuilder<void>().setItem([this](BaseItem* item)
+    {
+        item->pickUp(this);
+        const std::vector<BaseItem*> items = m_items.getCollection();
+        m_items.setAt(std::ranges::find(items, nullptr) - items.begin(), item);
+    }).build();
 }
 
-void Player::move(Direction direction)
+void Player::updateDamageIndicator() const
 {
-    Vec2Int newPosition = getPositionInWorld() + direction.getVector();
-    TileType tileType = getWorld()->getTileType(newPosition);
-    if (tileType == TileType::GROUND)
-        setPositionInWorld(newPosition);
+    if (m_choicedDirection.has_value())
+    {
+        DamageIndicatorsSystems* damageIndicators = getWorld()->getDamageIndicatorsForPlayer();
+        damageIndicators->reset();
+        if (const Weapon* currentWeapon = m_backpack.getCurrentWeapon())
+            currentWeapon->drawIndicators(damageIndicators, getPositionOnMap(), m_choicedDirection.value());
+    }
+}
+
+void Player::onMove(Direction direction)
+{
+    static std::shared_ptr<FunctionVisitorEntitiesReturnVoid> visitor = FunctionVisitorEntitiesBuilder<void>()
+        .setDecoration([](Decoration*) { })
+        .setMob([](mob::Mob*){ })
+        .setChest([](Chest*){ })
+        .setPlayer([](Player*) { }).build();
+    
+    if (m_choicedDirection.has_value() && m_choicedDirection.value() == direction)
+    {
+        Vec2Int newPosition = getPositionOnMap() + direction.getVector();
+        TileType tileType = getWorld()->getTileType(newPosition);
+        if (tileType == TileType::GROUND)
+        {
+            for (BaseEntity* entity : getWorld()->getEntitiesFromCell(newPosition))
+            {
+                entity->acceptVisit(visitor);
+                if (visitor->isCalled())
+                    return;
+            }
+            setMovedPositionOnMap(newPosition);
+        }
+        return;
+    }
+    
+    m_choicedDirection.emplace(direction);
+    updateDamageIndicator();
+}
+
+void Player::onAttacked()
+{
+    const Weapon* currentWeapon = m_backpack.getCurrentWeapon();
+    if (!currentWeapon || !m_choicedDirection.has_value())
+        return;
+    
+    currentWeapon->attack(getPositionOnMap(), m_choicedDirection.value());
+    attacked();
+}
+
+void Player::onInteracted()
+{
+    for (BaseEntity* entity : getWorld()->getEntitiesFromCell(getPositionOnMap()))
+    {
+        entity->acceptVisit(m_interactedVisitor);
+        if (m_interactedVisitor->isCalled())
+            break;
+    }
 }

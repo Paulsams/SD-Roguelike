@@ -9,13 +9,15 @@ class Player;
 class PlayerInput
 {
 public:
-    using attack_func_type = std::function<void()>;
-    using direction_func_type = std::function<void(Direction)>;
+    using attackDelegate = std::function<void()>;
+    using directionDelegate = std::function<void(Direction)>;
+    using interactDelegate = std::function<void()>;
 
     explicit PlayerInput(Player* player);
 
     EventContainer<Direction> moved;
     EventContainer<> attacked;
+    EventContainer<> interacted;
 private:
     void onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event) const;
     void tryInvokeDirectionFromInput(cocos2d::EventKeyboard::KeyCode keyCode) const;

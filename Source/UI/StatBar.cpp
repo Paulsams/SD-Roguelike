@@ -4,11 +4,44 @@
 
 #include "2d/CCLabel.h"
 #include "Stats/Modificators/BoundsModificator.h"
-#include "UI/Colors.h"
+#include "ui/UIImageView.h"
 #include "ui/UILoadingBar.h"
 
 using namespace cocos2d;
 using namespace cocos2d::ui;
+
+bool StatBar::postInit(LinearLayoutParameter* marginParameter, Size contentSize, const std::string& pathToImage)
+{
+    if (!m_stat->tryGet(m_boundsStat))
+        return false;
+    
+    setContentSize(contentSize);
+    
+    setLayoutParameter(marginParameter);
+    setAnchorPoint(Vec2::ZERO);
+
+    ImageView* frame = ImageView::create("FrameStatBar.png");
+    frame->ignoreContentAdaptWithSize(false);
+    frame->setContentSize(getContentSize());
+    frame->setAnchorPoint(Vec2::ZERO);
+    this->addChild(frame, 0);
+
+    m_bar = LoadingBar::create(pathToImage, m_boundsStat->getValueFromPercent(m_stat->getValue()));
+    m_bar->ignoreContentAdaptWithSize(false);
+    m_bar->setContentSize(contentSize);
+    m_bar->setAnchorPoint(Vec2::ZERO);
+    this->addChild(m_bar, 1);
+    
+    m_label = Label::createWithTTF(getTextView(), FontsTTF::onUI, textSize);
+    m_label->setContentSize(contentSize);
+    m_label->setPosition(contentSize / 2);
+    m_label->setScale(contentSize.height / textSize / coefficientScaleTextSize);
+    this->addChild(m_label, 2);
+
+    m_stat->changed += m_changeStatDelegate;
+
+    return true;
+}
 
 StatBar* StatBar::create(LinearLayoutParameter* marginParameter, Size contentSize,
                          const std::string& pathToImage, std::shared_ptr<IStat> stat)
@@ -22,35 +55,6 @@ StatBar* StatBar::create(LinearLayoutParameter* marginParameter, Size contentSiz
     }
     CC_SAFE_DELETE(statBar);
     return nullptr;
-}
-
-bool StatBar::postInit(LinearLayoutParameter* marginParameter, Size contentSize, const std::string& pathToImage)
-{
-    if (!m_stat->tryGet(m_boundsStat))
-        return false;
-    
-    setContentSize(contentSize);
-    
-    setLayoutParameter(marginParameter);
-    setAnchorPoint(Vec2::ZERO);
-
-    setBackGroundColorType(BackGroundColorType::SOLID);
-    setBackGroundColor(Colors::backgroundForStat);
-
-    m_bar = LoadingBar::create(pathToImage, m_stat->getValue());
-    m_bar->ignoreContentAdaptWithSize(false);
-    m_bar->setContentSize(contentSize);
-    m_bar->setAnchorPoint(Vec2::ZERO);
-    this->addChild(m_bar);
-
-    m_label = Label::createWithTTF(getTextView(), FontsTTF::onUI, 20);
-    m_label->setContentSize(contentSize);
-    m_label->setPosition(contentSize / 2);
-    this->addChild(m_label);
-
-    m_stat->changed += m_changeStatDelegate;
-
-    return true;
 }
 
 StatBar::StatBar(std::shared_ptr<IStat> stat)

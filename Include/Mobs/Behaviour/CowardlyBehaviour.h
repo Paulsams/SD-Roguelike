@@ -1,4 +1,5 @@
 #pragma once
+#include "ItemsSystem/AttackHandler.h"
 #include "Mobs/Behaviour/IMobBehaviour.h"
 
 namespace mob {

@@ -5,7 +5,6 @@ class World;
 
 struct IVisualAttack
 {
-    void draw(World* world, Vec2Int position) const {
-
-    }
+    virtual ~IVisualAttack() = default;
+    virtual void draw(World* world, Vec2Int position) const = 0;
 };

@@ -1,30 +1,55 @@
 ﻿#pragma once
 
-#include "2d/CCMenu.h"
-#include "ItemsSystem/IItem.h"
+#include "MenuItemForInventory.h"
 #include "ui/UILayout.h"
-#include "Utils/EventsSystem.h"
 
 class InventoryView final : public cocos2d::ui::Layout
 {
 public:
-    using Inventory = ObservableVector<std::shared_ptr<IItem>>;
+    struct SelectedItemInfo
+    {
+        SelectedItemInfo(InventoryView* inventory, MenuItemForInventory* item, int localIndex)
+            : inventory(inventory),
+              menuItem(item),
+              index(localIndex) { }
+
+        InventoryView* inventory;
+        MenuItemForInventory* menuItem;
+        int index;
+    };
     
-    static InventoryView* create(Inventory& observableItems, cocos2d::Size contentSize, cocos2d::Vec2 padding);
+    using Inventory = ObservableVector<BaseItem*>;
+    
+    static InventoryView* create(Inventory& observableItems, const std::vector<ItemTypeSlot>& availableSlots,
+        const SpriteWithRect& spriteWithRect, cocos2d::Size itemSize, int columns, cocos2d::Vec2 padding);
 
-    bool initWithContentSize(cocos2d::Size contentSize);
+    bool initWithGrid(cocos2d::Size itemSize, int columns);
 
-    ~InventoryView() override;
+    ~InventoryView();
+
+    bool isAvailable(ItemTypeSlot type) { return std::find(m_availableSlots.begin(),
+                                                           m_availableSlots.end(), type) != m_availableSlots.end(); }
+
+    void swapItems(int firstIndex, int secondIndex) const { m_observableItems.swap(firstIndex, secondIndex); }
+    
+    void setItemFromIndex(int index, BaseItem* item) const { m_observableItems.setAt(index, item); }
+    
+    EventContainer<SelectedItemInfo> selected;
 
 private:
-    InventoryView(Inventory& observableItems, cocos2d::Vec2 padding);
+    InventoryView(Inventory& observableItems, const SpriteWithRect& backgroundFrame,
+        const std::vector<ItemTypeSlot>& availableSlots, cocos2d::Vec2 padding);
 
-    void onChangeItem(size_t indexChange, Inventory::oldValue oldItem, Inventory::newValue newItem);
-    void onSwappedItems(size_t oldIndex, size_t newIndex);
+    void onChangeItem(size_t indexChange, Inventory::oldValue, Inventory::newValue newItem) const;
+
+    void onSwappedItems(size_t oldIndex, size_t newIndex) const;
 
     FunctionHandler<size_t, Inventory::oldValue, Inventory::newValue> m_changeItemDelegate;
     FunctionHandler<size_t, size_t> m_swappedItemsDelegate;
-    
+
+    std::vector<MenuItemForInventory*> m_menuItems;
+    SpriteWithRect m_backgroundFrame;
+    std::vector<ItemTypeSlot> m_availableSlots;
     Inventory& m_observableItems;
     cocos2d::Vec2 m_padding;
 };

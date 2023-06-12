@@ -67,32 +67,37 @@ list(APPEND GAME_SOURCE
     Source/Player/Player.cpp
     Source/Player/PlayerInput.cpp
 
+    Source/ItemsSystem/AttackHandler.cpp
+    Source/ItemsSystem/Attacks.cpp
     Source/ItemsSystem/Weapon.cpp
 
     Source/Mobs/Mob.cpp
-    Source/Mobs/Strategy/StateContainer.cpp
+    Source/Mobs/Strategy/StateMachine.cpp
     Source/Mobs/Strategy/StrategyWithStates.cpp
     Source/Mobs/Strategy/Normal.cpp
     Source/Mobs/Behaviour/AggressiveBehaviour.cpp
         Source/Mobs/Behaviour/CowardlyBehaviour.cpp
         Source/Mobs/Behaviour/PassiveBehaviour.cpp
 
-    Source/WorldSystem/BaseEntity.cpp
-
     Source/Pathfinder/PathfinderAStar.cpp
 
-    Source/WorldSystem/World.cpp
-    Source/WorldSystem/ReadFileWorldBuilder.cpp
-    Source/WorldSystem/RandomGeneratorWorldBuilder.cpp
-
     Source/Stats/StatsContainer.cpp
-
     Source/Stats/Modificators/StatWithModificators.cpp
 
     Source/UI/Canvas.cpp
     Source/UI/InventoryView.cpp
-    Source/UI/StepCounter.cpp
+    Source/UI/MenuItemForInventory.cpp
+    Source/UI/PlayerItemsOnUI.cpp
     Source/UI/StatBar.cpp
+    Source/UI/StepCounter.cpp
+    
+    Source/Utils/Common.cpp
+    
+    Source/WorldSystem/BaseEntity.cpp
+    Source/WorldSystem/DamageIndicatorsSystems.cpp
+    Source/WorldSystem/World.cpp
+    Source/WorldSystem/ReadFileWorldBuilder.cpp
+    Source/WorldSystem/RandomGeneratorWorldBuilder.cpp
     )
 
 list(APPEND GAME_HEADER
@@ -109,20 +114,23 @@ list(APPEND GAME_HEADER
     Include/Player/PlayerInput.h
 
     Include/ItemsSystem/Accessory.h
-    Include/ItemsSystem/AttackData.h
+    Include/ItemsSystem/AttackWithDamage.h
     Include/ItemsSystem/AttackHandler.h
-    Include/ItemsSystem/AttackSearchFromDFS.h
-    Include/ItemsSystem/IAttackSearch.h
-    Include/ItemsSystem/IItem.h
+    Include/ItemsSystem/Attacks.h
+    Include/ItemsSystem/BaseItem.h
+    Include/ItemsSystem/Damage.h
     Include/ItemsSystem/IVisualAttack.h
     Include/ItemsSystem/Weapon.h
+    
+    Include/ItemsSystem/AttackSearch/AttackSearchFromDFS.h
+    Include/ItemsSystem/AttackSearch/IAttackSearch.h
 
     Include/Mobs/Mob.h
     Include/Mobs/Strategy/BaseStateStrategy.h
     Include/Mobs/Strategy/IState.h
     Include/Mobs/Strategy/NothingStrategy.h
     Include/Mobs/Strategy/IMobStrategy.h
-    Include/Mobs/Strategy/StateContainer.h
+    Include/Mobs/Strategy/StateMachine.h
     Include/Mobs/Strategy/StrategyWithStates.h
     Include/Mobs/Strategy/Normal.h
     Include/Mobs/Behaviour/IMobBehaviour.h
@@ -139,11 +147,6 @@ list(APPEND GAME_HEADER
     Include/Pathfinder/PathfinderAStar.h
     Include/Pathfinder/IPathfindingAlgorithm.h
 
-    Include/WorldSystem/BaseEntity.h
-    Include/WorldSystem/World.h
-    Include/WorldSystem/ReadFileWorldBuilder.h
-    Include/WorldSystem/RandomGeneratorWorldBuilder.h
-
     Include/Stats/IHaveStats.h
     Include/Stats/IStat.h
     Include/Stats/IStatsContainer.h
@@ -154,14 +157,28 @@ list(APPEND GAME_HEADER
     Include/Stats/Modificators/StatWithModificators.h
 
     Include/UI/Canvas.h
-    Include/UI/Colors.h
     Include/UI/InventoryView.h
-    Include/UI/StepCounter.h
+    Include/UI/MenuItemForInventory.h
+    Include/UI/PlayerItemsOnUI.h
     Include/UI/StatBar.h
+    Include/UI/StepCounter.h
 
+    Include/Utils/Common.h
     Include/Utils/Direction.h
     Include/Utils/EventsSystem.h
-    Include/Utils/Common.h
+    Include/Utils/FontsTTF.h
+    Include/Utils/PoolObjects.h
+    Include/Utils/ValueNotifyChanged.h
+    
+    Include/WorldSystem/BaseEntity.h
+    Include/WorldSystem/Chest.h
+    Include/WorldSystem/DamageIndicatorsSystems.h
+    Include/WorldSystem/Decoration.h
+    Include/WorldSystem/FunctionVisitorEntities.h
+    Include/WorldSystem/RandomGeneratorWorldBuilder.h
+    Include/WorldSystem/ReadFileWorldBuilder.h
+    Include/WorldSystem/IVisitorEntities.h
+    Include/WorldSystem/World.h
     Include/WorldSystem/WorldTileConfig.h
     )
 

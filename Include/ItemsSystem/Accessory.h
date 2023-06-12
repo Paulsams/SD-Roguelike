@@ -1,7 +1,18 @@
 ﻿#pragma once
 
-class Accessory
+#include "BaseItem.h"
+#include "WorldSystem/BaseEntity.h"
+
+class Accessory final : public BaseItem
 {
 public:
-    // Accessory(Player)
+    Accessory(World* world, const cocos2d::Rect& rect)
+        : BaseItem(world, rect)
+        , m_stats(std::make_shared<StatsContainer>()) { }
+
+    const std::shared_ptr<IStatsContainer> getStats() const override { return m_stats; }
+    ItemTypeSlot getItemTypeFromSlot() const override { return ACCESSORY; }
+
+private:
+    std::shared_ptr<StatsContainer> m_stats;
 };

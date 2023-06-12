@@ -4,7 +4,8 @@
 
 namespace pathfinder {
 
-    std::vector<Vec2Int> PathfinderAStar::findPath(Graph& graph, Node* start, Node* end) {
+    std::vector<Vec2Int> PathfinderAStar::findPath(Graph& graph, Node* start, Node* end)
+    {
         if (!start || !end)
             throw std::invalid_argument("start or end is null");
 
@@ -19,7 +20,8 @@ namespace pathfinder {
         auto comporator = [](const Node* lhs, const Node* rhs) { return lhs->fGlobalGoal > rhs->fGlobalGoal;};
         std::priority_queue<Node*, std::vector<Node*>, decltype(comporator)> queue(comporator);
         queue.push(start);
-        while (!queue.empty() && curNode != end) {
+        while (!queue.empty() && curNode != end)
+        {
 
             while(!queue.empty() && graph.getVisitedNode(queue.top()))
                 queue.pop();
@@ -27,13 +29,17 @@ namespace pathfinder {
             curNode = queue.top();
             graph.setVisitedNode(curNode);
 
-            for(auto neighbor: curNode->neighbors) {
-                if (!graph.getVisitedNode(neighbor) && neighbor->tile != TILE_TYPE::OBSTACLE) {
+            for(auto neighbor: curNode->neighbors)
+            {
+                if (!graph.getVisitedNode(neighbor) && neighbor->tile != TileType::OBSTACLE &&
+                    neighbor->tile != TileType::DECORATION)
+                {
                     queue.push(neighbor);
                 }
 
                 float possibleLowerLocalGoal = curNode->fLocalGoal + curNode->distanceSquared(neighbor);
-                if (possibleLowerLocalGoal < neighbor->fLocalGoal) {
+                if (possibleLowerLocalGoal < neighbor->fLocalGoal)
+                    {
                     graph.setParentNode(neighbor, curNode);
                     neighbor->fLocalGoal = possibleLowerLocalGoal;
 
@@ -44,8 +50,9 @@ namespace pathfinder {
 
         std::vector<Vec2Int> path;
         path.push_back(end->pos);
-        Node* parent = nullptr;
-        while (!(parent = graph.getParentNode(end))) {
+        Node* parent;
+        while ((parent = graph.getParentNode(end)))
+        {
             path.push_back(parent->pos);
             end = parent;
         }

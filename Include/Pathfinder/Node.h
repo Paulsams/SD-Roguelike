@@ -5,24 +5,25 @@
 
 #include "Utils/Common.h"
 
+enum class TileType {
+    GROUND = 0,
+    OBSTACLE = 1,
+    DECORATION = 2,
+    OUT_OF_BOUNDS = 3,
+};
+
 namespace pathfinder {
-
-    enum class TILE_TYPE : uint32_t {
-        GROUND = 0,
-        OBSTACLE = 1,
-    };
-
-
+    
     struct Node {
         Vec2Int pos;
-        TILE_TYPE tile = TILE_TYPE::GROUND;
+        TileType tile = TileType::GROUND;
         std::vector<Node *> neighbors;
 
         float fGlobalGoal = std::numeric_limits<float>::infinity();
         float fLocalGoal = std::numeric_limits<float>::infinity();
 
         Node() : pos(-1, -1) {}
-        Node(const cocos2d::Point& pos,  TILE_TYPE tile) : pos(pos), tile(tile) {}
+        Node(const cocos2d::Point& pos, TileType tile) : pos(pos), tile(tile) {}
         Node(const cocos2d::Point& pos) : pos(pos) {}
 
         void clear() noexcept {

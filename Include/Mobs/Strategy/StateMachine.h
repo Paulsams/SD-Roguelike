@@ -18,17 +18,17 @@ namespace mob
 
     template <typename T, typename U>
     requires is_required_interface<T>
-    class StateContainer
+    class StateMachine
     {
         using func_holder = std::unordered_map<size_t,
                 std::vector< std::pair<std::function<bool(U*)>, std::shared_ptr<T>> > >;
 
     public:
-        StateContainer() = delete;
+        StateMachine() = delete;
         
-        StateContainer(std::shared_ptr<T> currentState, const func_holder& functions): m_currentState(std::move(currentState)),
+        StateMachine(std::shared_ptr<T> currentState, const func_holder& functions): m_currentState(std::move(currentState)),
                                                                                             m_functions(functions){}
-        StateContainer(StateContainer&& other) {
+        StateMachine(StateMachine&& other) {
             m_currentState = std::move(other.m_currentState);
             m_functions = std::move(m_functions);
         }

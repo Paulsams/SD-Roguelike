@@ -4,24 +4,37 @@
 #include "Utils/Common.h"
 #include "Utils/EventsSystem.h"
 
+struct IVisitorEntities;
 class World;
 
-class BaseEntity : public cocos2d::Node, public IHaveStats
+class BaseEntity : public virtual cocos2d::Node, public IHaveStats
 {
 public:
     using oldPosition = Vec2Int;
     using newPosition = Vec2Int;
 
-    BaseEntity(World* world)
+    Vec2Int getPositionOnMap() const { return m_position; }
+    World* getWorld() const { return m_world; }
+
+    void setPosition(const cocos2d::Vec2& position) override;
+    void setPosition(float x, float y) override;
+    void setMovedPositionOnMap(Vec2Int position);
+    void setPositionOnMapWithoutNotify(Vec2Int cellPosition);
+    
+    EventContainer<BaseEntity*, oldPosition, newPosition> moved;
+    EventContainer<BaseEntity*> deleted;
+
+    virtual void acceptVisit(std::shared_ptr<IVisitorEntities> visitor) = 0;
+
+protected:
+    explicit BaseEntity(World* world)
         : m_world(world) { }
 
-    Vec2Int getPositionInWorld() const { return m_position; }
-    World* getWorld() const { return m_world; }
-    
-    void setPositionInWorld(Vec2Int position);
-    
-    EventContainer<oldPosition, newPosition> moved;
-    EventContainer<BaseEntity*> deleted;
+    void destroyEntity()
+    {
+        deleted(this);
+        getParent()->removeChild(this);
+    }
     
 private:
     Vec2Int m_position;

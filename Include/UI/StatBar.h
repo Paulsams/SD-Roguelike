@@ -16,9 +16,11 @@ public:
 
 private:
     const FunctionHandler<IStat::oldValue, IStat::currentValue, IStat::changedValue> m_changeStatDelegate;
+    static constexpr float coefficientScaleTextSize = 2.5f;
+    static constexpr float textSize = 40.0f;
 
     explicit StatBar(std::shared_ptr<IStat> stat);
-    ~StatBar() override;
+    ~StatBar();
 
     std::string getTextView() const;
 

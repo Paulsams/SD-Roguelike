@@ -5,5 +5,4 @@ enum StatType
     Health,
     Mana,
     Level,
-    Attack,
 };

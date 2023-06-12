@@ -175,38 +175,46 @@ template <typename T>
 class ObservableVector
 {
 public:
-	using oldValue = const T&;
-	using newValue = const T&;
+	using oldValue = T&;
+	using newValue = T&;
 	
-	EventContainer<size_t, newValue> added;
-	EventContainer<size_t, newValue> removed;
+	// EventContainer<size_t, newValue> added;
+	// EventContainer<size_t, newValue> removed;
 	EventContainer<size_t, oldValue, newValue> changed;
 	EventContainer<size_t, size_t> swapped;
 
-	void push_back(const T& value)
+	ObservableVector(const std::vector<T>& vector) { m_collection = vector; }
+	ObservableVector(size_t size) { m_collection = std::vector<T>(size); }
+	
+	// void push_back(const T& value)
+	// {
+	// 	m_collection.push_back(value);
+	// 	added(m_collection.size() - 1, value);
+	// }
+	//
+	// void push_back(T&& value)
+	// {
+	// 	m_collection.push_back(std::move(value));
+	// 	added(m_collection.size() - 1, m_collection[m_collection.size() - 1]);
+	// }
+	//
+	// void erase(const T& value)
+	// {
+	// 	auto finded = std::find(m_collection.begin(), m_collection.end(), value);
+	// 	m_collection.erase(finded);
+	// 	removed(finded - m_collection.begin(), finded);
+	// }
+	//
+	// void eraseAt(size_t index)
+	// {
+	// 	const T& value = m_collection[index];
+	// 	m_collection.erase(m_collection.begin() + index);
+	// 	removed(index, value);
+	// }
+	
+	size_t size() const
 	{
-		m_collection.push_back(value);
-		added(m_collection.size() - 1, value);
-	}
-
-	void push_back(T&& value)
-	{
-		m_collection.push_back(std::move(value));
-		added(m_collection.size() - 1, m_collection[m_collection.size() - 1]);
-	}
-
-	void erase(const T& value)
-	{
-		auto finded = std::find(m_collection.begin(), m_collection.end(), value);
-		m_collection.erase(finded);
-		removed(finded - m_collection.begin(), finded);
-	}
-
-	void eraseAt(size_t index)
-	{
-		const T& value = m_collection[index];
-		m_collection.erase(m_collection.begin() + index);
-		removed(index, value);
+		return m_collection.size();
 	}
 
 	const T& operator[] (size_t index) const
@@ -216,14 +224,14 @@ public:
 
 	void setAt(size_t index, const T& value)
 	{
-		const T& old = m_collection[index];
+		T old = m_collection[index];
 		m_collection[index] = value;
-		changed(index, old, value);
+		changed(index, old, m_collection[index]);
 	}
 
 	void setAt(size_t index, T&& value)
 	{
-		const T& old = m_collection[index];
+		T old = m_collection[index];
 		m_collection[index] = std::move(value);
 		changed(index, old, value);
 	}
@@ -231,6 +239,7 @@ public:
 	void swap(size_t firstIndex, size_t secondIndex)
 	{
 		std::swap(m_collection[firstIndex], m_collection[secondIndex]);
+		swapped(firstIndex, secondIndex);
 	}
 
 	const std::vector<T>& getCollection() const { return m_collection; }

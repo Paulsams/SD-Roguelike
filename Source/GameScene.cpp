@@ -1,7 +1,11 @@
 #include "GameScene.h"
+
+#include "ItemsSystem/Attacks.h"
+#include "Mobs/Factory/MobsFactoryFromConfig.h"
 #include "UI/Canvas.h"
 #include "WorldSystem/World.h"
 #include "WorldSystem/RandomGeneratorWorldBuilder.h"
+#include "WorldSystem/ReadFileWorldBuilder.h"
 
 using namespace cocos2d;
 
@@ -52,21 +56,35 @@ bool GameScene::init(Camera* camera)
         return false;
 
     m_camera = camera;
+    auto mobsConfig = std::make_shared<mob::MobsConfig>();
+    const auto mobFactory = std::make_shared<mob::MobsFactoryFromConfig>(mobsConfig);
 
     m_worldTileConfig = std::make_shared<WorldTileConfig>("Resources/World.json");
-
+    
     m_gameLoop = std::make_shared<GameLoop>();
+
 //    m_world = World::create(ReadFileWorldBuilder().setPath("TileMap.tmx").build());
-    m_world = World::create(RandomGeneratorWorldBuilder().setPath("Template.tmx").setConfig(m_worldTileConfig->getLevelsTileConfig().at(0)).setWidth(100).setHeight(100).setIterCount(5).build());
-    m_world->setScale(0.31f);
+    // m_world = World::create(RandomGeneratorWorldBuilder().setPath("Template.tmx").setConfig(m_worldTileConfig->getLevelsTileConfig().at(0)).setWidth(100).setHeight(100).setIterCount(5).build());
+    // m_world->setScale(0.31f);
+
+    m_world = World::create(ReadFileWorldBuilder().setPath("Custom.tmx").build(), mobFactory);
+    //m_world = World::create(RandomGeneratorWorldBuilder().setPath("Template.tmx").setConfig(m_worldTileConfig).setWidth(100).setHeight(100).setIterCount(5).build());
+    m_world->setScale(1.5f);
+    m_gameLoop->add(m_world);
+
     this->addChild(m_world);
 
-    m_player = Player::create(m_world);
-    m_gameLoop->add(m_player);
+    Weapon* stick = Attacks::createWeapon(m_world, Attacks::stick_1);
+    stick->setPositionOnMapWithoutNotify({3, 3});
+    m_world->addEntity(stick);
 
-    m_world->addChild(m_player);
+    Weapon* axe_1 = Attacks::createWeapon(m_world, Attacks::axe_1);
+    axe_1->setPositionOnMapWithoutNotify({4, 5});
+    m_world->addEntity(axe_1);
+
+    m_player = Player::create(m_world);
+    m_player->setPositionOnMapWithoutNotify(m_world->getSpawnPoint());
     m_world->addPlayer(m_player);
-    m_player->setPositionInWorld(m_world->getSpawnPoint());
 
     m_canvas = Canvas::create(m_world, m_player, m_gameLoop);
     m_canvas->setContentSize(Director::getInstance()->getWinSize());
@@ -77,7 +95,7 @@ bool GameScene::init(Camera* camera)
     m_world->updateCullingRect(Rect(viewPoint, winSize));
     m_camera->setPosition(viewPoint);
 
-    m_player->moved += [this](Vec2Int, Vec2Int)
+    m_player->moved += [this](BaseEntity*, Vec2Int, Vec2Int)
     {
         static constexpr int moveCameraTag = 10;
         static constexpr float moveCameraTime = 0.4f;
@@ -99,6 +117,11 @@ bool GameScene::init(Camera* camera)
 
         this->m_gameLoop->step();
     };
+
+    m_player->attacked += [this]()
+    {
+        m_gameLoop->step();
+    };
     
     return true;
 }
@@ -114,7 +137,7 @@ Point GameScene::getViewPointCenter(Point position) const
     Point viewPoint = position - Point(winSize.width / 2, winSize.height / 2);
     viewPoint.x = std::clamp(viewPoint.x, 0.0f, mapSize.width * tileSize.width * m_world->getScale() -
         winSize.width + Canvas::widthRightPanel);
-    viewPoint.y = std::clamp(viewPoint.y, 0.0f,
+    viewPoint.y = std::clamp(viewPoint.y, -Canvas::heightBackpack,
         (mapSize.height * tileSize.height * m_world->getScale() - winSize.height));
     
     return viewPoint;
