@@ -42,8 +42,8 @@ namespace mob
     Mob::Mob(World* world, const MobInfo& info)
         : BaseEntity(world)
         , m_visionRange(info.visionRange)
-        , m_strategy(info.strategy())
-        , m_behaviour(info.startBehaviour())
+        , m_strategy(info.strategy)
+        , m_behaviour(info.startBehaviour)
         , m_stats(std::make_shared<StatsContainer>())
     {
         const auto mobHpStat = std::make_shared<StatWithModificators>(info.health);

@@ -47,7 +47,7 @@ Player::Player(World* world)
     , m_attackedDelegate(CC_CALLBACK_0(Player::onAttacked, this))
     , m_interactedDelegate(CC_CALLBACK_0(Player::onInteracted, this))
     , m_input(this)
-    , m_backpack(Attacks::createWeapon(world, Attacks::defaultWeapon, 1))
+    , m_backpack(Attacks::createDefaultWeapon(world))
     , m_statsContainer(std::make_shared<StatsContainer>())
     , m_items(12)
 {
@@ -82,7 +82,7 @@ void Player::scheduleDamageIndicators(bool isForcedUpdate) const
     {
         DamageIndicatorsSystems* damageIndicators = getWorld()->getDamageIndicatorsForPlayer(this);
         if (const Weapon* currentWeapon = m_backpack.getCurrentWeapon())
-            currentWeapon->scheduleDrawIndicators(damageIndicators, getPositionOnMap(), m_choicedDirection.value());
+            currentWeapon->scheduleDrawIndicators(damageIndicators, this, m_choicedDirection.value());
         
         if (isForcedUpdate)
             damageIndicators->update();

@@ -35,9 +35,10 @@ public:
     {
         if (m_isOpen)
             return;
-        
-        m_onInteractedFunc(this);
+
         m_isOpen = true;
+        m_onInteractedFunc(this);
+        destroyEntity(); 
     }
 
 private:

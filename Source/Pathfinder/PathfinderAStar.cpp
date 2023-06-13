@@ -4,7 +4,8 @@
 
 namespace pathfinder {
 
-    std::vector<Vec2Int> PathfinderAStar::findPath(Graph& graph, Node* start, Node* end)
+    std::vector<Vec2Int> PathfinderAStar::findPath(Graph& graph, Node* start, Node* end,
+        const std::function<bool(const Node*)>& isValidMove)
     {
         if (!start || !end)
             throw std::invalid_argument("start or end is null");
@@ -26,13 +27,16 @@ namespace pathfinder {
             while(!queue.empty() && graph.getVisitedNode(queue.top()))
                 queue.pop();
 
+            if (queue.empty())
+                break;
+
             curNode = queue.top();
             graph.setVisitedNode(curNode);
 
             for(auto neighbor: curNode->neighbors)
             {
                 if (!graph.getVisitedNode(neighbor) && neighbor->tile != TileType::OBSTACLE &&
-                    neighbor->tile != TileType::DECORATION)
+                    neighbor->tile != TileType::DECORATION && isValidMove(neighbor))
                 {
                     queue.push(neighbor);
                 }
@@ -49,11 +53,10 @@ namespace pathfinder {
         }
 
         std::vector<Vec2Int> path;
-        path.push_back(end->pos);
         Node* parent;
         while ((parent = graph.getParentNode(end)))
         {
-            path.push_back(parent->pos);
+            path.push_back(end->pos);
             end = parent;
         }
 

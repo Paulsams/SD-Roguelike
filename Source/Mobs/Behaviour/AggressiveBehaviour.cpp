@@ -10,14 +10,17 @@ namespace mob {
         if (m_attack->isPossibleAttack(mob->getWorld(), mobPos, playerPos - mobPos))
         {
             m_attack->attack(mob->getWorld(), mobPos, Direction(playerPos - mobPos));
-            drawDamageIndicators(mob, mobPos);
+            drawDamageIndicators(mob);
         }
-        else if (auto pathToPlayer = mob->getWorld()->findPath(mobPos, playerPos);
-                      pathToPlayer.size() <= mob->getVisionRange())
+        else if (playerPos.distance(mobPos) <= mob->getVisionRange())
         {
-            mobPos = pathToPlayer.at(1);
-            mob->setScheduleMovePositionOnMap(mobPos);
-            drawDamageIndicators(mob, mobPos);
+            if (auto pathToPlayer = mob->getWorld()->findPath(mobPos, playerPos);
+                pathToPlayer.size() <= mob->getVisionRange() && !pathToPlayer.empty())
+            {
+                mobPos = pathToPlayer.at(0);
+                mob->setScheduleMovePositionOnMap(mobPos);
+                drawDamageIndicators(mob);
+            }
         }
         else
         {
@@ -31,15 +34,15 @@ namespace mob {
         }
     }
 
-    void AggressiveBehaviour::drawDamageIndicators(Mob* mob, Vec2Int mobPos) const
+    void AggressiveBehaviour::drawDamageIndicators(Mob* mob) const
     {
         DamageIndicatorsSystems* damageIndicators = mob->getWorld()->getDamageIndicatorsForMobs();
-        damageIndicators->scheduleDraw([this, mob, mobPos](const std::function<void(DrawDamageInfo)>& drawFunc)
+        damageIndicators->scheduleDraw([this, mob](const std::function<void(DrawDamageInfo)>& drawFunc)
         {
-            m_attack->drawIndicators(mob->getWorld(), mobPos, Direction(RIGHT), drawFunc);
-            m_attack->drawIndicators(mob->getWorld(), mobPos, Direction(UP), drawFunc);
-            m_attack->drawIndicators(mob->getWorld(), mobPos, Direction(LEFT), drawFunc);
-            m_attack->drawIndicators(mob->getWorld(), mobPos, Direction(DOWN), drawFunc);
+            m_attack->drawIndicators(mob->getWorld(), mob->getPositionOnMap(), Direction(RIGHT), drawFunc);
+            m_attack->drawIndicators(mob->getWorld(), mob->getPositionOnMap(), Direction(UP), drawFunc);
+            m_attack->drawIndicators(mob->getWorld(), mob->getPositionOnMap(), Direction(LEFT), drawFunc);
+            m_attack->drawIndicators(mob->getWorld(), mob->getPositionOnMap(), Direction(DOWN), drawFunc);
         });
     }
 }

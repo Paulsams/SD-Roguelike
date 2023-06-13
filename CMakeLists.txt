@@ -139,6 +139,7 @@ list(APPEND GAME_HEADER
     Include/Mobs/Strategy/StateMachine.h
     Include/Mobs/Strategy/StrategyWithStates.h
     Include/Mobs/Strategy/Normal.h
+    Include/Mobs/Strategy/Panic.h
     Include/Mobs/Behaviour/IMobBehaviour.h
     Include/Mobs/Behaviour/AggressiveBehaviour.h
     Include/Mobs/Behaviour/CowardlyBehaviour.h
@@ -245,11 +246,11 @@ include(GoogleTest)
 
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ../tests)
 add_executable(baseTest tests/baseTest.cpp)
+add_executable(pathfinderTests tests/pathfinderTests.cpp Source/Pathfinder/PathfinderAStar.cpp)
+add_executable(stateMachineTest tests/stateMachineTests.cpp)
 
-target_link_libraries(
-        baseTest
-        PRIVATE
-        GTest::gtest_main
-        cocos2d
-)
+target_link_libraries( baseTest  PRIVATE  GTest::gtest_main  cocos2d)
+target_link_libraries( pathfinderTests  PRIVATE  GTest::gtest_main  cocos2d)
+target_link_libraries( stateMachineTest  PRIVATE  GTest::gtest_main  cocos2d)
+
 

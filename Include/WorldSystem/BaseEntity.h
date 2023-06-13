@@ -16,8 +16,6 @@ public:
     Vec2Int getPositionOnMap() const { return m_position; }
     World* getWorld() const { return m_world; }
 
-    void setPosition(const cocos2d::Vec2& position) override;
-    void setPosition(float x, float y) override;
     void setScheduleMovePositionOnMap(Vec2Int position);
     void setPositionOnMapWithoutNotify(Vec2Int cellPosition);
     void moveOnMapTo(Vec2Int endPosition, float time);
