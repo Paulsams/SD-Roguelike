@@ -94,7 +94,7 @@ namespace mob {
                              {[](Mob *mob) {
                                  std::shared_ptr<IStat> hpStat;
                                  std::shared_ptr<BoundsModificator> bounds;
-                                 if (mob->getStats()->tryGet(StatType::Health, hpStat) && hpStat->tryGet(bounds))
+                                 if (mob->getStats()->tryGet(StatType::HEALTH, hpStat) && hpStat->tryGet(bounds))
                                      return bounds->getValueFromPercent(hpStat->getValue()) < 40;
                                  else
                                      return false;
@@ -117,15 +117,15 @@ namespace mob {
             });
 
             elites.insert({
-                {375, orcWarrior}
+                {375, createMobInfoOrc()}
             });
 
             bosses.insert({
-                {129, orcWarrior}
+                {129, createMobInfoOrc()}
             });
 
             passives.insert({
-                {228, orcWarrior}
+                {228, createMobInfoOrc()}
             });
         }
 
