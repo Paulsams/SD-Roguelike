@@ -2,6 +2,8 @@
 #include "ItemsSystem/Items.h"
 #include "ItemsSystem/Attacks.h"
 
+#include <ranges>
+
 using RGWB = RandomGeneratorWorldBuilder;
 
 Tilemap* RGWB::build() const
@@ -72,9 +74,10 @@ Tilemap* RGWB::generateWorld() const
     std::vector<cocos2d::Value> chests;
 
     const std::vector<std::string> consumables = Items::getConsumables();
-    const std::map<int, std::vector<std::string>> tiers = Attacks::getTiers();
-    int maxTier = tiers.rbegin()->first;
-    int minTier = tiers.begin()->first;
+    const std::vector<std::pair<std::string, int>> weapons = Attacks::getTiers();
+    auto [minIt, maxIt] = std::ranges::minmax_element(weapons, std::less{}, &std::pair<std::string, int>::second);
+    int minTier = minIt->second;
+    int maxTier = maxIt->second;
 
     for (const Room& room : rooms)
     {
@@ -152,24 +155,22 @@ Tilemap* RGWB::generateWorld() const
 
         for (const auto& pos : room.m_chests)
         {
-            int tier = cocos2d::random(minTier, maxTier);
-            while (!tiers.contains(tier))
-                tier = cocos2d::random(minTier, maxTier);
+            auto [weaponName, weaponTier] = genFromVec(weapons);
 
             cocos2d::ValueMap currChest;
             currChest["name"] = "Chest";
             if (minTier == maxTier)
                 currChest["gid"] = m_config->getChests().back();
             else
-                currChest["gid"] = m_config->getChests().at((tier - minTier) / (maxTier - minTier) * (m_config->getChests().size() - 1));
+                currChest["gid"] = m_config->getChests().at(((float)weaponTier - minTier) / (maxTier - minTier) * (m_config->getChests().size() - 1));
+
             currChest["x"] = (room.m_cont.m_pos.x + pos.x - 1) * tileMap->getTileSize().width;
             currChest["y"] = (room.m_cont.m_pos.y + pos.y - 1) * tileMap->getTileSize().height;
             currChest["width"] = tileMap->getTileSize().width;
             currChest["height"] = tileMap->getTileSize().height;
-            currChest["loot"] = genFromVec(tiers.at(tier)) + ':' + std::to_string(tier);
+            currChest["loot"] = weaponName + ':' + std::to_string(weaponTier);
             chests.push_back({cocos2d::Value(currChest)});
         }
-
     }
 
     cocos2d::Vector<cocos2d::TMXObjectGroup*> newObjectGroups;

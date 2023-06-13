@@ -151,10 +151,10 @@ private:
     double m_minRoomFillBound = 0.025;
     double m_maxRoomFillBound = 0.05;
 
-    double m_normalRoomTreasureMean = 2;
-    double m_eliteRoomTreasureMean = 5;
-    double m_bossRoomTreasureMean = 7;
-    double m_treasureRoomTreasureMean = 10;
+    double m_normalRoomTreasureMean = 3;
+    double m_eliteRoomTreasureMean = 4;
+    double m_bossRoomTreasureMean = 5;
+    double m_treasureRoomTreasureMean = 7;
 
     double m_normalTileRatio = 0.7;
 

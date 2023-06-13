@@ -8,14 +8,14 @@ Attacks::Attacks()
     initWeaponsAndAttacks();
 }
 
-std::map<int, std::vector<std::string>> Attacks::getTiers()
+std::vector<std::pair<std::string, int>> Attacks::getTiers()
 {
-    std::map<int, std::vector<std::string>> result;
+    std::vector<std::pair<std::string, int>> result;
     for (const auto& [name, createFunctions] : instance.m_createWeapons)
     {
         std::vector<int> tiers(createFunctions.size());
-        for (auto [tier, func] : createFunctions)
-            result[tier].push_back(name);
+        for (const auto& [tier, func] : createFunctions)
+            result.emplace_back(name, tier);
     }
     return result;
 }
@@ -151,7 +151,7 @@ void Attacks::initWeaponsAndAttacks()
      * - X X 0
      */
 
-    addNewWeapon(defaultWeapon, 1, 3010, {{simpleRange, defaultAttackInfo, 1}});
+    m_createDefault = createCreatedFunc(3010, {{simpleRange, defaultAttackInfo, 1}});
 
     addNewWeapon(stick, 1, 2943, {{simpleRange, defaultAttackInfo, 2}});
 
