@@ -26,6 +26,9 @@ namespace pathfinder {
             while(!queue.empty() && graph.getVisitedNode(queue.top()))
                 queue.pop();
 
+            if (queue.empty())
+                break;
+
             curNode = queue.top();
             graph.setVisitedNode(curNode);
 
