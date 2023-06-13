@@ -10,10 +10,10 @@ Attacks::Attacks()
     initWeaponsAndAttacks();
 }
 
-std::unordered_map<int, std::vector<std::string>> Attacks::getTiers()
+std::map<int, std::vector<std::string>> Attacks::getTiers()
 {
-    std::unordered_map<int, std::vector<std::string>> result;
-    for (auto [name, createFunctions] : instance.m_createWeapons)
+    std::map<int, std::vector<std::string>> result;
+    for (const auto& [name, createFunctions] : instance.m_createWeapons)
     {
         std::vector<int> tiers(createFunctions.size());
         for (auto [tier, func] : createFunctions)

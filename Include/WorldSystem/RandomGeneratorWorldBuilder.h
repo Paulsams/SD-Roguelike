@@ -82,7 +82,7 @@ private:
     };
 
     template <typename ValueType>
-    const ValueType& genFromVec(const std::vector<ValueType>& vec) const
+    static const ValueType& genFromVec(const std::vector<ValueType>& vec)
     {
         CCASSERT(!vec.empty(), "Attempt to generate from empty vector");
         return vec.at(cocos2d::random((size_t)0, vec.size() - 1));

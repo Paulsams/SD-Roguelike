@@ -1,4 +1,6 @@
 #include "WorldSystem/RandomGeneratorWorldBuilder.h"
+#include "ItemsSystem/Items.h"
+#include "ItemsSystem/Attacks.h"
 
 using RGWB = RandomGeneratorWorldBuilder;
 
@@ -66,6 +68,13 @@ Tilemap* RGWB::generateWorld() const
     std::vector<cocos2d::Value> normalMobs;
     std::vector<cocos2d::Value> eliteMobs;
     std::vector<cocos2d::Value> bossMobs;
+    std::vector<cocos2d::Value> passiveMobs;
+    std::vector<cocos2d::Value> chests;
+
+    const std::vector<std::string> consumables = Items::getConsumables();
+    const std::map<int, std::vector<std::string>> tiers = Attacks::getTiers();
+    int maxTier = tiers.rbegin()->first;
+    int minTier = tiers.begin()->first;
 
     for (const Room& room : rooms)
     {
@@ -84,6 +93,7 @@ Tilemap* RGWB::generateWorld() const
             currDecoration["y"] = (room.m_cont.m_pos.y + pos.y - 1) * tileMap->getTileSize().height;
             currDecoration["width"] = tileMap->getTileSize().width;
             currDecoration["height"] = tileMap->getTileSize().height;
+            currDecoration["loot"] = genFromVec(consumables);
             decorations.push_back({cocos2d::Value(currDecoration)});
         }
 
@@ -126,6 +136,39 @@ Tilemap* RGWB::generateWorld() const
             bossMobs.push_back({cocos2d::Value(currBossMob)});
         }
 
+        for (const auto& pos : room.m_passiveMobs)
+        {
+            cocos2d::ValueMap currPassiveMob;
+            currPassiveMob["name"] = "PassiveMobs";
+//            currNormalMob["gid"] = genFromVec(m_config->getNormalMobs());
+            currPassiveMob["gid"] = 228;
+            currPassiveMob["x"] = (room.m_cont.m_pos.x + pos.x - 1) * tileMap->getTileSize().width;
+            currPassiveMob["y"] = (room.m_cont.m_pos.y + pos.y - 1) * tileMap->getTileSize().height;
+            currPassiveMob["width"] = tileMap->getTileSize().width;
+            currPassiveMob["height"] = tileMap->getTileSize().height;
+            passiveMobs.push_back({cocos2d::Value(currPassiveMob)});
+        }
+
+        for (const auto& pos : room.m_chests)
+        {
+
+            int tier = cocos2d::random(minTier, maxTier);
+
+            cocos2d::ValueMap currChest;
+            currChest["name"] = "Chest";
+//            currNormalMob["gid"] = genFromVec(m_config->getNormalMobs());
+            if (minTier == maxTier)
+                currChest["gid"] = m_config->getChests().back();
+            else
+                currChest["gid"] = m_config->getChests().at((tier - minTier) / (maxTier - minTier) * m_config->getChests().size());
+            currChest["x"] = (room.m_cont.m_pos.x + pos.x - 1) * tileMap->getTileSize().width;
+            currChest["y"] = (room.m_cont.m_pos.y + pos.y - 1) * tileMap->getTileSize().height;
+            currChest["width"] = tileMap->getTileSize().width;
+            currChest["height"] = tileMap->getTileSize().height;
+            currChest["loot"] = genFromVec(tiers.at(tier)) + ':' + std::to_string(tier);
+            chests.push_back({cocos2d::Value(currChest)});
+        }
+
     }
 
     cocos2d::Vector<cocos2d::TMXObjectGroup*> newObjectGroups;
@@ -134,6 +177,8 @@ Tilemap* RGWB::generateWorld() const
     cocos2d::TMXObjectGroup* normalMobsObjects = new cocos2d::TMXObjectGroup();
     cocos2d::TMXObjectGroup* eliteMobsObjects = new cocos2d::TMXObjectGroup();
     cocos2d::TMXObjectGroup* bossMobsObjects = new cocos2d::TMXObjectGroup();
+    cocos2d::TMXObjectGroup* passiveMobsObjects = new cocos2d::TMXObjectGroup();
+    cocos2d::TMXObjectGroup* chestsObjects = new cocos2d::TMXObjectGroup();
 
     utilsObjects->setGroupName("UtilsObjects");
     utilsObjects->setObjects({cocos2d::Value(spawnPoint)});
@@ -150,11 +195,19 @@ Tilemap* RGWB::generateWorld() const
     bossMobsObjects->setGroupName("BossMobs");
     bossMobsObjects->setObjects(bossMobs);
 
+    passiveMobsObjects->setGroupName("PassiveMobs");
+    passiveMobsObjects->setObjects(passiveMobs);
+
+    chestsObjects->setGroupName("Chests");
+    chestsObjects->setObjects(chests);
+
     newObjectGroups.pushBack(utilsObjects);
     newObjectGroups.pushBack(decorationsObjects);
     newObjectGroups.pushBack(normalMobsObjects);
     newObjectGroups.pushBack(eliteMobsObjects);
     newObjectGroups.pushBack(bossMobsObjects);
+    newObjectGroups.pushBack(passiveMobsObjects);
+    newObjectGroups.pushBack(chestsObjects);
     tileMap->setObjectGroups(newObjectGroups);
 
     return tileMap;
@@ -316,7 +369,7 @@ void RGWB::fillSpawnRoom(Room& room) const
 
 void RGWB::fillSingleBossRoom(Room& room) const
 {
-    static std::exponential_distribution<> d(m_bossRoomTreasureMean);
+    static std::exponential_distribution<> d(1/m_bossRoomTreasureMean);
     room.m_type = RoomType::BOSS;
     room.m_bossMobs.emplace_back(room.m_cont.m_width / 2, room.m_cont.m_height / 2);
     room.m_engaged.insert(Vec2Int{room.m_cont.m_width / 2, room.m_cont.m_height / 2});
@@ -338,7 +391,7 @@ void RGWB::fillSingleBossRoom(Room& room) const
 
 void RGWB::fillNormalRoom(Room& room) const
 {
-    static std::exponential_distribution<> d(m_normalRoomTreasureMean);
+    static std::exponential_distribution<> d(1/m_normalRoomTreasureMean);
     room.m_type = RoomType::NORMAL;
     int roomArea = room.m_cont.m_width * room.m_cont.m_height;
     int tryCounter = m_width * m_height;
@@ -360,7 +413,7 @@ void RGWB::fillNormalRoom(Room& room) const
 
 void RGWB::fillEliteRoom(Room& room) const
 {
-    static std::exponential_distribution<> d(m_eliteRoomTreasureMean);
+    static std::exponential_distribution<> d(1/m_eliteRoomTreasureMean);
     room.m_type = RoomType::ELITE;
     int roomArea = room.m_cont.m_width * room.m_cont.m_height;
     int tryCounter = m_width * m_height;
@@ -385,7 +438,7 @@ void RGWB::fillEliteRoom(Room& room) const
 
 void RGWB::fillTreasureRoom(Room& room) const
 {
-    static std::exponential_distribution<> d(m_treasureRoomTreasureMean);
+    static std::exponential_distribution<> d(1/m_treasureRoomTreasureMean);
     room.m_type = RoomType::TREASURE;
     int roomArea = room.m_cont.m_width * room.m_cont.m_height;
     int tryCounter = m_width * m_height;
@@ -438,13 +491,13 @@ std::vector<RGWB::Room> RGWB::generateRooms(const std::shared_ptr<Tree>& tree) c
     {
         if (currRoom.m_type == RoomType::NONE)
         {
-            double alpha = cocos2d::random(0., 1.);
-            if (alpha < m_normalRoomRatio)
-                fillNormalRoom(currRoom);
-            else if (alpha < m_normalRoomRatio + m_treasureRoomRatio)
+//            double alpha = cocos2d::random(0., 1.);
+//            if (alpha < m_normalRoomRatio)
+//                fillNormalRoom(currRoom);
+//            else if (alpha < m_normalRoomRatio + m_treasureRoomRatio)
                 fillTreasureRoom(currRoom);
-            else
-                fillEliteRoom(currRoom);
+//            else
+//                fillEliteRoom(currRoom);
         }
     }
     return rooms;

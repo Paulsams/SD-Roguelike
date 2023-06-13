@@ -10,7 +10,7 @@ public:
     static Weapon* createWeapon(World* world, const std::string& name, const int tier)
         { return instance.m_createWeapons.at(name).at(tier)(world); }
 
-    static std::unordered_map<int, std::vector<std::string>> getTiers();
+    static std::map<int, std::vector<std::string>> getTiers();
 
 private:
     static const Attacks instance;
