@@ -8,8 +8,8 @@
 
 namespace mob
 {
-    template<typename T>
-    concept is_required_interface = requires (T&& interfaceClass, Mob* mob)
+    template<typename T, typename U>
+    concept is_required_interface = requires (T&& interfaceClass, U* mob)
     {
         interfaceClass.enable(mob);
         interfaceClass.disable(mob);
@@ -18,7 +18,7 @@ namespace mob
     };
 
     template <typename T, typename U>
-    requires is_required_interface<T>
+    requires is_required_interface<T, U>
     class StateMachine
     {
         using func_holder = std::unordered_map<size_t,
@@ -32,11 +32,14 @@ namespace mob
                                                                                             m_functions(functions),
                                                                                             m_states(states)
                                                                                             {}
-        StateMachine(StateMachine&& other) {
-            m_currentState = std::move(other.m_currentState);
-            m_states = std::move(other.m_states);
-            m_functions = std::move(other.m_functions);
-        }
+        StateMachine(StateMachine&& other):
+            m_currentState(std::move(other.m_currentState)),
+            m_states(std::move(other.m_states)),
+            m_functions(std::move(other.m_functions)) {}
+
+        StateMachine(const StateMachine& other):  m_currentState(other.m_currentState),
+                                                  m_states(other.m_states),
+                                                  m_functions(other.m_functions) {}
 
         std::shared_ptr<T> get() const {
             return m_currentState;
