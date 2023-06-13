@@ -2,7 +2,7 @@
 
 enum StatType
 {
-    Health,
-    Mana,
-    Level,
+    HEALTH,
+    MANA,
+    LEVEL,
 };

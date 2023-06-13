@@ -22,7 +22,7 @@ namespace mob {
                   {
                     { [](Mob *mob) {
                         std::shared_ptr<IStat> hpStat;
-                        if (mob->getStats()->tryGet(StatType::Health, hpStat))
+                        if (mob->getStats()->tryGet(StatType::HEALTH, hpStat))
                             return hpStat->getValue() < 50;
                         else
                             return false;

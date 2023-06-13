@@ -46,8 +46,6 @@ private:
     FunctionHandler<Direction> m_moveDelegate;
     FunctionHandler<> m_attackedDelegate;
     FunctionHandler<> m_interactedDelegate;
-
-    std::shared_ptr<FunctionVisitorEntitiesReturnVoid> m_interactedVisitor;
     
     PlayerInput m_input;
     std::unordered_map<ClotheType, cocos2d::Sprite*> m_clothes;

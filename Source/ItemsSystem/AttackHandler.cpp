@@ -18,7 +18,7 @@ void AttackHandler::attack(World* world, Vec2Int position, Direction direction) 
             {
                 const bool isPossibleAttack = attack->isPossibleAttackFromEntity(entity);
                 const bool isReachable = attack->getSearch()->isReachable(world, position, endPosition);
-                if (isPossibleAttack && isReachable && entity->getStats()->tryGet(Health, healthStat))
+                if (isPossibleAttack && isReachable && entity->getStats()->tryGet(HEALTH, healthStat))
                 {
                     float damage = attack->getDamage()->get(entity);
                     healthStat->changeValueBy(-damage);
@@ -66,7 +66,7 @@ void AttackHandler::drawIndicators(World* world, Vec2Int position, Direction dir
             {
                 const bool isPossibleAttack = attack->isPossibleAttackFromEntity(entity);
                 const bool isReachable = attack->getSearch()->isReachable(world, position, endPosition);
-                if (isPossibleAttack && isReachable && entity->getStats()->tryGet(Health, healthStat))
+                if (isPossibleAttack && isReachable && entity->getStats()->tryGet(HEALTH, healthStat))
                 {
                     damage.emplace(attack->getDamage()->get(entity));
                     break;

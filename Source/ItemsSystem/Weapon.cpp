@@ -22,7 +22,7 @@ Weapon::Weapon(World* world, const cocos2d::Rect& rect, ItemTypeSlot itemTypeSlo
     , m_statsContainer(std::make_shared<StatsContainer>())
     , m_damages(damages)
 {
-    m_statsContainer->add(Level, std::make_shared<StatWithModificators>(0));
+    m_statsContainer->add(LEVEL, std::make_shared<StatWithModificators>(0));
 }
 
 void Weapon::setModificatorDamage(const IDamageModificator* modificator)

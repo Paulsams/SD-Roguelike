@@ -7,7 +7,7 @@ class PoolObjects
 {
 public:
     PoolObjects(std::function<T*()> createFunc)
-        : m_createFunc(std::move(createFunc)) { }
+        : m_createFunc(createFunc) { }
     
     T* get()
     {

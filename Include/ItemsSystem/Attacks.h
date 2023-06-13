@@ -2,31 +2,23 @@
 
 #include "ItemsSystem/Weapon.h"
 
-struct WeaponInfo
-{
-    const int gid;
-    const int tier;
-};
-
 class Attacks
 {
 public:
-    static const WeaponInfo defaultWeapon;
-    static const WeaponInfo stick_1;
-    static const WeaponInfo axe_1;
+    static const std::string defaultWeapon;
 
-    static Weapon* createWeapon(World* world, WeaponInfo info)
-        { return instance.m_createWeapons.at(info.gid).at(info.tier)(world); }
+    static Weapon* createWeapon(World* world, const std::string& name, const int tier)
+        { return instance.m_createWeapons.at(name).at(tier)(world); }
+
+    static std::unordered_map<int, std::vector<std::string>> getTiers();
 
 private:
     static const Attacks instance;
     Attacks();
     
     void initWeaponsAndAttacks();
-    void addNewWeapon(WeaponInfo info, std::vector<std::tuple<const std::vector<Vec2Int>,
-        std::shared_ptr<AttackInfo>, float>> ranges);
+    void addNewWeapon(const std::string& name, int tier, int gid,
+        std::vector<std::tuple<const std::vector<Vec2Int>, std::shared_ptr<AttackInfo>, float>> ranges);
 
-    std::map<int, std::map<int, std::function<Weapon* (World*)>>> m_createWeapons;
+    std::unordered_map<std::string, std::unordered_map<int, std::function<Weapon* (World*)>>> m_createWeapons;
 };
-
-inline const Attacks Attacks::instance = Attacks();
