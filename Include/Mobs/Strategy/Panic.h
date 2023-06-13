@@ -1,14 +1,14 @@
 #pragma once
-#include "BaseStateStrategy.h"
-#include "Mobs/Behaviour/IMobBehaviour.h"
+
+#include "Mobs/Strategy/BaseStateStrategy.h"
 
 namespace mob {
 
-    class Normal: public BaseStateStrategy {
+    class Panic: public BaseStateStrategy {
         std::shared_ptr<IMobBehaviour> startBehaviour;
-        Normal() = delete;
+        Panic() = delete;
     public:
-        explicit Normal(std::shared_ptr<IMobBehaviour> startB) : startBehaviour(std::move(startB)) {}
+        explicit Panic(std::shared_ptr<IMobBehaviour> startB) : startBehaviour(std::move(startB)) {}
         void enable(Mob* mob) override {
             mob->changeBehaviour(startBehaviour);
         }
@@ -16,8 +16,7 @@ namespace mob {
         void disable(Mob*) override {}
         void update(Mob* mob) override {}
         size_t getTypeId() override {
-            return typeid(Normal).hash_code();
+            return typeid(Panic).hash_code();
         }
-
     };
 }

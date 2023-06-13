@@ -2,7 +2,7 @@
 
 
 namespace mob {
-    void Normal::update(Mob *mob) {
-        mob->changeBehaviour(aggressiveBehaviour);
-    }
+//    void Normal::update(Mob *mob) {
+//        mob->changeBehaviour(aggressiveBehaviour);
+//    }
 }

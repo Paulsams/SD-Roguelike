@@ -49,11 +49,10 @@ namespace pathfinder {
         }
 
         std::vector<Vec2Int> path;
-        path.push_back(end->pos);
         Node* parent;
         while ((parent = graph.getParentNode(end)))
         {
-            path.push_back(parent->pos);
+            path.push_back(end->pos);
             end = parent;
         }
 

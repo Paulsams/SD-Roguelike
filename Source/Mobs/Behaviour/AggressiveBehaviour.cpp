@@ -18,9 +18,9 @@ namespace mob {
             m_attack->drawIndicators(mob->getWorld(), damageIndicators, mobPos, Direction(DOWN));
         }
         else if (auto pathToPlayer = mob->getWorld()->findPath(mobPos, playerPos);
-                      pathToPlayer.size() <= mob->getVisionRange())
+                      pathToPlayer.size() <= mob->getVisionRange() && !pathToPlayer.empty())
         {
-            mobPos = pathToPlayer.at(1);
+            mobPos = pathToPlayer.at(0);
             mob->setMovedPositionOnMap(mobPos);
             DamageIndicatorsSystems* damageIndicators = mob->getWorld()->getDamageIndicatorsForEnemies();
             m_attack->drawIndicators(mob->getWorld(), damageIndicators, mobPos, Direction(RIGHT));

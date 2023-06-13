@@ -41,7 +41,7 @@ namespace pathfinder {
                 for (int y = 0; y < height; ++y) {
                     Node curNode(Vec2Int(x, y), fToTileType(tiles[(height - 1 - y) * width + x/*y * width + x*/]));
                     for (auto[yy, xx]: direction) {
-                        if (y > 0 && y < height - 1 && x > 0 && x < width - 1)
+                        if (y - yy >= 0 && y - yy <= height - 1 && x + xx >= 0 && x + xx <= width - 1)
                             curNode.neighbors.push_back(&nodes[(y - yy) * width + (x + xx)]);
                     }
 

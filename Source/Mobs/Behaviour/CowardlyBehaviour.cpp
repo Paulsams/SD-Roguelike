@@ -7,9 +7,10 @@ namespace mob {
         const auto mobPos = mob->getPositionOnMap();
         const Player* player = mob->getWorld()->getNearestPlayer(mobPos);
         const auto playerPos = player->getPositionOnMap();
-        if (m_attack->isPossibleAttack(mob->getWorld(), mobPos, playerPos - mobPos)) {
-            m_attack->attack(mob->getWorld(), mobPos, Direction(playerPos - mobPos));
-        } else if (const auto distance = playerPos.distance(mobPos); distance <= mob->getVisionRange()) {
+//        if (m_attack->isPossibleAttack(mob->getWorld(), mobPos, playerPos - mobPos)) {
+//            m_attack->attack(mob->getWorld(), mobPos, Direction(playerPos - mobPos));
+//        } else
+            if (const auto distance = playerPos.distance(mobPos); distance <= mob->getVisionRange()) {
             auto delta =  playerPos - mobPos;
             const auto direction = Direction(playerPos - mobPos);
             // Vec2Int offset;
