@@ -7,7 +7,7 @@
 class AttackHandler
 {
 public:
-    explicit AttackHandler(const std::map<Vec2Int, std::shared_ptr<AttackWithDamage>>&& m_ranges);
+    explicit AttackHandler(const std::map<Vec2Int, std::vector<std::shared_ptr<AttackWithDamage>>>&& ranges);
 
     void attack(World* world, Vec2Int position, Direction direction) const;
     bool isPossibleAttack(World* world, Vec2Int position, Vec2Int localPosition) const;
@@ -15,7 +15,7 @@ public:
         std::function<void(DrawDamageInfo)> drawFunc) const;
 
 private:
-    const std::map<Vec2Int, std::shared_ptr<AttackWithDamage>> m_ranges;
+    std::map<Vec2Int, std::vector<std::shared_ptr<AttackWithDamage>>> m_ranges;
 };
 
 class AttackHandlerBuilder
@@ -26,10 +26,10 @@ public:
     AttackHandlerBuilder& addAttackData(std::vector<Vec2Int> ranges, std::shared_ptr<AttackWithDamage> attackData)
     {
         for (Vec2Int range : ranges)
-            m_ranges.insert({range, attackData});
+            m_ranges[range].push_back(attackData);
         return *this;
     }
     
 private:
-    std::map<Vec2Int, std::shared_ptr<AttackWithDamage>> m_ranges;
+    std::map<Vec2Int, std::vector<std::shared_ptr<AttackWithDamage>>> m_ranges;
 };
