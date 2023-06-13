@@ -61,27 +61,27 @@ bool GameScene::init(Camera* camera)
 
     m_worldTileConfig = std::make_shared<WorldTileConfig>("Resources/World.json");
     
-    // const std::string tilemapInXML = generateXMLForTMXTiledMap(RandomGeneratorWorldBuilder()
-    //     .setPath("Template.tmx")
-    //     .setConfig(m_worldTileConfig->getLevelsTileConfig().at(0))
-    //     .setWidth(100)
-    //     .setHeight(100)
-    //     .setIterCount(5)
-    //     .build());
-    //
-    // std::ofstream outfile ("Resources/test.tmx");
-    // outfile << tilemapInXML << std::endl;
-    // outfile.close();
+     const std::string tilemapInXML = generateXMLForTMXTiledMap(RandomGeneratorWorldBuilder()
+         .setPath("Template.tmx")
+         .setConfig(m_worldTileConfig->getLevelsTileConfig().at(0))
+         .setWidth(100)
+         .setHeight(100)
+         .setIterCount(5)
+         .build());
+
+     std::ofstream outfile ("Resources/test.tmx");
+     outfile << tilemapInXML << std::endl;
+     outfile.close();
     
     m_gameLoop = std::make_shared<GameLoop>();
 
 //    m_world = World::create(ReadFileWorldBuilder().setPath("TileMap.tmx").build());
-    // m_world = World::create(RandomGeneratorWorldBuilder().setPath("Template.tmx").setConfig(m_worldTileConfig->getLevelsTileConfig().at(0)).setWidth(100).setHeight(100).setIterCount(5).build());
-    // m_world->setScale(0.31f);
+     m_world = World::create(RandomGeneratorWorldBuilder().setPath("Template.tmx").setConfig(m_worldTileConfig->getLevelsTileConfig().at(0)).setWidth(100).setHeight(100).setIterCount(5).build(), mobFactory);
+     m_world->setScale(0.31f);
 
-    m_world = World::create(ReadFileWorldBuilder().setPath("Custom.tmx").build(), mobFactory);
-    //m_world = World::create(RandomGeneratorWorldBuilder().setPath("Template.tmx").setConfig(m_worldTileConfig).setWidth(100).setHeight(100).setIterCount(5).build());
-    m_world->setScale(1.5f);
+//    m_world = World::create(ReadFileWorldBuilder().setPath("Custom.tmx").build(), mobFactory);
+//    m_world = World::create(RandomGeneratorWorldBuilder().setPath("Template.tmx").setConfig(m_worldTileConfig).setWidth(100).setHeight(100).setIterCount(5).build());
+//    m_world->setScale(1.5f);
     m_gameLoop->add(m_world);
 
     this->addChild(m_world);

@@ -46,7 +46,7 @@ bool World::initWithTilemap()
     const TMXObjectGroup* objectsGroup = m_tilemap->getObjectGroup("UtilsObjects");
     const TMXObjectGroup* normalMobsGroup = m_tilemap->getObjectGroup("NormalMobs");
     const TMXObjectGroup* eliteMobsGroup = m_tilemap->getObjectGroup("EliteMobs");
-    const TMXObjectGroup* bossMobsGroup = m_tilemap->getObjectGroup("Bosses");
+    const TMXObjectGroup* bossMobsGroup = m_tilemap->getObjectGroup("BossMobs");
     const TMXObjectGroup* passiveMobsGroup = m_tilemap->getObjectGroup("PassiveMobs");
     const TMXObjectGroup* chestsGroup = m_tilemap->getObjectGroup("Chests");
     const TMXObjectGroup* decorationsGroup = m_tilemap->getObjectGroup("Decorations");
