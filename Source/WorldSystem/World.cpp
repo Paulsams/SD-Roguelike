@@ -108,6 +108,9 @@ void World::tryInitDecorations(const TMXObjectGroup* decorationsGroup, const Siz
 
 void World::tryInitChests(const TMXObjectGroup* chestsGroup, const Size tileSize)
 {
+    if (!chestsGroup)
+        return;
+    
     for (const auto& chestObject : chestsGroup->getObjects())
     {
         const ValueMap& chestMap = chestObject.asValueMap();

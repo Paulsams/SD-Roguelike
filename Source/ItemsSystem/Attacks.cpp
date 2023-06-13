@@ -1,8 +1,6 @@
 ﻿#include "ItemsSystem/Attacks.h"
 #include "ItemsSystem/AttackSearch/AttackSearchFromDFS.h"
 
-inline const std::string Attacks::defaultWeapon = "Default";
-
 inline const Attacks Attacks::instance = Attacks();
 
 Attacks::Attacks()
@@ -39,7 +37,7 @@ void Attacks::initWeaponsAndAttacks()
         nullptr, std::make_shared<AttackSearchFromDFS>());
 
     const std::vector<Vec2Int> oneDistanceRange = {{1, 0}};
-    addNewWeapon(defaultWeapon, 1, 3010, {{oneDistanceRange, defaultAttackInfo, 1}});
+    m_createDefault = createCreatedFunc(3010, {{oneDistanceRange, defaultAttackInfo, 1}});
 
     const std::vector<Vec2Int> rightOneDistanceRange = {{1, 0}, {1, -1}};
     addNewWeapon(stick, 1, 2943, {{rightOneDistanceRange, defaultAttackInfo, 1}});
@@ -49,20 +47,26 @@ void Attacks::initWeaponsAndAttacks()
 }
 
 void Attacks::addNewWeapon(const std::string& name, int tier, int gid,
+    const std::vector<std::tuple<const std::vector<Vec2Int>, std::shared_ptr<AttackInfo>, float>>& ranges)
+{
+    m_createWeapons[name].insert({tier, createCreatedFunc(gid, ranges)});
+}
+
+std::function<Weapon*(World*)> Attacks::createCreatedFunc(int gid,
     std::vector<std::tuple<const std::vector<Vec2Int>, std::shared_ptr<AttackInfo>, float>> ranges)
 {
-    m_createWeapons[name].insert({tier,
-        [ranges, gid](World* world) {
-            AttackHandlerBuilder attackBuilder;
-            std::vector<std::shared_ptr<Damage>> damages;
-            damages.reserve(ranges.size());
-            for (auto [range, attackInfo, damage] : ranges)
-            {
-                damages.push_back(std::make_shared<Damage>(damage));
-                attackBuilder.addAttackData(range, std::make_shared<AttackWithDamage>(attackInfo, damages.back()));
-            }
-            const auto attack = attackBuilder.build();
+    return [ranges, gid](World* world) {
+        AttackHandlerBuilder attackBuilder;
+        std::vector<std::shared_ptr<Damage>> damages;
+        damages.reserve(ranges.size());
+        for (auto [range, attackInfo, damage] : ranges)
+        {
+            damages.push_back(std::make_shared<Damage>(damage));
+            attackBuilder.addAttackData(range, std::make_shared<AttackWithDamage>(attackInfo, damages.back()));
+        }
+        const auto attack = attackBuilder.build();
             
-            return Weapon::create(world, world->getRectFromGid(gid), WEAPON, attack, damages);
-        }});
+        return Weapon::create(world, world->getRectFromGid(gid), WEAPON, attack, damages);
+    };
 }
+

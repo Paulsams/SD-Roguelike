@@ -240,8 +240,17 @@ std::string generateXMLForTMXTiledMap(Tilemap* map)
             
             is << "<objectgroup name=\"" << objectGroup->getGroupName() << "\" width=\"" << mapWidth << "\" height=\"" << mapHeight << "\">";
             tryAddPropertiesToStream(objectGroup->getProperties(), is);
-
+            
             is << std::endl;
+            
+            static std::set<std::string> nonPropertiesKeys = {
+                "id", "name", "gid", "x", "y",
+                "width", "height", "type", "rotation"
+            };
+
+            std::ostringstream floatStream;
+
+            std::vector<std::pair<std::string, Value>> propertiesValues;
             
             for (auto& obj : objectGroup->getObjects())
             {
@@ -250,18 +259,48 @@ std::string generateXMLForTMXTiledMap(Tilemap* map)
                 for (auto& [key, value] : obj.asValueMap())
                 {
                     is << " " << key << "=\"";
-                    
-                    if (key == "y")  // Convert back to Tiled coordinate system
-                        is << (mapHeight - 1) * map->getTileSize().height - value.asFloat() << "\"";
-                    else if (value.getType() == Value::Type::FLOAT || value.getType() == Value::Type::DOUBLE)
-                        is << value.asFloat() << "\"";
+
+                    if (nonPropertiesKeys.contains(key))
+                    {
+                        std::string property;
+                        if (key == "y")  // Convert back to Tiled coordinate system
+                        {
+                            floatStream << (mapHeight - 1) * map->getTileSize().height - value.asFloat();
+                            property = floatStream.str();
+                        }
+                        else if (value.getType() == Value::Type::FLOAT || value.getType() == Value::Type::DOUBLE)
+                        {
+                            floatStream << value.asFloat();
+                            property = floatStream.str();
+                        }
+                        else
+                        {
+                            property = value.asString();
+                        }
+
+                        is << property << "\"";
+                        floatStream.str("");
+                    }
                     else
-                        is << value.asString() << "\"";
+                    {
+                        propertiesValues.push_back({key, value});
+                    }
                     
                     //is << " " << key << "=\"" << value << "\"";
                 }
+
+                if (propertiesValues.empty())
+                {
+                    is << " />" << std::endl;
+                    continue;
+                }
                 
-                is << " />" << std::endl;
+                is << ">" << std::endl;
+                is << "<properties>" << std::endl;
+                for (const auto& [key, value] : propertiesValues)
+                    is << "<property name=\"" << key << "\" value=\"" << value.asString() << "\"/>" << std::endl;
+                is << "</properties>" << std::endl;
+                is << "<objects/>" << std::endl;
             }
             
             is << "</objectgroup>" << std::endl;
