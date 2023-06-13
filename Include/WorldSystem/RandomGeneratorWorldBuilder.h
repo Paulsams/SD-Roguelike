@@ -9,6 +9,7 @@
 #include <set>
 #include <random>
 #include <cstring>
+#include <unordered_set>
 
 class RandomGeneratorWorldBuilder
 {
@@ -83,7 +84,7 @@ private:
     template <typename ValueType>
     const ValueType& genFromVec(const std::vector<ValueType>& vec) const
     {
-        CCASSERT(!vec.empty(), "Try to generate from empty vector");
+        CCASSERT(!vec.empty(), "Attempt to generate from empty vector");
         return vec.at(cocos2d::random((size_t)0, vec.size() - 1));
     }
 
@@ -135,8 +136,6 @@ private:
     [[nodiscard]] std::pair<Container, Container> randomSplit(const Container& cont) const;
     [[nodiscard]] std::shared_ptr<Tree> splitContainer(const Container& cont, size_t iterCount) const;
 
-    size_t getFarthestRoom(const std::vector<Room>& in, const std::vector<size_t>& base) const;
-
     /// drawing
     void drawWalls(TilemapLayer* layer) const;
     void drawGround(TilemapLayer* wallsLayer, TilemapLayer* groundLayer, const std::vector<Container>& ground) const;
@@ -147,7 +146,7 @@ private:
     void fillRoomVec2int(Room& room, std::vector<Vec2Int>& mobs, int counter, int tryCounter) const;
 
     void fillSpawnRoom(Room& room) const;
-    void fillBossRooms(std::vector<Room>& rooms, size_t spawnRoom) const;
+    void fillBossRooms(std::vector<Room>& rooms) const;
     void fillSingleBossRoom(Room& room) const;
     void fillNormalRoom(Room& room) const;
     void fillEliteRoom(Room& room) const;
@@ -157,7 +156,7 @@ private:
 
 private:
     /*
-     *  Elite rom ratio -> 1 - m_normalRoomRatio - m_treasureRoomRatio;
+     *  Elite room ratio -> 1 - m_normalRoomRatio - m_treasureRoomRatio;
      *  Number of bosses -> m_iterCount;
      *  Spawn room -> the smallest room
      *  Bosses rooms -> the farthest rooms from spawn
@@ -169,7 +168,7 @@ private:
     double m_treasureRoomRatio = 0.05;
 
     double m_minRoomFillBound = 0.025;
-    double m_maxRoomFillBound = 0.2;
+    double m_maxRoomFillBound = 0.05;
 
     double m_normalRoomTreasureMean = 0.5;
     double m_eliteRoomTreasureMean = 1;
