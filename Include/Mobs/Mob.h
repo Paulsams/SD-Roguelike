@@ -24,9 +24,9 @@ namespace mob {
         
         void acceptVisit(std::shared_ptr<IVisitorEntities> visitor) override { visitor->visitMob(this); }
 
-    protected:
-        Mob(World* world, const MobInfo& info);
     private:
+
+        Mob(World* world, const MobInfo& info);
         int m_visionRange;
         std::shared_ptr<IMobStrategy> m_strategy;
         std::shared_ptr<IMobBehaviour> m_behaviour;
