@@ -37,8 +37,8 @@ void MenuItemForInventory::choice()
 
 void MenuItemForInventory::unchoice()
 {
-    setColor(Color3B::WHITE);
-    m_frame->setColor(Color3B::WHITE);
+    setColor(Color3B::GRAY);
+    m_frame->setColor(Color3B::GRAY);
 }
 
 void MenuItemForInventory::selected()
@@ -61,13 +61,13 @@ bool MenuItemForInventory::initWithSprite(const SpriteWithRect& sprite)
     m_frame->ignoreContentAdaptWithSize(false);
     m_frame->setContentSize(getContentSize());
     m_frame->setAnchorPoint(Vec2::ZERO);
+    m_frame->setColor(Color3B::GRAY);
     this->addChild(m_frame);
 
     m_backgroundItemIcon = ImageView::create(sprite.first);
     m_backgroundItemIcon->setTextureRect(sprite.second);
     m_backgroundItemIcon->ignoreContentAdaptWithSize(false);
     m_backgroundItemIcon->setOpacity(128);
-    m_backgroundItemIcon->setColor(Color3B::GRAY);
     m_backgroundItemIcon->setContentSize(getContentSize() * 0.7f);
     m_backgroundItemIcon->setPosition(getContentSize() / 2);
     this->addChild(m_backgroundItemIcon);

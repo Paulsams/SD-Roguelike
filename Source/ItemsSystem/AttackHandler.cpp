@@ -18,7 +18,7 @@ void AttackHandler::attack(World* world, Vec2Int position, Direction direction) 
             {
                 const bool isPossibleAttack = attack->isPossibleAttackFromEntity(entity);
                 const bool isReachable = attack->getSearch()->isReachable(world, position, endPosition);
-                if (isPossibleAttack && isReachable && entity->getStats()->tryGet(Health, healthStat))
+                if (isPossibleAttack && isReachable && entity->getStats()->tryGet(HEALTH, healthStat))
                 {
                     float damage = attack->getDamage()->get(entity);
                     healthStat->changeValueBy(-damage);
@@ -51,8 +51,9 @@ bool AttackHandler::isPossibleAttack(World* world, Vec2Int position, Vec2Int loc
     return false;
 }
 
-void AttackHandler::drawIndicators(World* world, DamageIndicatorsSystems* indicators,
-    Vec2Int position, Direction direction) const
+// В идеале бы такое через корутины можно было сделать, но что есть уж
+void AttackHandler::drawIndicators(World* world, Vec2Int position, Direction direction,
+    std::function<void(DrawDamageInfo)> drawFunc) const
 {
     std::shared_ptr<IStat> healthStat;
     std::optional<float> damage;
@@ -65,7 +66,7 @@ void AttackHandler::drawIndicators(World* world, DamageIndicatorsSystems* indica
             {
                 const bool isPossibleAttack = attack->isPossibleAttackFromEntity(entity);
                 const bool isReachable = attack->getSearch()->isReachable(world, position, endPosition);
-                if (isPossibleAttack && isReachable && entity->getStats()->tryGet(Health, healthStat))
+                if (isPossibleAttack && isReachable && entity->getStats()->tryGet(HEALTH, healthStat))
                 {
                     damage.emplace(attack->getDamage()->get(entity));
                     break;
@@ -73,7 +74,7 @@ void AttackHandler::drawIndicators(World* world, DamageIndicatorsSystems* indica
             }
         }
         
-        indicators->draw(endPosition, damage.has_value() ? cocos2d::Color3B::RED :cocos2d::Color3B::GREEN, damage);
+        drawFunc({endPosition, damage.has_value() ? cocos2d::Color3B::RED :cocos2d::Color3B::GREEN, damage});
         damage.reset();
     }
 }

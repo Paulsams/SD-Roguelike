@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.1" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="32" tileheight="32" infinite="0" nextlayerid="14" nextobjectid="208">
+<map version="1.10" tiledversion="1.10.1" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="32" tileheight="32" infinite="0" nextlayerid="14" nextobjectid="210">
  <tileset firstgid="1" name="Tileset" tilewidth="32" tileheight="32" tilecount="3072" columns="64">
   <image source="Tileset.png" width="2048" height="1536"/>
  </tileset>
@@ -5017,10 +5017,24 @@
  <objectgroup id="11" name="EliteMobs"/>
  <objectgroup id="12" name="Bosses"/>
  <objectgroup id="13" name="PassiveMobs"/>
- <objectgroup id="4" name="Chests"/>
+ <objectgroup id="4" name="Chests">
+  <object id="209" name="Chest - 1" gid="2936" x="384" y="1472" width="32" height="32">
+   <properties>
+    <property name="loot" value="Berdysh:1"/>
+   </properties>
+  </object>
+ </objectgroup>
  <objectgroup id="6" name="Decorations">
-  <object id="144" name="Statue" gid="733" x="96" y="1120" width="32" height="32"/>
-  <object id="146" name="Fountain - 1" gid="734" x="704" y="1280" width="32" height="32"/>
+  <object id="144" name="Statue" gid="733" x="96" y="1120" width="32" height="32">
+   <properties>
+    <property name="loot" value="HealthPotion"/>
+   </properties>
+  </object>
+  <object id="146" name="Fountain - 1" gid="734" x="704" y="1280" width="32" height="32">
+   <properties>
+    <property name="loot" value="HealthPotion"/>
+   </properties>
+  </object>
   <object id="147" name="Fountain - 1" gid="734" x="512" y="1088" width="32" height="32"/>
   <object id="154" name="Fountain - 2" gid="735" x="800" y="288" width="32" height="32"/>
   <object id="152" name="Statue" gid="798" x="1504" y="1504" width="32" height="32"/>

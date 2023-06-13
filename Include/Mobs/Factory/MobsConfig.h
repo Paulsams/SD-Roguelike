@@ -115,6 +115,18 @@ namespace mob {
             normals.insert({
                 {176, createMobInfoOrc()}
             });
+
+            elites.insert({
+                {375, orcWarrior}
+            });
+
+            bosses.insert({
+                {129, orcWarrior}
+            });
+
+            passives.insert({
+                {228, orcWarrior}
+            });
         }
 
         std::shared_ptr<AttackHandler> createAttack(const std::vector<std::tuple<const std::vector<Vec2Int> &,

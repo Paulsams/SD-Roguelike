@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "BaseItem.h"
-#include "WorldSystem/BaseEntity.h"
 
 class Accessory final : public BaseItem
 {

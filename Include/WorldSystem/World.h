@@ -10,13 +10,14 @@
 
 class Player;
 class BaseEntity;
+class BaseItem;
 
 class World : public cocos2d::Node, public IUpdatable
 {
 public:
     static World* create(Tilemap* tilemap, std::shared_ptr<mob::BaseMobAbstractFactory> mobFactory);
 
-    bool initWithConfig();
+    bool initWithTilemap();
 
     Vec2Int getSpawnPoint() const { return m_spawnPoint; }
 
@@ -58,13 +59,17 @@ public:
     
     void update() override;
 
-    DamageIndicatorsSystems* getDamageIndicatorsForPlayer() const { return m_damageIndicatorsPlayer; }
-    DamageIndicatorsSystems* getDamageIndicatorsForEnemies() const { return m_damageIndicatorsEnemies; }
+    DamageIndicatorsSystems* getDamageIndicatorsForMobs() const { return m_damageIndicatorsMobs; }
+    DamageIndicatorsSystems* getDamageIndicatorsForPlayer(const Player* player) const { return m_playersDamageIndicators.at(player); }
     
 private:
     explicit World(Tilemap* tilemap, std::shared_ptr<mob::BaseMobAbstractFactory> mobFactory);
+
+    void tryInitDecorations(const cocos2d::TMXObjectGroup* decorationsGroup, cocos2d::Size tileSize);
+    void tryInitChests(const cocos2d::TMXObjectGroup* chestsGroup, cocos2d::Size tileSize);
+    bool spawnItem(BaseEntity* entity, Vec2Int direction, const std::function<BaseItem*()>& createFunc);
     
-    void spawnMobs(const cocos2d::TMXObjectGroup* group, cocos2d::Size tileSize,
+    void trySpawnMobs(const cocos2d::TMXObjectGroup* group, cocos2d::Size tileSize,
         std::function<mob::Mob*(mob::BaseMobAbstractFactory*, World*, int)> createFunc);
 
     void updateTileType(Vec2Int position) const;
@@ -78,8 +83,8 @@ private:
 
     FunctionHandler<BaseEntity*> m_deletedEntityDelegate;
     
-    TilemapLayer* m_ground;
-    TilemapLayer* m_walls;
+    TilemapLayer* m_ground = nullptr;
+    TilemapLayer* m_walls = nullptr;
 
     std::shared_ptr<mob::BaseMobAbstractFactory> m_mobFactory;
     std::vector<mob::Mob*> m_mobs;
@@ -89,8 +94,8 @@ private:
     Tilemap* m_tilemap;
     Vec2Int m_spawnPoint;
     std::shared_ptr<pathfinder::Graph> m_graph;
-    DamageIndicatorsSystems* m_damageIndicatorsPlayer;
-    DamageIndicatorsSystems* m_damageIndicatorsEnemies;
+    DamageIndicatorsSystems* m_damageIndicatorsMobs;
+    std::map<const Player*, DamageIndicatorsSystems*> m_playersDamageIndicators;
 
     std::shared_ptr<IPathfindingAlgorithm> m_pathfinding;
     

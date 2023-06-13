@@ -10,6 +10,13 @@
 
 class World;
 
+struct DrawDamageInfo
+{
+    const Vec2Int position;
+    const cocos2d::Color3B color;
+    const std::optional<float> damage;
+};
+
 class DamageIndicator : public cocos2d::Node
 {
 public:
@@ -35,7 +42,7 @@ class DamageIndicatorsSystems : public cocos2d::Node, public IUpdatable
 public:
     static DamageIndicatorsSystems* create(World* world);
 
-    void draw(Vec2Int position, cocos2d::Color3B color, std::optional<float> damage);
+    void scheduleDraw(const std::function<void(std::function<void(DrawDamageInfo)>)>& scheduleDrawFunc);
     void reset();
     void update() override;
 
@@ -44,6 +51,8 @@ private:
     
     std::vector<DamageIndicator*> m_showedObjects;
     
-    PoolObjects<DamageIndicator*> m_indicators;
+    PoolObjects<DamageIndicator> m_indicators;
     World* m_world;
+
+    std::vector<std::function<void(std::function<void(DrawDamageInfo)>)>> m_deferredDraws;
 };

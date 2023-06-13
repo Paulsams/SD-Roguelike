@@ -44,6 +44,8 @@ Generated Files
 AppPackages
 BundleArtifacts
 .vs/
+CTestTestfile.cmake
+_deps/
 
 !cocos2d/**/[Dd]ebug/
 !cocos2d/**/[Rr]elease/

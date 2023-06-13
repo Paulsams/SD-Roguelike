@@ -26,24 +26,25 @@ endif()
 
 set(CMAKE_CXX_STANDARD 20)
 
-#if(MSVC)
-#    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+if(MSVC)
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 #        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /WX")
-#    else()
+    else()
 #        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /WX /O3")
-#    endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
-#else()
-#    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-##        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fsanitize=address -fno-omit-frame-pointer")
-#    else()
+    endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
+else()
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+#        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fsanitize=address -fno-omit-frame-pointer")
+    else()
 #        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wpedantic -Wextra -Wunused-parameter \
 #        -Wcast-align -Wcast-qual -Wduplicated-branches \
 #        -Wduplicated-cond -Wextra-semi -Wfloat-equal -Wlogical-op \
 #        -Wnon-virtual-dtor -Wsign-promo \
 #        -pedantic-errors \
 #        -O3")
-#    endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
-#endif()
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
+    endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
+endif()
 
 # record sources, headers, resources...
 set(GAME_SOURCE)
@@ -69,6 +70,8 @@ list(APPEND GAME_SOURCE
 
     Source/ItemsSystem/AttackHandler.cpp
     Source/ItemsSystem/Attacks.cpp
+    Source/ItemsSystem/BaseItem.cpp
+    Source/ItemsSystem/Items.cpp
     Source/ItemsSystem/Weapon.cpp
 
     Source/Mobs/Mob.cpp
@@ -76,8 +79,8 @@ list(APPEND GAME_SOURCE
     Source/Mobs/Strategy/StrategyWithStates.cpp
     Source/Mobs/Strategy/Normal.cpp
     Source/Mobs/Behaviour/AggressiveBehaviour.cpp
-        Source/Mobs/Behaviour/CowardlyBehaviour.cpp
-        Source/Mobs/Behaviour/PassiveBehaviour.cpp
+    Source/Mobs/Behaviour/CowardlyBehaviour.cpp
+    Source/Mobs/Behaviour/PassiveBehaviour.cpp
 
     Source/Pathfinder/PathfinderAStar.cpp
 
@@ -92,6 +95,7 @@ list(APPEND GAME_SOURCE
     Source/UI/StepCounter.cpp
     
     Source/Utils/Common.cpp
+    Source/Utils/TMXGenerator.cpp
     
     Source/WorldSystem/BaseEntity.cpp
     Source/WorldSystem/DamageIndicatorsSystems.cpp
@@ -118,7 +122,9 @@ list(APPEND GAME_HEADER
     Include/ItemsSystem/AttackHandler.h
     Include/ItemsSystem/Attacks.h
     Include/ItemsSystem/BaseItem.h
+    Include/ItemsSystem/ConsumableItem.h
     Include/ItemsSystem/Damage.h
+    Include/ItemsSystem/Items.h
     Include/ItemsSystem/IVisualAttack.h
     Include/ItemsSystem/Weapon.h
     
@@ -169,6 +175,7 @@ list(APPEND GAME_HEADER
     Include/Utils/EventsSystem.h
     Include/Utils/FontsTTF.h
     Include/Utils/PoolObjects.h
+    Include/Utils/TMXGenerator.h
     Include/Utils/ValueNotifyChanged.h
     
     Include/WorldSystem/BaseEntity.h

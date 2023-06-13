@@ -1,7 +1,9 @@
 ﻿#include "UI/InventoryView.h"
 
+#include "2d/CCMenu.h"
+
 InventoryView* InventoryView::create(Inventory& observableItems, const std::vector<ItemTypeSlot>& availableSlots,
-    const SpriteWithRect& spriteWithRect, cocos2d::Size itemSize, int columns, cocos2d::Vec2 padding)
+                                     const SpriteWithRect& spriteWithRect, cocos2d::Size itemSize, int columns, cocos2d::Vec2 padding)
 {
     auto inventoryView = new (std::nothrow) InventoryView(observableItems, spriteWithRect, availableSlots, padding);
     if (inventoryView && inventoryView->initWithGrid(itemSize, columns))

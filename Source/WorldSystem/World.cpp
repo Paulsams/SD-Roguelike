@@ -1,7 +1,9 @@
 #include "WorldSystem/World.h"
 
+#include "ItemsSystem/Items.h"
 #include "Pathfinder/PathfinderAStar.h"
 #include "Player/Player.h"
+#include "WorldSystem/Chest.h"
 #include "WorldSystem/Decoration.h"
 #include "WorldSystem/WorldTileConfig.h"
 
@@ -10,7 +12,7 @@ using namespace cocos2d;
 World* World::create(Tilemap* tilemap, std::shared_ptr<mob::BaseMobAbstractFactory> mobFactory)
 {
     auto world = new (std::nothrow) World(tilemap, mobFactory);
-    if (world && world->initWithConfig())
+    if (world && world->initWithTilemap())
     {
         world->autorelease();
         return world;
@@ -32,7 +34,7 @@ Vec2Int readPositionFromTile(const ValueMap& valueMap, Size tileSize)
     return pos;
 }
 
-bool World::initWithConfig()
+bool World::initWithTilemap()
 {
     this->addChild(m_tilemap, 0, 99);
 
@@ -44,7 +46,7 @@ bool World::initWithConfig()
     const TMXObjectGroup* objectsGroup = m_tilemap->getObjectGroup("UtilsObjects");
     const TMXObjectGroup* normalMobsGroup = m_tilemap->getObjectGroup("NormalMobs");
     const TMXObjectGroup* eliteMobsGroup = m_tilemap->getObjectGroup("EliteMobs");
-    const TMXObjectGroup* bossMobsGroup = m_tilemap->getObjectGroup("Bosses");
+    const TMXObjectGroup* bossMobsGroup = m_tilemap->getObjectGroup("BossMobs");
     const TMXObjectGroup* passiveMobsGroup = m_tilemap->getObjectGroup("PassiveMobs");
     const TMXObjectGroup* chestsGroup = m_tilemap->getObjectGroup("Chests");
     const TMXObjectGroup* decorationsGroup = m_tilemap->getObjectGroup("Decorations");
@@ -59,37 +61,121 @@ bool World::initWithConfig()
     const ValueMap spawnPoint = objectsGroup->getObject("SpawnPoint");
     m_spawnPoint = readPositionFromRectangle(spawnPoint, tileSize);
 
+    tryInitDecorations(decorationsGroup, tileSize);
+    tryInitChests(chestsGroup, tileSize);
+    
+    trySpawnMobs(normalMobsGroup, tileSize, &mob::BaseMobAbstractFactory::createNormal);
+    trySpawnMobs(eliteMobsGroup, tileSize, &mob::BaseMobAbstractFactory::createElite);
+    trySpawnMobs(bossMobsGroup, tileSize, &mob::BaseMobAbstractFactory::createBoss);
+    trySpawnMobs(passiveMobsGroup, tileSize, &mob::BaseMobAbstractFactory::createPassive);
+
+    m_damageIndicatorsMobs = DamageIndicatorsSystems::create(this);
+    this->addChild(m_damageIndicatorsMobs);
+ 
+    return true;
+}
+
+void World::tryInitDecorations(const TMXObjectGroup* decorationsGroup, const Size tileSize)
+{
+    if (!decorationsGroup)
+        return;
+    
     for (const auto& decorationObject : decorationsGroup->getObjects())
     {
         const ValueMap& decorationMap = decorationObject.asValueMap();
         const int gid = decorationMap.at("gid").asInt();
+        
         const auto decoration = Decoration::create(this, getRectFromGid(gid - 1));
         const Vec2Int position = readPositionFromTile(decorationMap, tileSize);
         decoration->setPositionOnMapWithoutNotify(position);
         addEntity(decoration);
         m_graph->getNodeByPos(position)->tile = TileType::DECORATION;
+
+        const auto nameLootIterator = decorationMap.find("loot");
+        if (nameLootIterator != decorationMap.end())
+        {
+            std::string nameLoot = nameLootIterator->second.asString();
+            decoration->deleted += [this, nameLoot](BaseEntity* entity)
+            {
+                spawnItem(entity, {0, 0}, [this, nameLoot]()
+                {
+                    return Items::createConsumable(this, nameLoot);
+                });
+            };
+        }
     }
-    
-    spawnMobs(normalMobsGroup, tileSize, &mob::BaseMobAbstractFactory::createNormal);
-    spawnMobs(eliteMobsGroup, tileSize, &mob::BaseMobAbstractFactory::createElite);
-    spawnMobs(bossMobsGroup, tileSize, &mob::BaseMobAbstractFactory::createBoss);
-    spawnMobs(passiveMobsGroup, tileSize, &mob::BaseMobAbstractFactory::createPassive);
-
-    m_damageIndicatorsPlayer = DamageIndicatorsSystems::create(this);
-    this->addChild(m_damageIndicatorsPlayer);
-
-    m_damageIndicatorsEnemies = DamageIndicatorsSystems::create(this);
-    this->addChild(m_damageIndicatorsEnemies);
- 
-    return true;
 }
 
-void World::spawnMobs(const TMXObjectGroup* group, const Size tileSize,
+void World::tryInitChests(const TMXObjectGroup* chestsGroup, const Size tileSize)
+{
+    if (!chestsGroup)
+        return;
+
+    for (const auto& chestObject : chestsGroup->getObjects())
+    {
+        const ValueMap& chestMap = chestObject.asValueMap();
+        const int gid = chestMap.at("gid").asInt();
+        
+        const auto chest = Chest::create(this, {Paths::toGameTileset, getRectFromGid(gid - 1)},
+            [this, chestMap](Chest* chest)
+            {
+                const auto nameLootIterator = chestMap.find("loot");
+                if (nameLootIterator != chestMap.end())
+                {
+                    const std::string weaponInfo = nameLootIterator->second.asString();
+                    const size_t weaponSplitIndex = nameLootIterator->second.asString().find(':');
+                    std::string nameWeapon = weaponInfo.substr(0, weaponSplitIndex);
+                    int tier = std::stoi(weaponInfo.substr(weaponSplitIndex + 1));
+                    static std::vector<Vec2Int> directionsSpawn =
+                        {
+                            {0, -1},
+                            {1, 0},
+                            {-1, 0},
+                            {0, 1}
+                        };
+
+                    std::function<BaseItem*()> spawnItemFunc = [this, nameWeapon, tier]()
+                        {
+                           return Attacks::createWeapon(this, nameWeapon, tier);
+                        };
+                    for (const auto direction : directionsSpawn)
+                    {
+                        if (spawnItem(chest, direction, spawnItemFunc))
+                            break;
+                    }
+                }
+            });
+        const Vec2Int position = readPositionFromTile(chestMap, tileSize);
+        chest->setPositionOnMapWithoutNotify(position);
+        addEntity(chest);
+        m_graph->getNodeByPos(position)->tile = TileType::OBSTACLE;
+    }
+}
+
+bool World::spawnItem(BaseEntity* entity, Vec2Int direction, const std::function<BaseItem*()>& createFunc)
+{
+    const Vec2Int position = entity->getPositionOnMap() + direction;
+    const TileType tileType = getTileType(position);
+    if (tileType == TileType::GROUND)
+    {
+        BaseItem* item = createFunc();
+        item->setPositionOnMapWithoutNotify(position);
+        addEntity(item);
+        return true;
+    }
+    
+    return false;
+}
+
+void World::trySpawnMobs(const TMXObjectGroup* group, const Size tileSize,
     std::function<mob::Mob*(mob::BaseMobAbstractFactory*, World*, int)> createFunc)
 {
-    for (const auto& decorationObject : group->getObjects())
+    if (group == nullptr)
+        return;
+    
+    for (const auto& mobObject : group->getObjects())
     {
-        const ValueMap& mobMap = decorationObject.asValueMap();
+        const ValueMap& mobMap = mobObject.asValueMap();
         const int gid = mobMap.at("gid").asInt();
         const auto mob = createFunc(m_mobFactory.get(), this, gid);
         const Vec2Int position = readPositionFromTile(mobMap, tileSize);
@@ -100,7 +186,7 @@ void World::spawnMobs(const TMXObjectGroup* group, const Size tileSize,
 
 void World::addEntity(BaseEntity* entity)
 {
-    std::shared_ptr<FunctionVisitorEntitiesReturnVoid> visitor = FunctionVisitorEntitiesBuilder<void>()
+    static std::shared_ptr<FunctionVisitorEntitiesReturnVoid> visitor = FunctionVisitorEntitiesBuilder<void>()
         .setMob([this](mob::Mob* mob) { m_mobs.push_back(mob); }).build();
 
     const Vec2Int positionOnMap = entity->getPositionOnMap();
@@ -125,6 +211,10 @@ void World::addPlayer(Player* player)
 {
     m_player = player;
     addEntity(m_player);
+
+    DamageIndicatorsSystems* newIndicators = DamageIndicatorsSystems::create(this);
+    this->addChild(newIndicators);
+    m_playersDamageIndicators.insert({player, newIndicators});
 }
 
 const Player* World::getNearestPlayer(Vec2) const
@@ -143,14 +233,15 @@ TileType World::getTileType(Vec2Int position) const
 
 void World::update()
 {
-    m_damageIndicatorsPlayer->update();
-    m_damageIndicatorsEnemies->update();
-    
     m_movedEntities.clear();
     
     m_player->update();
     for (mob::Mob* mob : m_mobs)
         mob->update();
+
+    for (auto [player, damageIndicators] : m_playersDamageIndicators)
+        damageIndicators->update();
+    m_damageIndicatorsMobs->update();
 }
 
 World::World(Tilemap* tilemap, std::shared_ptr<mob::BaseMobAbstractFactory> mobFactory)
@@ -189,13 +280,15 @@ void World::updateTileType(Vec2Int position) const
 
 void World::onEntityMoved(BaseEntity* entity, BaseEntity::oldPosition oldPosition, BaseEntity::newPosition newPosition)
 {
+    static float moveTime = 0.1f;
+    
     if (!m_movedEntities.insert({newPosition, entity}).second)
         return;
 
     std::vector<BaseEntity*>& oldEntities = m_entities[getIndexFromVec2(oldPosition)];
     oldEntities.erase(std::ranges::find(oldEntities, entity));
     m_entities[getIndexFromVec2(newPosition)].push_back(entity);
-    entity->setPositionOnMapWithoutNotify(newPosition);
+    entity->moveOnMapTo(newPosition, moveTime);
 }
 
 void World::internalRemoveEntity(BaseEntity* entity)

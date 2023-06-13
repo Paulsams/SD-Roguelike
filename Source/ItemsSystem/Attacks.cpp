@@ -1,20 +1,30 @@
 ﻿#include "ItemsSystem/Attacks.h"
 #include "ItemsSystem/AttackSearch/AttackSearchFromDFS.h"
 
-inline const WeaponInfo Attacks::defaultWeapon = {3010, 1};
-inline const WeaponInfo Attacks::stick_1 = {2943, 1};
-inline const WeaponInfo Attacks::axe_1 = {1766, 1};
+inline const Attacks Attacks::instance = Attacks();
 
 Attacks::Attacks()
 {
-    if (m_createWeapons.size() != 0)
-        return;
-
     initWeaponsAndAttacks();
+}
+
+std::map<int, std::vector<std::string>> Attacks::getTiers()
+{
+    std::map<int, std::vector<std::string>> result;
+    for (const auto& [name, createFunctions] : instance.m_createWeapons)
+    {
+        std::vector<int> tiers(createFunctions.size());
+        for (auto [tier, func] : createFunctions)
+            result[tier].push_back(name);
+    }
+    return result;
 }
 
 void Attacks::initWeaponsAndAttacks()
 {
+    static const std::string stick = "Stick";
+    static const std::string berdysh = "Berdysh";
+    
     AttackInfo::PossibleAttackDelegate dontHitObstacle =
         [](TileType tileType) { return tileType == TileType::GROUND || tileType == TileType::DECORATION; };
     
@@ -27,30 +37,36 @@ void Attacks::initWeaponsAndAttacks()
         nullptr, std::make_shared<AttackSearchFromDFS>());
 
     const std::vector<Vec2Int> oneDistanceRange = {{1, 0}};
-    addNewWeapon(defaultWeapon, {{oneDistanceRange, defaultAttackInfo, 1}});
+    m_createDefault = createCreatedFunc(3010, {{oneDistanceRange, defaultAttackInfo, 1}});
 
     const std::vector<Vec2Int> rightOneDistanceRange = {{1, 0}, {1, -1}};
-    addNewWeapon(stick_1, {{rightOneDistanceRange, defaultAttackInfo, 1}});
+    addNewWeapon(stick, 1, 2943, {{rightOneDistanceRange, defaultAttackInfo, 1}});
 
     const std::vector<Vec2Int> axeRange = {{3, 1}, {3, 0}, {3, -1}};
-    addNewWeapon(axe_1, {{axeRange, defaultAttackInfo, 3}});
+    addNewWeapon(berdysh, 1, 1766, {{axeRange, defaultAttackInfo, 3}});
 }
 
-void Attacks::addNewWeapon(WeaponInfo info,
+void Attacks::addNewWeapon(const std::string& name, int tier, int gid,
+    const std::vector<std::tuple<const std::vector<Vec2Int>, std::shared_ptr<AttackInfo>, float>>& ranges)
+{
+    m_createWeapons[name].insert({tier, createCreatedFunc(gid, ranges)});
+}
+
+std::function<Weapon*(World*)> Attacks::createCreatedFunc(int gid,
     std::vector<std::tuple<const std::vector<Vec2Int>, std::shared_ptr<AttackInfo>, float>> ranges)
 {
-    m_createWeapons[info.gid].insert({info.tier,
-        [info, ranges](World* world) {
-            AttackHandlerBuilder attackBuilder;
-            std::vector<std::shared_ptr<Damage>> damages;
-            damages.reserve(ranges.size());
-            for (auto [range, attackInfo, damage] : ranges)
-            {
-                damages.push_back(std::make_shared<Damage>(damage));
-                attackBuilder.addAttackData(range, std::make_shared<AttackWithDamage>(attackInfo, damages.back()));
-            }
-            const auto attack = attackBuilder.build();
+    return [ranges, gid](World* world) {
+        AttackHandlerBuilder attackBuilder;
+        std::vector<std::shared_ptr<Damage>> damages;
+        damages.reserve(ranges.size());
+        for (auto [range, attackInfo, damage] : ranges)
+        {
+            damages.push_back(std::make_shared<Damage>(damage));
+            attackBuilder.addAttackData(range, std::make_shared<AttackWithDamage>(attackInfo, damages.back()));
+        }
+        const auto attack = attackBuilder.build();
             
-            return Weapon::create(world, World::getRectFromGid(info.gid), WEAPON, attack, damages);
-        }});
+        return Weapon::create(world, world->getRectFromGid(gid), WEAPON, attack, damages);
+    };
 }
+

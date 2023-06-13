@@ -10,7 +10,10 @@ namespace mob {
         std::shared_ptr<AttackHandler> m_attack;
     public:
         AggressiveBehaviour(std::shared_ptr<AttackHandler> attack): m_attack(std::move(attack)) {}
-
+        
         void update(Mob*) override;
+
+    private:
+        void drawDamageIndicators(Mob* mob, Vec2Int mobPos) const;
     };
 }

@@ -1,6 +1,6 @@
 #include "GameScene.h"
 
-#include "ItemsSystem/Attacks.h"
+#include "Utils/TMXGenerator.h"
 #include "Mobs/Factory/MobsFactoryFromConfig.h"
 #include "UI/Canvas.h"
 #include "WorldSystem/World.h"
@@ -61,30 +61,32 @@ bool GameScene::init(Camera* camera)
 
     m_worldTileConfig = std::make_shared<WorldTileConfig>("Resources/World.json");
     
+     const std::string tilemapInXML = generateXMLForTMXTiledMap(RandomGeneratorWorldBuilder()
+         .setPath("Template.tmx")
+         .setConfig(m_worldTileConfig->getLevelsTileConfig().at(0))
+         .setWidth(100)
+         .setHeight(100)
+         .setIterCount(5)
+         .build());
+
+     std::ofstream outfile ("Resources/test.tmx");
+     outfile << tilemapInXML << std::endl;
+     outfile.close();
+    
     m_gameLoop = std::make_shared<GameLoop>();
 
 //    m_world = World::create(ReadFileWorldBuilder().setPath("TileMap.tmx").build());
-    // m_world = World::create(RandomGeneratorWorldBuilder().setPath("Template.tmx").setConfig(m_worldTileConfig->getLevelsTileConfig().at(0)).setWidth(100).setHeight(100).setIterCount(5).build());
-    // m_world->setScale(0.31f);
+     m_world = World::create(RandomGeneratorWorldBuilder().setPath("Template.tmx").setConfig(m_worldTileConfig->getLevelsTileConfig().at(0)).setWidth(100).setHeight(100).setIterCount(5).build(), mobFactory);
+//     m_world->setScale(0.31f);
 
-    m_world = World::create(ReadFileWorldBuilder().setPath("Custom.tmx").build(), mobFactory);
-    //m_world = World::create(RandomGeneratorWorldBuilder().setPath("Template.tmx").setConfig(m_worldTileConfig).setWidth(100).setHeight(100).setIterCount(5).build());
+//    m_world = World::create(ReadFileWorldBuilder().setPath("Custom.tmx").build(), mobFactory);
+//    m_world = World::create(RandomGeneratorWorldBuilder().setPath("Template.tmx").setConfig(m_worldTileConfig).setWidth(100).setHeight(100).setIterCount(5).build());
     m_world->setScale(1.5f);
     m_gameLoop->add(m_world);
 
     this->addChild(m_world);
 
-    Weapon* stick = Attacks::createWeapon(m_world, Attacks::stick_1);
-    stick->setPositionOnMapWithoutNotify({3, 3});
-    m_world->addEntity(stick);
-
-    Weapon* axe_1 = Attacks::createWeapon(m_world, Attacks::axe_1);
-    axe_1->setPositionOnMapWithoutNotify({4, 5});
-    m_world->addEntity(axe_1);
-
-    m_player = Player::create(m_world);
-    m_player->setPositionOnMapWithoutNotify(m_world->getSpawnPoint());
-    m_world->addPlayer(m_player);
+    createPlayer();
 
     m_canvas = Canvas::create(m_world, m_player, m_gameLoop);
     m_canvas->setContentSize(Director::getInstance()->getWinSize());
@@ -95,18 +97,15 @@ bool GameScene::init(Camera* camera)
     m_world->updateCullingRect(Rect(viewPoint, winSize));
     m_camera->setPosition(viewPoint);
 
-    m_player->moved += [this](BaseEntity*, Vec2Int, Vec2Int)
+    m_player->moved += [this](const BaseEntity*, Vec2Int, Vec2Int endPosition)
     {
         static constexpr int moveCameraTag = 10;
         static constexpr float moveCameraTime = 0.4f;
         static constexpr float coefficientOffsetSize = 0.4f;
 
-        Size winSize = Director::getInstance()->getWinSize();
-        
-        Point viewPoint = getViewPointCenter(m_player->getPosition() * m_world->getScale());
+        const Size winSize = Director::getInstance()->getWinSize();
+        Point viewPoint = getViewPointCenter(m_world->convertToMapSpace(endPosition) * m_world->getScale());
         m_camera->stopActionByTag(moveCameraTag);
-        
-        //m_world->moveTilemap(m_camera->getPosition() - viewPoint);
         
         auto moveTo = MoveTo::create(moveCameraTime, {viewPoint.x, viewPoint.y, m_camera->getPositionZ()});
         moveTo->setTag(moveCameraTag);
@@ -124,6 +123,27 @@ bool GameScene::init(Camera* camera)
     };
     
     return true;
+}
+
+void GameScene::createPlayer()
+{
+    static const Size sizeRect = {32, 32};
+    
+    m_player = Player::create(m_world);
+    m_player->setPositionOnMapWithoutNotify(m_world->getSpawnPoint());
+    m_world->addPlayer(m_player);
+
+    constexpr int templatePeopleId = 2210 - 1;
+    m_player->setClothe(Player::TemplatePeople, {Paths::toGameTileset,
+        Rect(Vec2{templatePeopleId % 64, templatePeopleId / 64} * sizeRect.width, sizeRect)});
+
+    constexpr int bibId = 2149 - 1;
+    m_player->setClothe(Player::Bib, {Paths::toGameTileset,
+        Rect(Vec2{bibId % 64, bibId / 64} * sizeRect.width, sizeRect)});
+
+    constexpr int helmetId = 1957 - 1;
+    m_player->setClothe(Player::Helmet, {Paths::toGameTileset,
+        Rect(Vec2{helmetId % 64, helmetId / 64} * sizeRect.width, sizeRect)});
 }
 
 Point GameScene::getViewPointCenter(Point position) const

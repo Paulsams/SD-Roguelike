@@ -48,7 +48,7 @@ namespace mob
     {
         const auto mobHpStat = std::make_shared<StatWithModificators>(info.health);
         mobHpStat->addModificator(std::make_shared<BoundsModificator>(MinMax(0, info.health)));
-        m_stats->add(Health, mobHpStat);
+        m_stats->add(HEALTH, mobHpStat);
 
         mobHpStat->changed += [this](IStat::oldValue, IStat::currentValue current, IStat::changedValue)
         {

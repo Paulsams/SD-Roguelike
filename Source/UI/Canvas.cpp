@@ -55,7 +55,7 @@ bool Canvas::init()
     const std::shared_ptr<IStatsContainer> playerStats = m_player->getStats();
     
     std::shared_ptr<IStat> playerHpStat;
-    if (playerStats->tryGet(Health, playerHpStat))
+    if (playerStats->tryGet(HEALTH, playerHpStat))
     {
         const auto playerHp = StatBar::create(marginParameter,
             Size(playerStatsBox->getContentSize().width - 10.0f, playerStatsBox->getContentSize().height / 2) - marginSizeOffset,
@@ -65,7 +65,7 @@ bool Canvas::init()
     }
 
     std::shared_ptr<IStat> playerManaStat;
-    if (playerStats->tryGet(Mana, playerManaStat))
+    if (playerStats->tryGet(MANA, playerManaStat))
     {
         const auto playerMana = StatBar::create(marginParameter,
             Size(playerStatsBox->getContentSize().width - 10.0f, playerStatsBox->getContentSize().height / 2) - marginSizeOffset,
@@ -82,7 +82,7 @@ bool Canvas::init()
     const Size padding = {10.0f, 10.0f};
 
     auto inventoryView = InventoryView::create(m_player->getInventory(),
-        {SPELL, WEAPON, ACCESSORY}, Paths::toAllInventoryCell, cellInventorySize, 3, padding);
+        {SPELL, WEAPON, ACCESSORY, CONSUMABLE}, Paths::toAllInventoryCell, cellInventorySize, 3, padding);
     inventoryView->setLayoutParameter(marginParameter);
     rightBox->addChild(inventoryView);
 
@@ -112,7 +112,7 @@ bool Canvas::init()
     horizontalParameter->setMargin(horizontalMargin);
 
     auto backpackWeaponView = InventoryView::create(backpack.getObservableWeapons(),
-    {WEAPON}, Paths::toWeaponInventoryCell, cellInventorySize, 3, padding);
+        {WEAPON}, Paths::toWeaponInventoryCell, cellInventorySize, 3, padding);
     backpackWeaponView->setLayoutParameter(horizontalParameter);
     
     auto backpackAccessoriesView = InventoryView::create(backpack.getObservableAccessories(),
