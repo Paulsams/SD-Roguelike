@@ -82,7 +82,7 @@ private:
     };
 
     template <typename ValueType>
-    const ValueType& genFromVec(const std::vector<ValueType>& vec) const
+    static const ValueType& genFromVec(const std::vector<ValueType>& vec)
     {
         CCASSERT(!vec.empty(), "Attempt to generate from empty vector");
         return vec.at(cocos2d::random((size_t)0, vec.size() - 1));
@@ -146,7 +146,6 @@ private:
     void fillRoomVec2int(Room& room, std::vector<Vec2Int>& mobs, int counter, int tryCounter) const;
 
     void fillSpawnRoom(Room& room) const;
-    void fillBossRooms(std::vector<Room>& rooms) const;
     void fillSingleBossRoom(Room& room) const;
     void fillNormalRoom(Room& room) const;
     void fillEliteRoom(Room& room) const;
