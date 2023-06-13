@@ -79,18 +79,18 @@ jobs:
         if: matrix.config.name == 'Ubuntu'
         run: tests/baseTest
 
-      - name: Base Test Windows
+      - name: Pathfinder Test Windows
         if: matrix.config.name == 'Windows'
-        run: tests/Debug/pathfinderTests.exe
+        run: tests/Debug/pathfinderTest.exe
 
-      - name: Base Test Linux
+      - name: Pathfinder Test Linux
         if: matrix.config.name == 'Ubuntu'
-        run: tests/pathfinderTests
+        run: tests/pathfinderTest
 
-      - name: Base Test Windows
+      - name: StateMachine Test Windows
         if: matrix.config.name == 'Windows'
         run: tests/Debug/stateMachineTest.exe
 
-      - name: Base Test Linux
+      - name: StateMachine Test Linux
         if: matrix.config.name == 'Ubuntu'
         run: tests/stateMachineTest

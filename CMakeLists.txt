@@ -246,11 +246,11 @@ include(GoogleTest)
 
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ../tests)
 add_executable(baseTest tests/baseTest.cpp)
-add_executable(pathfinderTests tests/pathfinderTests.cpp Source/Pathfinder/PathfinderAStar.cpp)
+add_executable(pathfinderTest tests/pathfinderTests.cpp Source/Pathfinder/PathfinderAStar.cpp)
 add_executable(stateMachineTest tests/stateMachineTests.cpp)
 
 target_link_libraries( baseTest  PRIVATE  GTest::gtest_main  cocos2d)
-target_link_libraries( pathfinderTests  PRIVATE  GTest::gtest_main  cocos2d)
+target_link_libraries( pathfinderTest  PRIVATE  GTest::gtest_main  cocos2d)
 target_link_libraries( stateMachineTest  PRIVATE  GTest::gtest_main  cocos2d)
 
 
