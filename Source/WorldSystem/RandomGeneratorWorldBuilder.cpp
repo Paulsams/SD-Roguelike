@@ -10,8 +10,8 @@ Tilemap* RGWB::build() const
         || m_height == 0
         || m_width == 0
         || m_iterCount == 0
-        || std::pow(2, m_iterCount) > m_width
-        || std::pow(2, m_iterCount) > m_height
+        || std::pow(2, m_iterCount + 1) > m_width
+        || std::pow(2, m_iterCount + 1) > m_height
         || !m_config)
     {
         return nullptr;
@@ -93,7 +93,8 @@ Tilemap* RGWB::generateWorld() const
             currDecoration["y"] = (room.m_cont.m_pos.y + pos.y - 1) * tileMap->getTileSize().height;
             currDecoration["width"] = tileMap->getTileSize().width;
             currDecoration["height"] = tileMap->getTileSize().height;
-            currDecoration["loot"] = genFromVec(consumables);
+            if (cocos2d::random(0., 1.) >= 0.5)
+                currDecoration["loot"] = genFromVec(consumables);
             decorations.push_back({cocos2d::Value(currDecoration)});
         }
 
@@ -151,16 +152,16 @@ Tilemap* RGWB::generateWorld() const
 
         for (const auto& pos : room.m_chests)
         {
-
             int tier = cocos2d::random(minTier, maxTier);
+            while (!tiers.contains(tier))
+                tier = cocos2d::random(minTier, maxTier);
 
             cocos2d::ValueMap currChest;
             currChest["name"] = "Chest";
-//            currNormalMob["gid"] = genFromVec(m_config->getNormalMobs());
             if (minTier == maxTier)
                 currChest["gid"] = m_config->getChests().back();
             else
-                currChest["gid"] = m_config->getChests().at((tier - minTier) / (maxTier - minTier) * m_config->getChests().size());
+                currChest["gid"] = m_config->getChests().at((tier - minTier) / (maxTier - minTier) * (m_config->getChests().size() - 1));
             currChest["x"] = (room.m_cont.m_pos.x + pos.x - 1) * tileMap->getTileSize().width;
             currChest["y"] = (room.m_cont.m_pos.y + pos.y - 1) * tileMap->getTileSize().height;
             currChest["width"] = tileMap->getTileSize().width;
@@ -291,13 +292,10 @@ std::pair<RGWB::Container, RGWB::Container> RGWB::randomSplit(const Container& c
         c1 = Container{cont.m_pos, cocos2d::random(2, cont.m_width), cont.m_height};
         c2 = Container{cont.m_pos.x + c1.m_width, cont.m_pos.y, cont.m_width - c1.m_width, cont.m_height};
 
-        if (m_discardByRatio)
-        {
-            double c1WR = static_cast<double>(c1.m_width) / c1.m_height;
-            double c2WR = static_cast<double>(c2.m_width) / c2.m_height;
-            if (c1WR < m_widthRatio || c2WR < m_widthRatio)
-                return randomSplit(cont);
-        }
+        double c1WR = static_cast<double>(c1.m_width) / c1.m_height;
+        double c2WR = static_cast<double>(c2.m_width) / c2.m_height;
+        if (c1WR < m_widthRatio || c2WR < m_widthRatio)
+            return randomSplit(cont);
     }
     else
     {
@@ -305,13 +303,10 @@ std::pair<RGWB::Container, RGWB::Container> RGWB::randomSplit(const Container& c
         c1 = Container{cont.m_pos, cont.m_width, cocos2d::random(2, cont.m_height)};
         c2 = Container{cont.m_pos.x, cont.m_pos.y + c1.m_height, cont.m_width, cont.m_height - c1.m_height};
 
-        if (m_discardByRatio)
-        {
-            double c1HR = static_cast<double>(c1.m_height) / c1.m_width;
-            double c2HR = static_cast<double>(c2.m_height) / c2.m_width;
-            if (c1HR < m_heightRatio || c2HR < m_heightRatio)
-                return randomSplit(cont);
-        }
+        double c1HR = static_cast<double>(c1.m_height) / c1.m_width;
+        double c2HR = static_cast<double>(c2.m_height) / c2.m_width;
+        if (c1HR < m_heightRatio || c2HR < m_heightRatio)
+            return randomSplit(cont);
     }
     return std::make_pair(c1, c2);
 }
@@ -491,13 +486,13 @@ std::vector<RGWB::Room> RGWB::generateRooms(const std::shared_ptr<Tree>& tree) c
     {
         if (currRoom.m_type == RoomType::NONE)
         {
-//            double alpha = cocos2d::random(0., 1.);
-//            if (alpha < m_normalRoomRatio)
-//                fillNormalRoom(currRoom);
-//            else if (alpha < m_normalRoomRatio + m_treasureRoomRatio)
+            double alpha = cocos2d::random(0., 1.);
+            if (alpha < m_normalRoomRatio)
+                fillNormalRoom(currRoom);
+            else if (alpha < m_normalRoomRatio + m_treasureRoomRatio)
                 fillTreasureRoom(currRoom);
-//            else
-//                fillEliteRoom(currRoom);
+            else
+                fillEliteRoom(currRoom);
         }
     }
     return rooms;

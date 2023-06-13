@@ -51,24 +51,6 @@ public:
         return *this;
     }
 
-    RandomGeneratorWorldBuilder& setDiscardByRatio(bool discardByRatio)
-    {
-        m_discardByRatio = discardByRatio;
-        return *this;
-    }
-
-    RandomGeneratorWorldBuilder& setRoomVerticalRatio(double widthRatio)
-    {
-        m_widthRatio = widthRatio;
-        return *this;
-    }
-
-    RandomGeneratorWorldBuilder& setRoomHorizontalRatio(float heightRatio)
-    {
-        m_heightRatio = heightRatio;
-        return *this;
-    }
-
 private:
 
     enum class RoomType : uint32_t
@@ -169,17 +151,15 @@ private:
     double m_minRoomFillBound = 0.025;
     double m_maxRoomFillBound = 0.05;
 
-    double m_normalRoomTreasureMean = 0.5;
-    double m_eliteRoomTreasureMean = 1;
-    double m_bossRoomTreasureMean = 3;
-    double m_treasureRoomTreasureMean = 5;
+    double m_normalRoomTreasureMean = 2;
+    double m_eliteRoomTreasureMean = 5;
+    double m_bossRoomTreasureMean = 7;
+    double m_treasureRoomTreasureMean = 10;
 
     double m_normalTileRatio = 0.7;
 
     static constexpr int m_meanCorridorWidth = 3;
     static constexpr int m_sigmaCorridorWidth = 1;
-
-    const std::vector<int> m_bonfires = {782, 783, 784, 785, 786, 787, 788, 789};
 
     double m_widthRatio = 0.45;
     double m_heightRatio = 0.45;
@@ -192,6 +172,4 @@ private:
     int m_width = 0;
 
     int m_iterCount = 0;
-
-    bool m_discardByRatio = true;
 };
