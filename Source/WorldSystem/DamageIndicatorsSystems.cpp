@@ -32,16 +32,26 @@ bool DamageIndicator::init()
     return true;
 }
 
-void DamageIndicator::setColorAndDamage(cocos2d::Color3B color, std::optional<float> damage) const
+void DamageIndicator::setColorAndDamage(cocos2d::Color3B color, std::optional<float> damage)
 {
     m_sprite->setColor(color);
-    m_label->setString(damage ? std::to_string(static_cast<int>(damage.value())) : "");
+    if (damage.has_value())
+        changeDamageValueBy(damage.value());
+    else
+        m_label->setString("");
+}
+
+void DamageIndicator::changeDamageValueBy(float changeValue)
+{
+    m_currentDamage += changeValue;
+    m_label->setString(std::to_string(static_cast<int>(m_currentDamage)));
 }
 
 void DamageIndicator::setVisible(bool visible)
 {
     Node::setVisible(visible);
     m_label->setVisible(visible);
+    m_currentDamage = 0.0f;
 }
 
 void DamageIndicator::setPosition(const cocos2d::Vec2& position)
@@ -79,7 +89,7 @@ void DamageIndicatorsSystems::scheduleDraw(const std::function<void(std::functio
 
 void DamageIndicatorsSystems::reset()
 {
-    for (DamageIndicator* indicator : m_showedObjects)
+    for (const auto& [position, indicator] : m_showedObjects)
     {
         m_indicators.release(indicator);
         indicator->setVisible(false);
@@ -95,11 +105,20 @@ void DamageIndicatorsSystems::update()
     {
         drawFunc([this](const DrawDamageInfo& drawInfo)
         {
-            DamageIndicator* indicator = m_indicators.get();
-            indicator->setVisible(true);
-            indicator->setPosition(m_world->convertToMapSpace(drawInfo.position));
-            indicator->setColorAndDamage(drawInfo.color, drawInfo.damage);
-            m_showedObjects.push_back(indicator);
+            auto findedIndicator = m_showedObjects.find(drawInfo.position);
+            if (findedIndicator != m_showedObjects.end())
+            {
+                if (drawInfo.damage.has_value())
+                    findedIndicator->second->changeDamageValueBy(drawInfo.damage.value());
+            }
+            else
+            {
+                DamageIndicator* indicator = m_indicators.get();
+                indicator->setVisible(true);
+                indicator->setPosition(m_world->convertToMapSpace(drawInfo.position));
+                indicator->setColorAndDamage(drawInfo.color, drawInfo.damage);
+                m_showedObjects.insert({drawInfo.position, indicator});
+            }
         });
     }
     m_deferredDraws.clear();

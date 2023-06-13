@@ -43,6 +43,8 @@ public:
         { return Vec2Int(position.x / m_tilemap->getTileSize().width,
                          position.y / m_tilemap->getTileSize().height); }
 
+    void scheduleMove(BaseEntity* entity, BaseEntity::oldPosition oldPosition, BaseEntity::newPosition newPosition);
+
     static cocos2d::Rect getRectFromGid(int gid) { return cocos2d::Rect(
         Vec2Int{gid % 64, gid / 64} * 32, {32, 32}); }
 
@@ -51,32 +53,26 @@ public:
 
     TileType getTileType(Vec2Int position) const;
 
-    std::vector<Vec2Int> findPath(Vec2Int start, Vec2Int finish) const
-    {
-        return m_pathfinding->findPath(*m_graph, m_graph->getNodeByPos(start),
-            m_graph->getNodeByPos(finish));
-    }
-    
+    std::vector<Vec2Int> findPath(Vec2Int start, Vec2Int finish) const;
+
     void update() override;
 
     DamageIndicatorsSystems* getDamageIndicatorsForMobs() const { return m_damageIndicatorsMobs; }
     DamageIndicatorsSystems* getDamageIndicatorsForPlayer(const Player* player) const { return m_playersDamageIndicators.at(player); }
-    
+
 private:
     explicit World(Tilemap* tilemap, std::shared_ptr<mob::BaseMobAbstractFactory> mobFactory);
 
     void tryInitDecorations(const cocos2d::TMXObjectGroup* decorationsGroup, cocos2d::Size tileSize);
     void tryInitChests(const cocos2d::TMXObjectGroup* chestsGroup, cocos2d::Size tileSize);
     bool spawnItem(BaseEntity* entity, Vec2Int direction, const std::function<BaseItem*()>& createFunc);
-    
+
+    void checkMoveEntities();
     void trySpawnMobs(const cocos2d::TMXObjectGroup* group, cocos2d::Size tileSize,
-        std::function<mob::Mob*(mob::BaseMobAbstractFactory*, World*, int)> createFunc);
+                      std::function<mob::Mob*(mob::BaseMobAbstractFactory*, World*, int)> createFunc);
 
     void updateTileType(Vec2Int position) const;
     size_t getIndexFromVec2(Vec2Int position) const { return position.x + position.y * getSize().width; }
-
-    void onEntityMoved(BaseEntity* entity, BaseEntity::oldPosition oldPosition, BaseEntity::newPosition newPosition);
-    FunctionHandler<BaseEntity*, BaseEntity::oldPosition, BaseEntity::newPosition> m_movedEntityDelegate;
 
     void internalRemoveEntity(BaseEntity* entity);
     void onDeletedEntity(BaseEntity* entity);
@@ -99,5 +95,6 @@ private:
 
     std::shared_ptr<IPathfindingAlgorithm> m_pathfinding;
     
-    std::map<Vec2Int, BaseEntity*> m_movedEntities;
+    std::set<Vec2Int> m_currentMovedEntities;
+    std::map<BaseEntity*, std::pair<Vec2Int, Vec2Int>> m_movedEntities;
 };

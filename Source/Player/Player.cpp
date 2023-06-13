@@ -82,7 +82,7 @@ void Player::scheduleDamageIndicators(bool isForcedUpdate) const
     {
         DamageIndicatorsSystems* damageIndicators = getWorld()->getDamageIndicatorsForPlayer(this);
         if (const Weapon* currentWeapon = m_backpack.getCurrentWeapon())
-            currentWeapon->scheduleDrawIndicators(damageIndicators, getPositionOnMap(), m_choicedDirection.value());
+            currentWeapon->scheduleDrawIndicators(damageIndicators, this, m_choicedDirection.value());
         
         if (isForcedUpdate)
             damageIndicators->update();

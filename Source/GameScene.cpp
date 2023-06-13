@@ -61,17 +61,17 @@ bool GameScene::init(Camera* camera)
 
     m_worldTileConfig = std::make_shared<WorldTileConfig>("Resources/World.json");
     
-     const std::string tilemapInXML = generateXMLForTMXTiledMap(RandomGeneratorWorldBuilder()
-         .setPath("Template.tmx")
-         .setConfig(m_worldTileConfig->getLevelsTileConfig().at(0))
-         .setWidth(100)
-         .setHeight(100)
-         .setIterCount(5)
-         .build());
-
-     std::ofstream outfile ("Resources/test.tmx");
-     outfile << tilemapInXML << std::endl;
-     outfile.close();
+//     const std::string tilemapInXML = generateXMLForTMXTiledMap(RandomGeneratorWorldBuilder()
+//         .setPath("Template.tmx")
+//         .setConfig(m_worldTileConfig->getLevelsTileConfig().at(0))
+//         .setWidth(100)
+//         .setHeight(100)
+//         .setIterCount(5)
+//         .build());
+//
+//     std::ofstream outfile ("Resources/test.tmx");
+//     outfile << tilemapInXML << std::endl;
+//     outfile.close();
     
     m_gameLoop = std::make_shared<GameLoop>();
 

@@ -126,23 +126,28 @@ void World::tryInitChests(const TMXObjectGroup* chestsGroup, const Size tileSize
                     const size_t weaponSplitIndex = nameLootIterator->second.asString().find(':');
                     std::string nameWeapon = weaponInfo.substr(0, weaponSplitIndex);
                     int tier = std::stoi(weaponInfo.substr(weaponSplitIndex + 1));
-                    static std::vector<Vec2Int> directionsSpawn =
-                        {
-                            {0, -1},
-                            {1, 0},
-                            {-1, 0},
-                            {0, 1}
-                        };
-
-                    std::function<BaseItem*()> spawnItemFunc = [this, nameWeapon, tier]()
-                        {
-                           return Attacks::createWeapon(this, nameWeapon, tier);
-                        };
-                    for (const auto direction : directionsSpawn)
+                    // static std::vector<Vec2Int> directionsSpawn =
+                    //     {
+                    //         {0, -1},
+                    //         {1, 0},
+                    //         {-1, 0},
+                    //         {0, 1}
+                    //     };
+                    //
+                    // std::function<BaseItem*()> spawnItemFunc = [this, nameWeapon, tier]()
+                    //     {
+                    //        return Attacks::createWeapon(this, nameWeapon, tier);
+                    //     };
+                    // for (const auto direction : directionsSpawn)
+                    // {
+                    //     if (spawnItem(chest, direction, spawnItemFunc))
+                    //         break;
+                    // }
+                    removeEntity(chest);
+                    spawnItem(chest, {0, 0}, [this, nameWeapon, tier]()
                     {
-                        if (spawnItem(chest, direction, spawnItemFunc))
-                            break;
-                    }
+                        return Attacks::createWeapon(this, nameWeapon, tier);
+                    });
                 }
             });
         const Vec2Int position = readPositionFromTile(chestMap, tileSize);
@@ -193,7 +198,6 @@ void World::addEntity(BaseEntity* entity)
     const size_t index = getIndexFromVec2(positionOnMap);
     
     m_entities[index].push_back(entity);
-    entity->moved += m_movedEntityDelegate;
     entity->deleted += m_deletedEntityDelegate;
     this->addChild(entity, 10);
 
@@ -203,8 +207,16 @@ void World::addEntity(BaseEntity* entity)
 void World::removeEntity(BaseEntity* entity)
 {
     internalRemoveEntity(entity);
-    entity->moved -= m_movedEntityDelegate;
     entity->deleted -= m_deletedEntityDelegate;
+}
+
+void World::scheduleMove(BaseEntity* entity, BaseEntity::oldPosition oldPosition, BaseEntity::newPosition newPosition)
+{
+    const auto finded = m_movedEntities.find(entity);
+    if (finded != m_movedEntities.end())
+        m_movedEntities.at(entity).second = newPosition;
+    else
+        m_movedEntities.insert({entity, {oldPosition, newPosition}});
 }
 
 void World::addPlayer(Player* player)
@@ -231,22 +243,67 @@ TileType World::getTileType(Vec2Int position) const
     return m_graph->getNodeByPos(position)->tile;
 }
 
+std::vector<Vec2Int> World::findPath(Vec2Int start, Vec2Int finish) const
+{
+    static std::shared_ptr<FunctionVisitorEntities<bool>> visitor = FunctionVisitorEntitiesBuilder<bool>()
+        .setMob([this](mob::Mob*) { return true; })
+        .setPlayer([this](Player*) { return true; })
+        .build();
+    
+    return m_pathfinding->findPath(*m_graph, m_graph->getNodeByPos(start),
+        m_graph->getNodeByPos(finish),
+        [this](const pathfinder::Node* node)
+        {
+            for (BaseEntity* entity : getEntitiesFromCell(node->pos))
+            {
+                entity->acceptVisit(visitor);
+                if (visitor->getReturnValue().value_or(false))
+                    return false;
+            }
+            return true;
+        });
+}
+
 void World::update()
 {
+    m_player->update();
+
+    checkMoveEntities();
     m_movedEntities.clear();
     
-    m_player->update();
     for (mob::Mob* mob : m_mobs)
         mob->update();
+    
+    checkMoveEntities();
+    m_movedEntities.clear();
+    
+    m_currentMovedEntities.clear();
 
     for (auto [player, damageIndicators] : m_playersDamageIndicators)
         damageIndicators->update();
     m_damageIndicatorsMobs->update();
 }
 
+void World::checkMoveEntities()
+{
+    for (const auto& [mob, positions] : m_movedEntities)
+    {
+        auto [oldPosition, newPosition] = positions;
+
+        if (m_currentMovedEntities.emplace(newPosition).second)
+        {
+            static constexpr float moveTime = 0.1f;
+            
+            std::vector<BaseEntity*>& oldEntities = m_entities[getIndexFromVec2(oldPosition)];
+            oldEntities.erase(std::ranges::find(oldEntities, mob));
+            m_entities[getIndexFromVec2(newPosition)].push_back(mob);
+            mob->moveOnMapTo(newPosition, moveTime);
+        }
+    }
+}
+
 World::World(Tilemap* tilemap, std::shared_ptr<mob::BaseMobAbstractFactory> mobFactory)
-    : m_movedEntityDelegate(CC_CALLBACK_3(World::onEntityMoved, this))
-    , m_deletedEntityDelegate(CC_CALLBACK_1(World::onDeletedEntity, this))
+    : m_deletedEntityDelegate(CC_CALLBACK_1(World::onDeletedEntity, this))
     , m_mobFactory(mobFactory)
     , m_entities(std::vector<std::vector<BaseEntity*>>
         (tilemap->getMapSize().width * tilemap->getMapSize().height))
@@ -278,19 +335,6 @@ void World::updateTileType(Vec2Int position) const
     m_graph->getNodeByPos(position)->tile = tileType;
 }
 
-void World::onEntityMoved(BaseEntity* entity, BaseEntity::oldPosition oldPosition, BaseEntity::newPosition newPosition)
-{
-    static float moveTime = 0.1f;
-    
-    if (!m_movedEntities.insert({newPosition, entity}).second)
-        return;
-
-    std::vector<BaseEntity*>& oldEntities = m_entities[getIndexFromVec2(oldPosition)];
-    oldEntities.erase(std::ranges::find(oldEntities, entity));
-    m_entities[getIndexFromVec2(newPosition)].push_back(entity);
-    entity->moveOnMapTo(newPosition, moveTime);
-}
-
 void World::internalRemoveEntity(BaseEntity* entity)
 {
     std::shared_ptr<FunctionVisitorEntitiesReturnVoid> visitor = FunctionVisitorEntitiesBuilder<void>()
@@ -302,6 +346,7 @@ void World::internalRemoveEntity(BaseEntity* entity)
     entitiesOnCurrentCell.erase(std::ranges::find(entitiesOnCurrentCell, entity));
     updateTileType(positionOnMap);
     entity->acceptVisit(visitor);
+    m_movedEntities.erase(entity);
 }
 
 void World::onDeletedEntity(BaseEntity* entity)
