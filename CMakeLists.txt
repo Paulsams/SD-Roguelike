@@ -69,6 +69,8 @@ list(APPEND GAME_SOURCE
 
     Source/ItemsSystem/AttackHandler.cpp
     Source/ItemsSystem/Attacks.cpp
+    Source/ItemsSystem/BaseItem.cpp
+    Source/ItemsSystem/Items.cpp
     Source/ItemsSystem/Weapon.cpp
 
     Source/Mobs/Mob.cpp
@@ -119,7 +121,9 @@ list(APPEND GAME_HEADER
     Include/ItemsSystem/AttackHandler.h
     Include/ItemsSystem/Attacks.h
     Include/ItemsSystem/BaseItem.h
+    Include/ItemsSystem/ConsumableItem.h
     Include/ItemsSystem/Damage.h
+    Include/ItemsSystem/Items.h
     Include/ItemsSystem/IVisualAttack.h
     Include/ItemsSystem/Weapon.h
     

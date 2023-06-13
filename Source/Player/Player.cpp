@@ -3,6 +3,7 @@
 #include "Player/Player.h"
 #include "Stats/Modificators/BoundsModificator.h"
 #include "Stats/Modificators/StatWithModificators.h"
+#include "WorldSystem/Chest.h"
 
 using namespace cocos2d;
 
@@ -29,7 +30,7 @@ bool Player::init()
 
 void Player::update()
 {
-    m_statsContainer->get(Mana)->changeValueBy(1);
+    m_statsContainer->get(MANA)->changeValueBy(1);
     scheduleDamageIndicators();
 }
 
@@ -46,7 +47,7 @@ Player::Player(World* world)
     , m_attackedDelegate(CC_CALLBACK_0(Player::onAttacked, this))
     , m_interactedDelegate(CC_CALLBACK_0(Player::onInteracted, this))
     , m_input(this)
-    , m_backpack(Attacks::createWeapon(world, Attacks::defaultWeapon))
+    , m_backpack(Attacks::createWeapon(world, Attacks::defaultWeapon, 1))
     , m_statsContainer(std::make_shared<StatsContainer>())
     , m_items(12)
 {
@@ -58,20 +59,13 @@ Player::Player(World* world)
 
     const auto playerHpStat = std::make_shared<StatWithModificators>(100.0f);
     playerHpStat->addModificator(std::make_shared<BoundsModificator>(MinMax(0, 100.0f)));
-    m_statsContainer->add(Health, playerHpStat);
+    m_statsContainer->add(HEALTH, playerHpStat);
 
     const auto playerManaStat = std::make_shared<StatWithModificators>(30.0f);
     playerManaStat->addModificator(std::make_shared<BoundsModificator>(MinMax(0, 100.0f)));
-    m_statsContainer->add(Mana, playerManaStat);
+    m_statsContainer->add(MANA, playerManaStat);
 
-    m_statsContainer->add(Level, std::make_shared<StatWithModificators>(0));
-
-    m_interactedVisitor = FunctionVisitorEntitiesBuilder<void>().setItem([this](BaseItem* item)
-    {
-        item->pickUp(this);
-        const std::vector<BaseItem*> items = m_items.getCollection();
-        m_items.setAt(std::ranges::find(items, nullptr) - items.begin(), item);
-    }).build();
+    m_statsContainer->add(LEVEL, std::make_shared<StatWithModificators>(0));
 }
 
 void Player::createClothe(ClotheType type)
@@ -137,10 +131,45 @@ void Player::onAttacked()
 
 void Player::onInteracted()
 {
+    const auto itemVisitor = FunctionVisitorEntitiesBuilder<void>()
+        .setItem([this](BaseItem* item)
+        {
+            const std::vector<BaseItem*> items = m_items.getCollection();
+            const size_t insertIndex = std::ranges::find(items, nullptr) - items.begin();
+            if (insertIndex <= m_items.size())
+            {
+                m_items.setAt(insertIndex, item);
+                item->pickUp(this);
+            }
+        })
+        .build();
+
+    // В идеале тут надо было бы делать интерфейс IInteractable какой-нибудь, но это бы переусложнило систему и пришлось
+    // бы делать много динамик кастов (аля компонентная система, но через полиморфизм), но так как у нас только
+    // определенные типы взаимодействий возможны -- сделал пока что так.
+    const auto chestVisitor = FunctionVisitorEntitiesBuilder<void>()
+        .setChest([this](Chest* chest)
+        {
+            chest->interact();
+        })
+        .build();
+
+    if (m_choicedDirection.has_value())
+    {
+        const Vec2Int checkPosition = getPositionOnMap() + m_choicedDirection.value().getVector();
+        for (BaseEntity* entity : getWorld()->getEntitiesFromCell(checkPosition))
+        {
+            entity->acceptVisit(chestVisitor);
+            if (chestVisitor->isCalled())
+                return;
+        }
+    }
+
+    // TODO: оставить только верхний интеракт, а предметы на которых стоишь показывать через ещё одно окошко инвентаря
     for (BaseEntity* entity : getWorld()->getEntitiesFromCell(getPositionOnMap()))
     {
-        entity->acceptVisit(m_interactedVisitor);
-        if (m_interactedVisitor->isCalled())
-            break;
+        entity->acceptVisit(itemVisitor);
+        if (itemVisitor->isCalled())
+            return;
     }
 }

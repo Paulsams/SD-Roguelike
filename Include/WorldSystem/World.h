@@ -10,13 +10,14 @@
 
 class Player;
 class BaseEntity;
+class BaseItem;
 
 class World : public cocos2d::Node, public IUpdatable
 {
 public:
     static World* create(Tilemap* tilemap, std::shared_ptr<mob::BaseMobAbstractFactory> mobFactory);
 
-    bool initWithConfig();
+    bool initWithTilemap();
 
     Vec2Int getSpawnPoint() const { return m_spawnPoint; }
 
@@ -63,6 +64,10 @@ public:
     
 private:
     explicit World(Tilemap* tilemap, std::shared_ptr<mob::BaseMobAbstractFactory> mobFactory);
+
+    void tryInitDecorations(const cocos2d::TMXObjectGroup* decorationsGroup, cocos2d::Size tileSize);
+    void tryInitChests(const cocos2d::TMXObjectGroup* chestsGroup, cocos2d::Size tileSize);
+    bool spawnItem(BaseEntity* entity, Vec2Int direction, const std::function<BaseItem*()>& createFunc);
     
     void trySpawnMobs(const cocos2d::TMXObjectGroup* group, cocos2d::Size tileSize,
         std::function<mob::Mob*(mob::BaseMobAbstractFactory*, World*, int)> createFunc);
@@ -78,8 +83,8 @@ private:
 
     FunctionHandler<BaseEntity*> m_deletedEntityDelegate;
     
-    TilemapLayer* m_ground;
-    TilemapLayer* m_walls;
+    TilemapLayer* m_ground = nullptr;
+    TilemapLayer* m_walls = nullptr;
 
     std::shared_ptr<mob::BaseMobAbstractFactory> m_mobFactory;
     std::vector<mob::Mob*> m_mobs;

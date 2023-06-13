@@ -1,7 +1,6 @@
 #include "GameScene.h"
 
 #include "Utils/TMXGenerator.h"
-#include "ItemsSystem/Attacks.h"
 #include "Mobs/Factory/MobsFactoryFromConfig.h"
 #include "UI/Canvas.h"
 #include "WorldSystem/World.h"
@@ -86,14 +85,6 @@ bool GameScene::init(Camera* camera)
     m_gameLoop->add(m_world);
 
     this->addChild(m_world);
-
-    Weapon* stick = Attacks::createWeapon(m_world, Attacks::stick_1);
-    stick->setPositionOnMapWithoutNotify({3, 3});
-    m_world->addEntity(stick);
-
-    Weapon* axe_1 = Attacks::createWeapon(m_world, Attacks::axe_1);
-    axe_1->setPositionOnMapWithoutNotify({4, 5});
-    m_world->addEntity(axe_1);
 
     createPlayer();
 
