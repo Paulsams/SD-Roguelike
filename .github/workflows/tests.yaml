@@ -73,24 +73,30 @@ jobs:
 
       - name: Base Test Windows
         if: matrix.config.name == 'Windows'
+        shell: bash
         run: tests/Debug/baseTest.exe
 
       - name: Base Test Linux
         if: matrix.config.name == 'Ubuntu'
+        shell: bash
         run: tests/baseTest
 
       - name: Pathfinder Test Windows
         if: matrix.config.name == 'Windows'
+        shell: bash
         run: tests/Debug/pathfinderTest.exe
 
       - name: Pathfinder Test Linux
         if: matrix.config.name == 'Ubuntu'
+        shell: bash
         run: tests/pathfinderTest
 
       - name: StateMachine Test Windows
         if: matrix.config.name == 'Windows'
+        shell: bash
         run: tests/Debug/stateMachineTest.exe
 
       - name: StateMachine Test Linux
         if: matrix.config.name == 'Ubuntu'
+        shell: bash
         run: tests/stateMachineTest

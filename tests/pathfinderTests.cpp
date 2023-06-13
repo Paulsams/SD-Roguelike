@@ -106,7 +106,7 @@ std::function<TileType(int)> fToTileType = [](int tile) {
 //        EXPECT_EQ(expectedPath[i], res[i]);
 //    }
 //}
-//
+
 //TEST(PathFinderSimple3PathTest, pathfinderSimple3PathTest) {
 //    const int height = 7, width = 7;
 //    const cocos2d::Size testSize(width, height);
