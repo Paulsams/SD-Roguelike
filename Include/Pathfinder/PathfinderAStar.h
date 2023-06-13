@@ -10,7 +10,8 @@ namespace pathfinder {
         }
         
     public:
-        std::vector<Vec2Int> findPath(Graph& graph, Node* start, Node* end) override;
+        std::vector<Vec2Int> findPath(Graph& graph, Node* start, Node* end,
+            const std::function<bool(const Node*)>& isValidMove) override;
     };
 
 }

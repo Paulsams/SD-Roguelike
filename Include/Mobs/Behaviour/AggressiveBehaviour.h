@@ -14,6 +14,6 @@ namespace mob {
         void update(Mob*) override;
 
     private:
-        void drawDamageIndicators(Mob* mob, Vec2Int mobPos) const;
+        void drawDamageIndicators(Mob* mob) const;
     };
 }
