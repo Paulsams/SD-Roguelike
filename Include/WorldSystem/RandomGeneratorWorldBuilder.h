@@ -146,7 +146,6 @@ private:
     void fillRoomVec2int(Room& room, std::vector<Vec2Int>& mobs, int counter, int tryCounter) const;
 
     void fillSpawnRoom(Room& room) const;
-    void fillBossRooms(std::vector<Room>& rooms) const;
     void fillSingleBossRoom(Room& room) const;
     void fillNormalRoom(Room& room) const;
     void fillEliteRoom(Room& room) const;

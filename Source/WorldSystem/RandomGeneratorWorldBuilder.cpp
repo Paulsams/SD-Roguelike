@@ -127,16 +127,6 @@ Tilemap* RGWB::generateWorld() const
         }
 
     }
-//    objectsGroup->setObjects({cocos2d::Value(spawnPoint)});
-
-//    for (cocos2d::TMXObjectGroup* og : objectGroups)
-//    {
-//        std::cout << og->getGroupName() << std::endl;
-//        for (const auto& [k, v] : og->getObject("Pipa")) {
-//            std::cout << "\t" << k << std::endl;
-//        }
-//    }
-
 
     cocos2d::Vector<cocos2d::TMXObjectGroup*> newObjectGroups;
     cocos2d::TMXObjectGroup* utilsObjects = new cocos2d::TMXObjectGroup();
@@ -324,22 +314,6 @@ void RGWB::fillSpawnRoom(Room& room) const
 
 
 
-void RGWB::fillBossRooms(std::vector<Room>& rooms) const
-{
-    int bossCount = m_iterCount;
-    for (int i = 0; i < bossCount; ++i)
-    {
-        size_t idx = cocos2d::random((size_t)0, rooms.size() - 1);
-        while (rooms[idx].m_type != RoomType::NONE)
-        {
-            idx = cocos2d::random((size_t)0, rooms.size() - 1);
-        }
-        fillSingleBossRoom(rooms[idx]);
-    }
-}
-
-
-
 void RGWB::fillSingleBossRoom(Room& room) const
 {
     static std::exponential_distribution<> d(m_bossRoomTreasureMean);
@@ -449,7 +423,16 @@ std::vector<RGWB::Room> RGWB::generateRooms(const std::shared_ptr<Tree>& tree) c
     }
 
     fillSpawnRoom(rooms[spawnRoomIdx]);
-    fillBossRooms(rooms);
+    int bossCount = m_iterCount;
+    for (int i = 0; i < bossCount; ++i)
+    {
+        size_t idx = cocos2d::random((size_t)0, rooms.size() - 1);
+        while (rooms[idx].m_type != RoomType::NONE)
+        {
+            idx = cocos2d::random((size_t)0, rooms.size() - 1);
+        }
+        fillSingleBossRoom(rooms[idx]);
+    }
 
     for (Room& currRoom : rooms)
     {
