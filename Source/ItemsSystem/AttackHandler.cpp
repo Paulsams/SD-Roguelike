@@ -2,29 +2,32 @@
 
 #include "ItemsSystem/AttackHandler.h"
 
-AttackHandler::AttackHandler(const std::map<Vec2Int, std::shared_ptr<AttackWithDamage>>&& m_ranges)
-    : m_ranges(std::move(m_ranges)) { }
+AttackHandler::AttackHandler(const std::map<Vec2Int, std::vector<std::shared_ptr<AttackWithDamage>>>&& ranges)
+    : m_ranges(std::move(ranges)) { }
 
 void AttackHandler::attack(World* world, Vec2Int position, Direction direction) const
 {
     std::shared_ptr<IStat> healthStat;
-    for (const auto& [range, attack] : m_ranges)
+    for (const auto& [range, attacks] : m_ranges)
     {
         const Vec2Int endPosition = position + direction.rotate(range);
-        if (attack->isPossibleAttack(world->getTileType(endPosition)))
+        for (const auto& attack : attacks)
         {
-            // мейби тут делать плитки огня и подобное
-            for (BaseEntity* entity : world->getEntitiesFromCell(endPosition))
+            if (attack->isPossibleAttack(world->getTileType(endPosition)))
             {
-                const bool isPossibleAttack = attack->isPossibleAttackFromEntity(entity);
-                const bool isReachable = attack->getSearch()->isReachable(world, position, endPosition);
-                if (isPossibleAttack && isReachable && entity->getStats()->tryGet(HEALTH, healthStat))
+                // мейби тут делать плитки огня и подобное
+                for (BaseEntity* entity : world->getEntitiesFromCell(endPosition))
                 {
-                    float damage = attack->getDamage()->get(entity);
-                    healthStat->changeValueBy(-damage);
-                    if (const std::shared_ptr<IVisualAttack> visualAttack = attack->getVisual())
-                        visualAttack->draw(world, endPosition);
-                    break;
+                    const bool isPossibleAttack = attack->isPossibleAttackFromEntity(entity);
+                    const bool isReachable = attack->getSearch()->isReachable(world, position, endPosition);
+                    if (isPossibleAttack && isReachable && entity->getStats()->tryGet(HEALTH, healthStat))
+                    {
+                        float damage = attack->getDamage()->get(entity);
+                        healthStat->changeValueBy(-damage);
+                        if (const std::shared_ptr<IVisualAttack> visualAttack = attack->getVisual())
+                            visualAttack->draw(world, endPosition);
+                        break;
+                    }
                 }
             }
         }
@@ -43,9 +46,16 @@ bool AttackHandler::isPossibleAttack(World* world, Vec2Int position, Vec2Int loc
     if (range != m_ranges.end())
     {
         const Vec2Int endPosition = position + localPosition;
-        const bool isPossible = range->second->isPossibleAttack(world->getTileType(endPosition));
-        const bool isReachable = range->second->getSearch()->isReachable(world, position, endPosition);
-        return isPossible && isReachable;
+        for (const auto& attack : range->second)
+        {
+            const bool isPossible = attack->isPossibleAttack(world->getTileType(endPosition));
+            const bool isReachable = attack->getSearch()->isReachable(world, position, endPosition);
+
+            if (isPossible && isReachable)
+                return true;
+        }
+
+        return false;
     }
 
     return false;
@@ -57,24 +67,27 @@ void AttackHandler::drawIndicators(World* world, Vec2Int position, Direction dir
 {
     std::shared_ptr<IStat> healthStat;
     std::optional<float> damage;
-    for (auto [range, attack] : m_ranges)
+    for (auto [range, attacks] : m_ranges)
     {
         const Vec2Int endPosition = position + direction.rotate(range);
-        if (attack->isPossibleAttack(world->getTileType(endPosition)))
+        for (const auto& attack : attacks)
         {
-            for (BaseEntity* entity : world->getEntitiesFromCell(endPosition))
+            if (attack->isPossibleAttack(world->getTileType(endPosition)))
             {
-                const bool isPossibleAttack = attack->isPossibleAttackFromEntity(entity);
-                const bool isReachable = attack->getSearch()->isReachable(world, position, endPosition);
-                if (isPossibleAttack && isReachable && entity->getStats()->tryGet(HEALTH, healthStat))
+                for (BaseEntity* entity : world->getEntitiesFromCell(endPosition))
                 {
-                    damage.emplace(attack->getDamage()->get(entity));
-                    break;
+                    const bool isPossibleAttack = attack->isPossibleAttackFromEntity(entity);
+                    const bool isReachable = attack->getSearch()->isReachable(world, position, endPosition);
+                    if (isPossibleAttack && isReachable && entity->getStats()->tryGet(HEALTH, healthStat))
+                    {
+                        damage.emplace(attack->getDamage()->get(entity));
+                        break;
+                    }
                 }
             }
+            
+            drawFunc({endPosition, damage.has_value() ? cocos2d::Color3B::RED :cocos2d::Color3B::GREEN, damage});
+            damage.reset();
         }
-        
-        drawFunc({endPosition, damage.has_value() ? cocos2d::Color3B::RED :cocos2d::Color3B::GREEN, damage});
-        damage.reset();
     }
 }

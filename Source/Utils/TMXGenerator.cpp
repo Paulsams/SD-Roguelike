@@ -249,19 +249,19 @@ std::string generateXMLForTMXTiledMap(Tilemap* map)
             };
 
             std::ostringstream floatStream;
-
-            std::vector<std::pair<std::string, Value>> propertiesValues;
             
             for (auto& obj : objectGroup->getObjects())
             {
+                std::vector<std::pair<std::string, Value>> propertiesValues;
+                
                 is << "<object";
                 
                 for (auto& [key, value] : obj.asValueMap())
                 {
-                    is << " " << key << "=\"";
-
                     if (nonPropertiesKeys.contains(key))
                     {
+                        is << " " << key << "=\"";
+                        
                         std::string property;
                         if (key == "y")  // Convert back to Tiled coordinate system
                         {
@@ -300,7 +300,8 @@ std::string generateXMLForTMXTiledMap(Tilemap* map)
                 for (const auto& [key, value] : propertiesValues)
                     is << "<property name=\"" << key << "\" value=\"" << value.asString() << "\"/>" << std::endl;
                 is << "</properties>" << std::endl;
-                is << "<objects/>" << std::endl;
+                
+                is << "</object>" << std::endl;
             }
             
             is << "</objectgroup>" << std::endl;

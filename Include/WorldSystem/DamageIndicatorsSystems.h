@@ -24,7 +24,9 @@ public:
     
     bool init() override;
 
-    void setColorAndDamage(cocos2d::Color3B color, std::optional<float> damage) const;
+    void setColorAndDamage(cocos2d::Color3B color, std::optional<float> damage);
+    void changeDamageValueBy(float changeValue);
+    
     void setVisible(bool visible) override;
     void setPosition(const cocos2d::Vec2& position) override;
     void setPosition(float x, float y) override;
@@ -32,6 +34,7 @@ public:
 private:
     DamageIndicator(World* world);
 
+    float m_currentDamage;
     cocos2d::Sprite* m_sprite;
     cocos2d::Label* m_label;
     World* m_world;
@@ -49,8 +52,7 @@ public:
 private:
     DamageIndicatorsSystems(World* world);
     
-    std::vector<DamageIndicator*> m_showedObjects;
-    
+    std::map<Vec2Int, DamageIndicator*> m_showedObjects;
     PoolObjects<DamageIndicator> m_indicators;
     World* m_world;
 
