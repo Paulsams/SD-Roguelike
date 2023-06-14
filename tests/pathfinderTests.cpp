@@ -1,7 +1,7 @@
-#include "../Include/Pathfinder/IPathfindingAlgorithm.h"
-#include "../Include/Pathfinder/PathfinderAStar.h"
+#include "Pathfinder/IPathfindingAlgorithm.h"
+#include "Pathfinder/PathfinderAStar.h"
+
 #include <gtest/gtest.h>
-#include <cocos2d.h>
 
 pathfinder::PathfinderAStar finder;
 std::function<TileType(int)> fToTileType = [](int tile) {

@@ -250,8 +250,38 @@ add_executable(baseTest tests/baseTest.cpp)
 add_executable(pathfinderTest tests/pathfinderTests.cpp Source/Pathfinder/PathfinderAStar.cpp)
 add_executable(stateMachineTest tests/stateMachineTests.cpp)
 
+add_executable(generatorTest tests/generatorTest.cpp
+        Source/Pathfinder/PathfinderAStar.cpp
+
+        Source/WorldSystem/RandomGeneratorWorldBuilder.cpp
+        Source/WorldSystem/BaseEntity.cpp
+        Source/WorldSystem/DamageIndicatorsSystems.cpp
+        Source/WorldSystem/World.cpp
+
+        Source/ItemsSystem/AttackHandler.cpp
+        Source/ItemsSystem/Attacks.cpp
+        Source/ItemsSystem/BaseItem.cpp
+        Source/ItemsSystem/Items.cpp
+        Source/ItemsSystem/Weapon.cpp
+
+        Source/Stats/StatsContainer.cpp
+        Source/Stats/Modificators/StatWithModificators.cpp
+
+        Source/Utils/Common.cpp
+        Source/Utils/TMXGenerator.cpp
+
+        Source/Player/Player.cpp
+        Source/Player/PlayerInput.cpp
+        )
+
 target_link_libraries( baseTest  PRIVATE  GTest::gtest_main  cocos2d)
 target_link_libraries( pathfinderTest  PRIVATE  GTest::gtest_main  cocos2d)
 target_link_libraries( stateMachineTest  PRIVATE  GTest::gtest_main  cocos2d)
+target_link_libraries( generatorTest  PRIVATE  GTest::gtest_main  cocos2d)
+
+if(WINDOWS)
+    cocos_copy_target_dll(pathfinderTest)
+    cocos_copy_target_dll(generatorTest)
+endif()
 
 

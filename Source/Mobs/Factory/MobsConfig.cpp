@@ -47,7 +47,7 @@ MobInfo MobsConfig::createNormalMobInfoWithHighPanic()
 {
     const auto defaultAttackInfo = std::make_shared<AttackInfo>(dontHitObstacle, hitOnlyPlayer, nullptr, std::make_shared<AttackSearchFromDFS>());
 
-    const std::shared_ptr<AttackHandler> attack = createAttack({{Attacks::simpleRange, defaultAttackInfo, 4}});
+    const std::shared_ptr<AttackHandler> attack = createAttack({{Attacks::simpleRange, defaultAttackInfo, 3}});
 
     transitions_type transitionFunction =
             {

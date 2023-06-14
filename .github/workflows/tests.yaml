@@ -100,3 +100,13 @@ jobs:
         if: matrix.config.name == 'Ubuntu'
         shell: bash
         run: tests/stateMachineTest
+
+      - name: WorldGenerator Test Windows
+        if: matrix.config.name == 'Windows'
+        shell: bash
+        run: tests/Debug/generatorTest.exe
+
+      - name: WorldGenerator Test Linux
+        if: matrix.config.name == 'Ubuntu'
+        shell: bash
+        run: tests/generatorTest

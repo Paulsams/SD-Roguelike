@@ -76,12 +76,18 @@ bool GameScene::init(Camera* camera)
     m_gameLoop = std::make_shared<GameLoop>();
 
 //    m_world = World::create(ReadFileWorldBuilder().setPath("TileMap.tmx").build());
-     m_world = World::create(RandomGeneratorWorldBuilder().setPath("Template.tmx").setConfig(m_worldTileConfig->getLevelsTileConfig().at(0)).setWidth(100).setHeight(100).setIterCount(5).build(), mobFactory);
-     m_world->setScale(0.5f);
+    Tilemap* tileMap = RandomGeneratorWorldBuilder().setPath("Template.tmx").setConfig(m_worldTileConfig->getLevelsTileConfig().at(0)).setWidth(55).setHeight(55).setIterCount(4).build();
+     m_world = World::create(tileMap, mobFactory);
+//     m_world->setScale(0.5f);
+
+    const std::string tilemapInXML = generateXMLForTMXTiledMap(tileMap);
+     std::ofstream outfile ("Resources/test.tmx");
+     outfile << tilemapInXML << std::endl;
+     outfile.close();
 
 //    m_world = World::create(ReadFileWorldBuilder().setPath("Custom.tmx").build(), mobFactory);
 //    m_world = World::create(RandomGeneratorWorldBuilder().setPath("Template.tmx").setConfig(m_worldTileConfig).setWidth(100).setHeight(100).setIterCount(5).build());
-//    m_world->setScale(1.5f);
+    m_world->setScale(1.5f);
     m_gameLoop->add(m_world);
 
     this->addChild(m_world);
