@@ -52,10 +52,13 @@ TEST_P(GeneratorTestsFixture, generatorTest)
                         .setWidth(width)
                         .setHeight(height)
                         .setIterCount(iterCount)
-                        .setPath(std::filesystem::current_path().parent_path() / "Resources"/ "Template.tmx")
+                        .setPath((std::filesystem::current_path().parent_path() / "Resources"/ "Template.tmx").string())
                         .build();
 
     uint32_t* wallsLayer = tileMap->getLayer("Walls")->getTiles();
+
+    const TMXObjectGroup* bossMobsGroup = tileMap->getObjectGroup("BossMobs");
+    ASSERT_FALSE(bossMobsGroup->getObjects().empty());
 
     pathfinder::Graph graph(cocos2d::Size(width, height), wallsLayer, [](uint32_t gid){ return gid == 0 ? TileType::GROUND : TileType::OBSTACLE; });
     std::set<Vec2Int> not_visited;
