@@ -250,7 +250,10 @@ add_executable(pathfinderTest tests/pathfinderTests.cpp Source/Pathfinder/Pathfi
 add_executable(stateMachineTest tests/stateMachineTests.cpp)
 
 target_link_libraries( baseTest  PRIVATE  GTest::gtest_main  cocos2d)
-target_link_libraries( pathfinderTest  PRIVATE  GTest::gtest_main  cocos2d)
+target_link_libraries( pathfinderTest  PUBLIC  GTest::gtest_main  cocos2d)
+if(WINDOWS)
+    cocos_copy_target_dll(pathfinderTest)
+endif()
 target_link_libraries( stateMachineTest  PRIVATE  GTest::gtest_main  cocos2d)
 
 
