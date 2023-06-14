@@ -273,6 +273,7 @@ add_executable(generatorTest tests/generatorTest.cpp
 
         Source/Player/Player.cpp
         Source/Player/PlayerInput.cpp
+        Source/Mobs/Mob.cpp
         )
 
 target_link_libraries( baseTest  PRIVATE  GTest::gtest_main  cocos2d)
@@ -282,12 +283,7 @@ target_link_libraries( generatorTest  PRIVATE  GTest::gtest_main  cocos2d)
 
 if(WINDOWS)
     cocos_copy_target_dll(pathfinderTest)
-    cocos_copy_target_dll(generatorTest)
-endif()
-
-if(WINDOWS)
-    cocos_copy_target_dll(baseTest)
-    cocos_copy_target_dll(pathfinderTest)
     cocos_copy_target_dll(stateMachineTest)
+    cocos_copy_target_dll(generatorTest)
 endif()
 
