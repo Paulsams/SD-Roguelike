@@ -17,7 +17,7 @@ struct GeneratorTestsFixture : public testing::TestWithParam<std::tuple<int, int
 {
     pathfinder::PathfinderAStar finder;
     std::function<bool(const pathfinder::Node*)> isValid = [] (const pathfinder::Node*) {return true;};
-    std::shared_ptr<LevelTileConfig> config = std::make_shared<WorldTileConfig>("Resources/World.json")->getLevelsTileConfig().at(0);
+    std::shared_ptr<LevelTileConfig> config = std::make_shared<WorldTileConfig>("./Resources/World.json")->getLevelsTileConfig().at(0);
 };
 
 INSTANTIATE_TEST_SUITE_P(
@@ -41,7 +41,7 @@ TEST_P(GeneratorTestsFixture, generatorTest)
                         .setWidth(width)
                         .setHeight(height)
                         .setIterCount(iterCount)
-                        .setPath("Resources/Template.tmx")
+                        .setPath("./Resources/Template.tmx")
 //                        .setPath(std::filesystem::current_path().parent_path() / "Resources"/ "Template.tmx")
                         .build();
 
