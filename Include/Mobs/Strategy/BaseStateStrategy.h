@@ -5,7 +5,7 @@
 namespace mob
 {
 
-class BaseStateStrategy : public IState
+class BaseStateStrategy : public IState<Mob>
 {
 public:
     virtual void update(Mob*) = 0;
