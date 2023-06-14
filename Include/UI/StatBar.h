@@ -5,7 +5,7 @@
 #include "ui/UILayout.h"
 #include "ui/UILoadingBar.h"
 
-class StatBar : public cocos2d::ui::Layout
+class StatBar final : public cocos2d::ui::Layout
 {
 public:
     static StatBar* create(cocos2d::ui::LinearLayoutParameter* marginParameter, cocos2d::Size contentSize,
@@ -15,7 +15,7 @@ public:
         const std::string& pathToImage);
 
 private:
-    const FunctionHandler<IStat::oldValue, IStat::currentValue, IStat::changedValue> m_changeStatDelegate;
+    const FunctionHandler<IStat::currentValue, IStat::changedValue, IStat::wantedChangeValue> m_changeStatDelegate;
     static constexpr float coefficientScaleTextSize = 2.5f;
     static constexpr float textSize = 40.0f;
 
@@ -24,7 +24,7 @@ private:
 
     std::string getTextView() const;
 
-    void OnChanged(IStat::oldValue oldValue, IStat::currentValue currentValue, IStat::changedValue changedValue);
+    void OnChanged(IStat::currentValue currentValue, IStat::changedValue, IStat::wantedChangeValue);
 
     std::shared_ptr<IStat> m_stat;
     std::shared_ptr<BoundsModificator> m_boundsStat;

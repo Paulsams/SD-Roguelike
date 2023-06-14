@@ -1,11 +1,9 @@
-#include "../Include/Mobs/Strategy/StateMachine.h"
-#include "../Include/Mobs/Strategy/Normal.h"
-#include "../Include/Mobs/Strategy/Panic.h"
+#include "Mobs/Strategy/StateMachine.h"
 #include "Stats/Modificators/BoundsModificator.h"
 
-#include "Mobs/Factory/MobsConfig.h"
-#include <unordered_map>
 #include <gtest/gtest.h>
+
+#include <unordered_map>
 
 struct test_struct {
     int health = 100;

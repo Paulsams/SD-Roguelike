@@ -12,8 +12,8 @@ Tilemap* RGWB::build() const
         || m_height == 0
         || m_width == 0
         || m_iterCount == 0
-        || std::pow(2, m_iterCount + 1) > m_width
-        || std::pow(2, m_iterCount + 1) > m_height
+        || std::pow(2, m_iterCount) > m_width * (1 - 1.0/Room::s_partDiv)
+        || std::pow(2, m_iterCount) > m_height * (1 - 1.0/Room::s_partDiv)
         || !m_config)
     {
         return nullptr;
@@ -105,8 +105,8 @@ Tilemap* RGWB::generateWorld() const
         {
             cocos2d::ValueMap currNormalMob;
             currNormalMob["name"] = "NormalMobs";
-//            currNormalMob["gid"] = genFromVec(m_config->getNormalMobs());
-            currNormalMob["gid"] = 176;
+            currNormalMob["gid"] = genFromVec(m_config->getNormalMobs());
+//            currNormalMob["gid"] = 176;
             currNormalMob["x"] = (room.m_cont.m_pos.x + pos.x - 1) * tileMap->getTileSize().width;
             currNormalMob["y"] = (room.m_cont.m_pos.y + pos.y - 1) * tileMap->getTileSize().height;
             currNormalMob["width"] = tileMap->getTileSize().width;
@@ -118,8 +118,8 @@ Tilemap* RGWB::generateWorld() const
         {
             cocos2d::ValueMap currEliteMob;
             currEliteMob["name"] = "EliteMobs";
-//            currNormalMob["gid"] = genFromVec(m_config->getNormalMobs());
-            currEliteMob["gid"] = 375;
+            currEliteMob["gid"] = genFromVec(m_config->getEliteMobs());
+//            currEliteMob["gid"] = 375;
             currEliteMob["x"] = (room.m_cont.m_pos.x + pos.x - 1) * tileMap->getTileSize().width;
             currEliteMob["y"] = (room.m_cont.m_pos.y + pos.y - 1) * tileMap->getTileSize().height;
             currEliteMob["width"] = tileMap->getTileSize().width;
@@ -131,8 +131,8 @@ Tilemap* RGWB::generateWorld() const
         {
             cocos2d::ValueMap currBossMob;
             currBossMob["name"] = "BossMobs";
-//            currNormalMob["gid"] = genFromVec(m_config->getNormalMobs());
-            currBossMob["gid"] = 129;
+            currBossMob["gid"] = genFromVec(m_config->getBossMobs());
+//            currBossMob["gid"] = 129;
             currBossMob["x"] = (room.m_cont.m_pos.x + pos.x - 1) * tileMap->getTileSize().width;
             currBossMob["y"] = (room.m_cont.m_pos.y + pos.y - 1) * tileMap->getTileSize().height;
             currBossMob["width"] = tileMap->getTileSize().width;
@@ -144,8 +144,8 @@ Tilemap* RGWB::generateWorld() const
         {
             cocos2d::ValueMap currPassiveMob;
             currPassiveMob["name"] = "PassiveMobs";
-//            currNormalMob["gid"] = genFromVec(m_config->getNormalMobs());
-            currPassiveMob["gid"] = 228;
+            currPassiveMob["gid"] = genFromVec(m_config->getPassiveMobs());
+//            currPassiveMob["gid"] = 228;
             currPassiveMob["x"] = (room.m_cont.m_pos.x + pos.x - 1) * tileMap->getTileSize().width;
             currPassiveMob["y"] = (room.m_cont.m_pos.y + pos.y - 1) * tileMap->getTileSize().height;
             currPassiveMob["width"] = tileMap->getTileSize().width;
@@ -290,23 +290,23 @@ std::pair<RGWB::Container, RGWB::Container> RGWB::randomSplit(const Container& c
     if (cocos2d::random() % 2 == 0)
     {
         // Vertical
-        c1 = Container{cont.m_pos, cocos2d::random(2, cont.m_width), cont.m_height};
+        c1 = Container{cont.m_pos, cocos2d::random(1, cont.m_width), cont.m_height};
         c2 = Container{cont.m_pos.x + c1.m_width, cont.m_pos.y, cont.m_width - c1.m_width, cont.m_height};
 
         double c1WR = static_cast<double>(c1.m_width) / c1.m_height;
         double c2WR = static_cast<double>(c2.m_width) / c2.m_height;
-        if (c1WR < m_widthRatio || c2WR < m_widthRatio)
+        if (c1.m_width * c1.m_height == 0 || c2.m_width * c2.m_height == 0 || c1WR < m_widthRatio || c2WR < m_widthRatio)
             return randomSplit(cont);
     }
     else
     {
         // Horizontal
-        c1 = Container{cont.m_pos, cont.m_width, cocos2d::random(2, cont.m_height)};
+        c1 = Container{cont.m_pos, cont.m_width, cocos2d::random(1, cont.m_height)};
         c2 = Container{cont.m_pos.x, cont.m_pos.y + c1.m_height, cont.m_width, cont.m_height - c1.m_height};
 
         double c1HR = static_cast<double>(c1.m_height) / c1.m_width;
         double c2HR = static_cast<double>(c2.m_height) / c2.m_width;
-        if (c1HR < m_heightRatio || c2HR < m_heightRatio)
+        if (c1.m_width * c1.m_height == 0 || c2.m_width * c2.m_height == 0 || c1HR < m_heightRatio || c2HR < m_heightRatio)
             return randomSplit(cont);
     }
     return std::make_pair(c1, c2);
@@ -337,7 +337,7 @@ void RGWB::fillRoomVec2int(Room& room, std::vector<Vec2Int>& mobs, int counter, 
             pos.x = cocos2d::random(0, room.m_cont.m_width - 1) + 1;
             pos.y = cocos2d::random(0, room.m_cont.m_height - 1);
             --tryCounter;
-        } while (room.m_engaged.contains(pos) && tryCounter);
+        } while (room.m_engaged.contains(pos) && tryCounter > 0);
         mobs.push_back(pos);
         room.m_engaged.insert(pos);
     }
@@ -348,17 +348,6 @@ void RGWB::fillRoomVec2int(Room& room, std::vector<Vec2Int>& mobs, int counter, 
 void RGWB::fillSpawnRoom(Room& room) const
 {
     room.m_type = RoomType::SPAWN;
-
-    room.m_decorations.emplace_back(Vec2Int{1,0});
-    room.m_decorations.emplace_back(Vec2Int{1, room.m_cont.m_height - 1});
-    room.m_decorations.emplace_back(Vec2Int{room.m_cont.m_width, 0});
-    room.m_decorations.emplace_back(Vec2Int{room.m_cont.m_width, room.m_cont.m_height - 1});
-
-    room.m_engaged.insert(Vec2Int{room.m_cont.m_width / 2, room.m_cont.m_height / 2});
-    room.m_engaged.insert(Vec2Int{1,0});
-    room.m_engaged.insert(Vec2Int{1, room.m_cont.m_height - 1});
-    room.m_engaged.insert(Vec2Int{room.m_cont.m_width, 0});
-    room.m_engaged.insert(Vec2Int{room.m_cont.m_width, room.m_cont.m_height - 1});
 }
 
 
@@ -371,7 +360,7 @@ void RGWB::fillSingleBossRoom(Room& room) const
     room.m_engaged.insert(Vec2Int{room.m_cont.m_width / 2, room.m_cont.m_height / 2});
 
     int roomArea = room.m_cont.m_width * room.m_cont.m_height;
-    int tryCounter = m_width * m_height;
+    int tryCounter = roomArea;
 
     int normalMobsCount = roomArea * m_minRoomFillBound;
     fillRoomVec2int(room, room.m_normalMobs, normalMobsCount, tryCounter);
@@ -390,7 +379,7 @@ void RGWB::fillNormalRoom(Room& room) const
     static std::exponential_distribution<> d(1/m_normalRoomTreasureMean);
     room.m_type = RoomType::NORMAL;
     int roomArea = room.m_cont.m_width * room.m_cont.m_height;
-    int tryCounter = m_width * m_height;
+    int tryCounter = roomArea;
 
     int passiveMobsCount = roomArea * m_minRoomFillBound;
     fillRoomVec2int(room, room.m_passiveMobs, passiveMobsCount, tryCounter);
@@ -412,7 +401,7 @@ void RGWB::fillEliteRoom(Room& room) const
     static std::exponential_distribution<> d(1/m_eliteRoomTreasureMean);
     room.m_type = RoomType::ELITE;
     int roomArea = room.m_cont.m_width * room.m_cont.m_height;
-    int tryCounter = m_width * m_height;
+    int tryCounter = roomArea;
 
     int passiveMobsCount = roomArea * m_minRoomFillBound;
     fillRoomVec2int(room, room.m_passiveMobs, passiveMobsCount, tryCounter);
@@ -437,7 +426,7 @@ void RGWB::fillTreasureRoom(Room& room) const
     static std::exponential_distribution<> d(1/m_treasureRoomTreasureMean);
     room.m_type = RoomType::TREASURE;
     int roomArea = room.m_cont.m_width * room.m_cont.m_height;
-    int tryCounter = m_width * m_height;
+    int tryCounter = roomArea;
 
     int passiveMobsCount = roomArea * m_minRoomFillBound;
     fillRoomVec2int(room, room.m_passiveMobs, passiveMobsCount, tryCounter);
@@ -463,7 +452,7 @@ std::vector<RGWB::Room> RGWB::generateRooms(const std::shared_ptr<Tree>& tree) c
     for (const Container& c : leafs)
     {
         rooms.emplace_back(c);
-        if (smallestArea > rooms.back().m_cont.m_width * rooms.back().m_cont.m_height)
+        if (smallestArea > rooms.back().m_cont.m_width * rooms.back().m_cont.m_height && rooms.back().m_cont.m_width * rooms.back().m_cont.m_height > 0)
         {
             spawnRoomIdx = currIdx;
             smallestArea = rooms.back().m_cont.m_width * rooms.back().m_cont.m_height;

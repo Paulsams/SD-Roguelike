@@ -45,7 +45,7 @@ private:
         std::shared_ptr<StatWithModificators> healthStat = std::make_shared<StatWithModificators>(health);
         healthStat->addModificator(std::make_shared<BoundsModificator>(MinMax(0, health)));
         m_stats->add(HEALTH, healthStat);
-        healthStat->changed += [this](IStat::oldValue, IStat::currentValue current, IStat::changedValue)
+        healthStat->changed += [this](IStat::currentValue current, IStat::changedValue, IStat::wantedChangeValue)
         {
             if (current <= 0.0f)
                 destroyEntity();

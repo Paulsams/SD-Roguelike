@@ -66,7 +66,12 @@ bool World::initWithTilemap()
     
     trySpawnMobs(normalMobsGroup, tileSize, &mob::BaseMobAbstractFactory::createNormal);
     trySpawnMobs(eliteMobsGroup, tileSize, &mob::BaseMobAbstractFactory::createElite);
-    trySpawnMobs(bossMobsGroup, tileSize, &mob::BaseMobAbstractFactory::createBoss);
+    trySpawnMobs(bossMobsGroup, tileSize, [this](mob::BaseMobAbstractFactory* factory, World* world, int gid)
+    {
+        mob::Mob* boss = factory->createBoss(world, gid);
+        m_bosses.push_back(boss);
+        return boss;
+    });
     trySpawnMobs(passiveMobsGroup, tileSize, &mob::BaseMobAbstractFactory::createPassive);
 
     m_damageIndicatorsMobs = DamageIndicatorsSystems::create(this);
@@ -97,7 +102,7 @@ void World::tryInitDecorations(const TMXObjectGroup* decorationsGroup, const Siz
             std::string nameLoot = nameLootIterator->second.asString();
             decoration->deleted += [this, nameLoot](BaseEntity* entity)
             {
-                spawnItem(entity, {0, 0}, [this, nameLoot]()
+                spawnItem(entity->getPositionOnMap(), [this, nameLoot]()
                 {
                     return Items::createConsumable(this, nameLoot);
                 });
@@ -143,10 +148,12 @@ void World::tryInitChests(const TMXObjectGroup* chestsGroup, const Size tileSize
                     //     if (spawnItem(chest, direction, spawnItemFunc))
                     //         break;
                     // }
-                    removeEntity(chest);
-                    spawnItem(chest, {0, 0}, [this, nameWeapon, tier]()
+                    World* world = this;
+                    Vec2Int chestPosition = chest->getPositionOnMap();
+                    chest->destroyEntity();
+                    world->spawnItem(chestPosition, [world, nameWeapon, tier]()
                     {
-                        return Attacks::createWeapon(this, nameWeapon, tier);
+                        return Attacks::createWeapon(world, nameWeapon, tier);
                     });
                 }
             });
@@ -157,23 +164,22 @@ void World::tryInitChests(const TMXObjectGroup* chestsGroup, const Size tileSize
     }
 }
 
-bool World::spawnItem(BaseEntity* entity, Vec2Int direction, const std::function<BaseItem*()>& createFunc)
+bool World::spawnItem(Vec2Int position, const std::function<BaseItem*()>& createFunc)
 {
-    const Vec2Int position = entity->getPositionOnMap() + direction;
-    const TileType tileType = getTileType(position);
-    if (tileType == TileType::GROUND)
-    {
-        BaseItem* item = createFunc();
-        item->setPositionOnMapWithoutNotify(position);
-        addEntity(item);
-        return true;
-    }
-    
-    return false;
+    // const TileType tileType = getTileType(position);
+    // if (tileType == TileType::GROUND)
+    // {
+    BaseItem* item = createFunc();
+    item->setPositionOnMapWithoutNotify(position);
+    addEntity(item);
+    return true;
+    // }
+    //
+    // return false;
 }
 
 void World::trySpawnMobs(const TMXObjectGroup* group, const Size tileSize,
-    std::function<mob::Mob*(mob::BaseMobAbstractFactory*, World*, int)> createFunc)
+    const std::function<mob::Mob*(mob::BaseMobAbstractFactory*, World*, int)>& createFunc)
 {
     if (group == nullptr)
         return;
@@ -191,23 +197,41 @@ void World::trySpawnMobs(const TMXObjectGroup* group, const Size tileSize,
 
 void World::addEntity(BaseEntity* entity)
 {
-    static std::shared_ptr<FunctionVisitorEntitiesReturnVoid> visitor = FunctionVisitorEntitiesBuilder<void>()
-        .setMob([this](mob::Mob* mob) { m_mobs.push_back(mob); }).build();
-
+    static std::shared_ptr<FunctionVisitorEntities<int>> visitorGetZOrder = FunctionVisitorEntitiesBuilder<int>()
+        .setChest([](Chest*)           { return 4; })
+        .setDecoration([](Decoration*) { return 4; })
+        .setItem([](BaseItem*)         { return 1; })
+        .setMob([](mob::Mob*)          { return 5; })
+        .setPlayer([](Player*)         { return 6; })
+        .build();
+    
     const Vec2Int positionOnMap = entity->getPositionOnMap();
     const size_t index = getIndexFromVec2(positionOnMap);
     
     m_entities[index].push_back(entity);
-    entity->deleted += m_deletedEntityDelegate;
-    this->addChild(entity, 10);
+    entity->acceptVisit(visitorGetZOrder);
+    this->addChild(entity, visitorGetZOrder->getReturnValue().value());
 
-    entity->acceptVisit(visitor);
+    entity->acceptVisit(m_visitorFromAddEntity);
 }
 
 void World::removeEntity(BaseEntity* entity)
 {
-    internalRemoveEntity(entity);
-    entity->deleted -= m_deletedEntityDelegate;
+    const Vec2Int positionOnMap = entity->getPositionOnMap();
+    std::vector<BaseEntity*>& entitiesOnCurrentCell = m_entities[getIndexFromVec2(positionOnMap)];
+    entitiesOnCurrentCell.erase(std::ranges::find(entitiesOnCurrentCell, entity));
+    updateTileType(positionOnMap);
+    entity->acceptVisit(m_visitorFromRemoveEntity);
+    m_movedEntities.erase(entity);
+
+    auto finded = std::ranges::find(m_bosses, entity);
+    if (finded != m_bosses.end())
+    {
+        m_bosses.erase(finded);
+        bossCountChanged(m_bosses);
+    }
+    
+    entity->removeFromParent();
 }
 
 void World::scheduleMove(BaseEntity* entity, BaseEntity::oldPosition oldPosition, BaseEntity::newPosition newPosition)
@@ -229,6 +253,17 @@ void World::addPlayer(Player* player)
     m_playersDamageIndicators.insert({player, newIndicators});
 }
 
+void World::removePlayer(Player* player)
+{
+    removeEntity(player);
+
+    DamageIndicatorsSystems* newIndicators = m_playersDamageIndicators.at(player);
+    m_playersDamageIndicators.erase(player);
+    newIndicators->removeFromParent();
+    
+    m_player = nullptr;
+}
+
 const Player* World::getNearestPlayer(Vec2) const
 {
     return m_player;
@@ -236,7 +271,7 @@ const Player* World::getNearestPlayer(Vec2) const
 
 TileType World::getTileType(Vec2Int position) const
 {
-    Size size = getSize();
+    const Size size = getSize();
     if (position.x < 0 || position.x >= size.width || position.y < 0 || position.y >= size.height)
         return TileType::OUT_OF_BOUNDS;
 
@@ -245,19 +280,14 @@ TileType World::getTileType(Vec2Int position) const
 
 std::vector<Vec2Int> World::findPath(Vec2Int start, Vec2Int finish) const
 {
-    static std::shared_ptr<FunctionVisitorEntities<bool>> visitor = FunctionVisitorEntitiesBuilder<bool>()
-        .setMob([this](mob::Mob*) { return true; })
-        .setPlayer([this](Player*) { return true; })
-        .build();
-    
     return m_pathfinding->findPath(*m_graph, m_graph->getNodeByPos(start),
         m_graph->getNodeByPos(finish),
         [this](const pathfinder::Node* node)
         {
             for (BaseEntity* entity : getEntitiesFromCell(node->pos))
             {
-                entity->acceptVisit(visitor);
-                if (visitor->getReturnValue().value_or(false))
+                entity->acceptVisit(m_visitorFindPath);
+                if (m_visitorFindPath->getReturnValue().value_or(false))
                     return false;
             }
             return true;
@@ -266,7 +296,8 @@ std::vector<Vec2Int> World::findPath(Vec2Int start, Vec2Int finish) const
 
 void World::update()
 {
-    m_player->update();
+    if (m_player)
+        m_player->update();
 
     checkMoveEntities();
     m_movedEntities.clear();
@@ -303,8 +334,7 @@ void World::checkMoveEntities()
 }
 
 World::World(Tilemap* tilemap, std::shared_ptr<mob::BaseMobAbstractFactory> mobFactory)
-    : m_deletedEntityDelegate(CC_CALLBACK_1(World::onDeletedEntity, this))
-    , m_mobFactory(mobFactory)
+    : m_mobFactory(mobFactory)
     , m_entities(std::vector<std::vector<BaseEntity*>>
         (tilemap->getMapSize().width * tilemap->getMapSize().height))
     , m_tilemap(tilemap)
@@ -312,12 +342,28 @@ World::World(Tilemap* tilemap, std::shared_ptr<mob::BaseMobAbstractFactory> mobF
 {
     Node::setContentSize({m_tilemap->getMapSize().width * m_tilemap->getTileSize().width,
         m_tilemap->getMapSize().height * m_tilemap->getTileSize().height});
+
+    m_visitorFromAddEntity = FunctionVisitorEntitiesBuilder<void>()
+        .setMob([this](mob::Mob* mob)
+        {
+            m_mobs.push_back(mob);
+        }).build();
+
+    m_visitorFromRemoveEntity = FunctionVisitorEntitiesBuilder<void>()
+        .setMob([this](mob::Mob* mob) { m_mobs.erase(std::ranges::find(m_mobs, mob)); })
+        .build();
+
+    m_visitorFindPath = FunctionVisitorEntitiesBuilder<bool>()
+        .setMob([this](mob::Mob*) { return true; })
+        .setPlayer([this](Player*) { return true; })
+        .build();
 }
 
 void World::updateTileType(Vec2Int position) const
 {
-    static std::shared_ptr<FunctionVisitorEntities<TileType>> visitor = FunctionVisitorEntitiesBuilder<TileType>().
-        setDecoration([](Decoration*){ return TileType::DECORATION; }).build();
+    static std::shared_ptr<FunctionVisitorEntities<TileType>> visitor = FunctionVisitorEntitiesBuilder<TileType>()
+        .setDecoration([](Decoration*){ return TileType::DECORATION; })
+        .build();
     
     const std::vector<BaseEntity*>& entities = m_entities[getIndexFromVec2(position)];
     TileType tileType = TileType::GROUND;
@@ -333,23 +379,4 @@ void World::updateTileType(Vec2Int position) const
     }
     
     m_graph->getNodeByPos(position)->tile = tileType;
-}
-
-void World::internalRemoveEntity(BaseEntity* entity)
-{
-    std::shared_ptr<FunctionVisitorEntitiesReturnVoid> visitor = FunctionVisitorEntitiesBuilder<void>()
-        .setMob([this](mob::Mob* mob) { m_mobs.erase(std::ranges::find(m_mobs, mob)); })
-        .build();
-
-    const Vec2Int positionOnMap = entity->getPositionOnMap();
-    std::vector<BaseEntity*>& entitiesOnCurrentCell = m_entities[getIndexFromVec2(positionOnMap)];
-    entitiesOnCurrentCell.erase(std::ranges::find(entitiesOnCurrentCell, entity));
-    updateTileType(positionOnMap);
-    entity->acceptVisit(visitor);
-    m_movedEntities.erase(entity);
-}
-
-void World::onDeletedEntity(BaseEntity* entity)
-{
-    internalRemoveEntity(entity);
 }

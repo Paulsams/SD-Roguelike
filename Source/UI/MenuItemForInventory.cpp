@@ -41,20 +41,6 @@ void MenuItemForInventory::unchoice()
     m_frame->setColor(Color3B::GRAY);
 }
 
-void MenuItemForInventory::selected()
-{
-    MenuItem::selected();
-    
-    if (!m_item)
-        return;
-
-    if (m_item->interact())
-    {
-        setItem(nullptr);
-        unchoice();
-    }
-}
-
 bool MenuItemForInventory::initWithSprite(const SpriteWithRect& sprite)
 {
     m_frame = ImageView::create(Paths::toIconFrame);

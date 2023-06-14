@@ -8,11 +8,13 @@ class PlayerItemsOnUI
 public:
     PlayerItemsOnUI(InventoryView* inventory, InventoryView* weapons,
         InventoryView* accessories, InventoryView* spells);
+        
+    ~PlayerItemsOnUI();
 
 private:
     FunctionHandler<InventoryView::SelectedItemInfo> m_selectedDelegate;
     
-    void OnSelected(InventoryView::SelectedItemInfo selectedInfo);
+    void onSelected(InventoryView::SelectedItemInfo selectedInfo);
 
     InventoryView* m_inventory;
     InventoryView* m_weapons;

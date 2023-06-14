@@ -72,7 +72,7 @@ std::string StatBar::getTextView() const
         std::to_string(static_cast<int>(m_boundsStat->bounds.getMax()));
 }
 
-void StatBar::OnChanged(IStat::oldValue, IStat::currentValue currentValue, IStat::changedValue)
+void StatBar::OnChanged(IStat::currentValue currentValue, IStat::changedValue, IStat::wantedChangeValue)
 {
     m_bar->setPercent(m_boundsStat->getValueFromPercent(currentValue));
     m_label->setString(getTextView());

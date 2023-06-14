@@ -6,16 +6,25 @@
 class InventoryView final : public cocos2d::ui::Layout
 {
 public:
+    enum SelectItemType
+    {
+        USE,
+        DROP,
+    };
+    
     struct SelectedItemInfo
     {
-        SelectedItemInfo(InventoryView* inventory, MenuItemForInventory* item, int localIndex)
-            : inventory(inventory),
-              menuItem(item),
-              index(localIndex) { }
+        SelectedItemInfo(InventoryView* inventory, MenuItemForInventory* item,
+            int localIndex, SelectItemType selectType)
+            : inventory(inventory)
+            , menuItem(item)
+            , index(localIndex)
+            , selectType(selectType) { }
 
         InventoryView* inventory;
         MenuItemForInventory* menuItem;
         int index;
+        SelectItemType selectType;
     };
     
     using Inventory = ObservableVector<BaseItem*>;

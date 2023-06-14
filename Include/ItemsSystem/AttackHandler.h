@@ -11,8 +11,10 @@ public:
 
     void attack(World* world, Vec2Int position, Direction direction) const;
     bool isPossibleAttack(World* world, Vec2Int position, Vec2Int localPosition) const;
-    void drawIndicators(World* world, Vec2Int position, Direction direction,
-        std::function<void(DrawDamageInfo)> drawFunc) const;
+    void drawIndicatorsWithNonUnion(World* world, Vec2Int position, const std::vector<Direction>& directions,
+                                    const std::function<void(DrawDamageInfo)>& drawFunc) const;
+
+    EventContainer<BaseEntity*, float> attacked;
 
 private:
     std::map<Vec2Int, std::vector<std::shared_ptr<AttackWithDamage>>> m_ranges;

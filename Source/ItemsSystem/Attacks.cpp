@@ -57,99 +57,7 @@ void Attacks::initWeaponsAndAttacks()
         .setDecoration([](Decoration*) { return true; })
         .build();
 
-    const auto defaultAttackInfo = std::make_shared<AttackInfo>(dontHitObstacle, hitMobsAndDecorations,
-        nullptr, std::make_shared<AttackSearchFromDFS>());
-
-    const std::vector<Vec2Int> simpleRange = {{1, 0}};
-    /*
-     * - 0 0 0
-     * @ X 0 0
-     * - 0 0 0
-     */
-
-    const std::vector<Vec2Int> closeLineRange = {{1, 1}, {1, 0}, {1, -1}};
-    /*
-     * - X 0 0
-     * @ X 0 0
-     * - X 0 0
-     */
-
-    const std::vector<Vec2Int> close2LineRange = {{1, 1}, {1, 0}, {1, -1}, {2, 1}, {2, 0}, {2, -1}};
-    /*
-     * - X X 0
-     * @ X X 0
-     * - X X 0
-     */
-
-    const std::vector<Vec2Int> close3LineRange = {{1, 1}, {1, 0}, {1, -1}, {2, 1}, {2, 0}, {2, -1}, {3, 1}, {3, 0}, {3, -1}};
-    /*
-     * - X X X
-     * @ X X X
-     * - X X X
-     */
-
-    const std::vector<Vec2Int> bigIRange = {{1, 0}, {2, 0}, {3, 0}};
-    /*
-     * - 0 0 0
-     * @ X X X
-     * - 0 0 0
-     */
-
-    const std::vector<Vec2Int> veryBigIRange = {{1, 0}, {2, 0}, {3, 0}, {4, 0}};
-    /*
-     * - 0 0 0 0
-     * @ X X X X
-     * - 0 0 0 0
-     */
-
-    const std::vector<Vec2Int> smallIRange = {{1, 0}, {2, 0}};
-    /*
-     * - 0 0 0
-     * @ X X 0
-     * - 0 0 0
-     */
-
-    const std::vector<Vec2Int> bigTRange = {{1, 0}, {2, 0}, {3, 1}, {3, 0}, {3, -1}};
-    /*
-     * - 0 0 X
-     * @ X X X
-     * - 0 0 X
-     */
-
-    const std::vector<Vec2Int> bigTRangeFlip = {{1, 1}, {1, 0}, {1, -1}, {2, 0}, {3, 0}};
-    /*
-     * - X 0 0
-     * @ X X X
-     * - X 0 0
-     */
-
-    const std::vector<Vec2Int> smallTRange = {{1, 0}, {2, 1}, {2, 0}, {2, -1}};
-    /*
-     * - 0 X 0
-     * @ X X 0
-     * - 0 X 0
-     */
-
-    const std::vector<Vec2Int> smallTRangeFlip = {{1, 1}, {1, 0}, {1, -1}, {2, 0}};
-    /*
-     * - X 0 0
-     * @ X X 0
-     * - X 0 0
-     */
-
-    const std::vector<Vec2Int> XRange = {{1, 0}, {2, 1}, {2, 0}, {2, -1}, {3, 0}};
-    /*
-     * - 0 X 0
-     * @ X X X
-     * - 0 X 0
-     */
-
-    const std::vector<Vec2Int> ARange = {{1, 1}, {1, 0}, {1, -1}, {2, 1}, {2, 0}, {2, -1}, {3, 0}};
-    /*
-     * - X X 0
-     * @ X X X
-     * - X X 0
-     */
+    const auto defaultAttackInfo = std::make_shared<AttackInfo>(dontHitObstacle, hitMobsAndDecorations, nullptr, std::make_shared<AttackSearchFromDFS>());
 
     m_createDefault = createCreatedFunc(3010, {{simpleRange, defaultAttackInfo, 1}});
 
@@ -224,27 +132,30 @@ void Attacks::initWeaponsAndAttacks()
     addNewWeapon(scythe, 4, 1849, {{bigTRange, defaultAttackInfo, 3}, {smallTRange, defaultAttackInfo, 5}});
 }
 
-void Attacks::addNewWeapon(const std::string& name, int tier, int gid,
-    const std::vector<std::tuple<const std::vector<Vec2Int>, std::shared_ptr<AttackInfo>, float>>& ranges)
+
+
+void Attacks::addNewWeapon(const std::string& name, int tier, int gid, const RangesInfo& ranges)
 {
-    m_createWeapons[name].insert({tier, createCreatedFunc(gid, ranges)});
+    m_createWeapons[name].emplace(tier, createCreatedFunc(gid, ranges));
 }
 
-std::function<Weapon*(World*)> Attacks::createCreatedFunc(int gid,
-    std::vector<std::tuple<const std::vector<Vec2Int>, std::shared_ptr<AttackInfo>, float>> ranges)
+
+
+std::function<Weapon*(World*)> Attacks::createCreatedFunc(int gid, const RangesInfo& ranges)
 {
-    return [ranges, gid](World* world) {
-        AttackHandlerBuilder attackBuilder;
-        std::vector<std::shared_ptr<Damage>> damages;
-        damages.reserve(ranges.size());
-        for (auto [range, attackInfo, damage] : ranges)
+    return [ranges, gid](World* world)
         {
-            damages.push_back(std::make_shared<Damage>(damage));
-            attackBuilder.addAttackData(range, std::make_shared<AttackWithDamage>(attackInfo, damages.back()));
-        }
-        const auto attack = attackBuilder.build();
-            
-        return Weapon::create(world, world->getRectFromGid(gid), WEAPON, attack, damages);
-    };
+            AttackHandlerBuilder attackBuilder;
+            std::vector<std::shared_ptr<Damage>> damages;
+            damages.reserve(ranges.size());
+            for (auto [range, attackInfo, damage] : ranges)
+            {
+                damages.push_back(std::make_shared<Damage>(damage));
+                attackBuilder.addAttackData(range, std::make_shared<AttackWithDamage>(attackInfo, damages.back()));
+            }
+            const auto attack = attackBuilder.build();
+
+            return Weapon::create(world, world->getRectFromGid(gid), WEAPON, attack, damages);
+        };
 }
 

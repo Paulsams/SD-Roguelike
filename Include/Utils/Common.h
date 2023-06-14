@@ -21,6 +21,7 @@ struct Paths
 
     static const std::string toHealthBar;
     static const std::string toManaBar;
+    static const std::string toExperiencePointsBar;
 
     static const SpriteWithRect toAllInventoryCell;
     static const SpriteWithRect toWeaponInventoryCell;

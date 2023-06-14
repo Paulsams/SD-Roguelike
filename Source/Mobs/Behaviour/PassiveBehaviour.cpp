@@ -8,7 +8,7 @@ namespace mob {
         DirectionType direction = static_cast<DirectionType>(cocos2d::RandomHelper::random_int(0, 3));
         if (auto possiblePos = mobPos + Direction(direction).getVector();
                 mob->getWorld()->getTileType(possiblePos) == TileType::GROUND) {
-            mob->setPosition(possiblePos);
+            mob->setScheduleMovePositionOnMap(possiblePos);
         }
     }
 

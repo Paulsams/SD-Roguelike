@@ -11,4 +11,7 @@ public:
     virtual bool applicationDidFinishLaunching();
     virtual void applicationDidEnterBackground();
     virtual void applicationWillEnterForeground();
+
+private:
+    static void runNewGame();
 };

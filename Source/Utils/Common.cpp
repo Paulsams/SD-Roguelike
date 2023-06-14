@@ -6,6 +6,7 @@ inline const std::string Paths::toIconFrame = "IconFrame.png";
 
 inline const std::string Paths::toHealthBar = "HealthBar.png";
 inline const std::string Paths::toManaBar = "ManaBar.png";
+inline const std::string Paths::toExperiencePointsBar = "ExperiencePointsBar.png";
 
 inline const SpriteWithRect Paths::toAllInventoryCell = {toUITileset,
     cocos2d::Rect{cocos2d::Vec2{70 % 64, 70 / 64} * 32, {32, 32}}};

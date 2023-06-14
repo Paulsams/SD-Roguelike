@@ -86,7 +86,7 @@ private:
     {
         explicit Room(const Container& cont);
 
-        static constexpr int s_partDiv = 4;
+        static constexpr int s_partDiv = 5;
 
         Container m_cont;
 
@@ -154,7 +154,7 @@ private:
     double m_normalRoomTreasureMean = 3;
     double m_eliteRoomTreasureMean = 4;
     double m_bossRoomTreasureMean = 5;
-    double m_treasureRoomTreasureMean = 7;
+    double m_treasureRoomTreasureMean = 6;
 
     double m_normalTileRatio = 0.7;
 

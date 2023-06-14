@@ -15,8 +15,6 @@ public:
 
     void choice();
     void unchoice();
-    
-    void selected() override;
 
     bool initWithSprite(const SpriteWithRect& sprite);
     BaseItem* getItem() const { return m_item; }

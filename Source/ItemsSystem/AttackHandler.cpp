@@ -23,6 +23,7 @@ void AttackHandler::attack(World* world, Vec2Int position, Direction direction) 
                     if (isPossibleAttack && isReachable && entity->getStats()->tryGet(HEALTH, healthStat))
                     {
                         float damage = attack->getDamage()->get(entity);
+                        attacked(entity, damage);
                         healthStat->changeValueBy(-damage);
                         if (const std::shared_ptr<IVisualAttack> visualAttack = attack->getVisual())
                             visualAttack->draw(world, endPosition);
@@ -62,32 +63,40 @@ bool AttackHandler::isPossibleAttack(World* world, Vec2Int position, Vec2Int loc
 }
 
 // В идеале бы такое через корутины можно было сделать, но что есть уж
-void AttackHandler::drawIndicators(World* world, Vec2Int position, Direction direction,
-    std::function<void(DrawDamageInfo)> drawFunc) const
+void AttackHandler::drawIndicatorsWithNonUnion(World* world, Vec2Int position, const std::vector<Direction>& directions,
+    const std::function<void(DrawDamageInfo)>& drawFunc) const
 {
+    static std::set<Vec2Int> visitedDirections;
+    
     std::shared_ptr<IStat> healthStat;
     std::optional<float> damage;
     for (auto [range, attacks] : m_ranges)
     {
-        const Vec2Int endPosition = position + direction.rotate(range);
-        for (const auto& attack : attacks)
+        for (const Direction& direction : directions)
         {
-            if (attack->isPossibleAttack(world->getTileType(endPosition)))
+            const Vec2Int endPosition = position + direction.rotate(range);
+            for (const auto& attack : attacks)
             {
-                for (BaseEntity* entity : world->getEntitiesFromCell(endPosition))
+                if (attack->isPossibleAttack(world->getTileType(endPosition)))
                 {
-                    const bool isPossibleAttack = attack->isPossibleAttackFromEntity(entity);
-                    const bool isReachable = attack->getSearch()->isReachable(world, position, endPosition);
-                    if (isPossibleAttack && isReachable && entity->getStats()->tryGet(HEALTH, healthStat))
+                    for (BaseEntity* entity : world->getEntitiesFromCell(endPosition))
                     {
-                        damage.emplace(attack->getDamage()->get(entity));
-                        break;
+                        const bool isPossibleAttack = attack->isPossibleAttackFromEntity(entity);
+                        const bool isReachable = attack->getSearch()->isReachable(world, position, endPosition);
+                        if (isPossibleAttack && isReachable && entity->getStats()->tryGet(HEALTH, healthStat))
+                        {
+                            damage.emplace(attack->getDamage()->get(entity));
+                            break;
+                        }
                     }
                 }
+
+                if (visitedDirections.emplace(endPosition).second)
+                    drawFunc({endPosition, damage.has_value() ? cocos2d::Color3B::RED : cocos2d::Color3B::GREEN, damage});
+                damage.reset();
             }
-            
-            drawFunc({endPosition, damage.has_value() ? cocos2d::Color3B::RED :cocos2d::Color3B::GREEN, damage});
-            damage.reset();
         }
     }
+
+    visitedDirections.clear();
 }

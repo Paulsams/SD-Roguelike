@@ -92,14 +92,15 @@ public:
         rapidjson::IStreamWrapper isw(ifs);
         doc.ParseStream(isw);
 
-        const rapidjson::Value& jsonLevels = doc["Level"];
-        for (auto it = jsonLevels.Begin(); it != jsonLevels.End(); ++it)
-            m_levels.emplace_back(std::make_shared<LevelTileConfig>(*it));
-
 //        rapidjson::OStreamWrapper out(std::cout);
 //        rapidjson::Writer<rapidjson::OStreamWrapper> writer(out);
 //        doc.Accept(writer);
 //        std::cout << std::endl;
+
+        const rapidjson::Value& jsonLevels = doc["Level"];
+        for (auto it = jsonLevels.Begin(); it != jsonLevels.End(); ++it)
+            m_levels.emplace_back(std::make_shared<LevelTileConfig>(*it));
+
     }
 
     [[nodiscard]] const std::vector<std::shared_ptr<LevelTileConfig>>& getLevelsTileConfig() const { return m_levels; }

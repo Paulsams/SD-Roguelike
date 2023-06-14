@@ -37,7 +37,7 @@ protected:
     explicit BaseItem(World* world, const cocos2d::Rect& rect);
     
     const Player* getPlayer() const { return m_player; }
-private:
+    
     cocos2d::Rect m_rectInTileset;
     cocos2d::Sprite* m_sprite;
     Player* m_player;
