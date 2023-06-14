@@ -14,7 +14,7 @@ public:
     static std::vector<std::pair<std::string, int>> getTiers();
 
 private:
-    inline static const std::string defaultWeapon = "Default"; 
+    inline static const std::string defaultWeapon = "Default";
     
     static const Attacks instance;
     std::function<Weapon*(World*)> m_createDefault;

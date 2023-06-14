@@ -15,23 +15,23 @@ struct AttackInfo
     
     AttackInfo(const PossibleAttackDelegate& possibleAttack,
         PossibleAttackFromEntity possibleAttackFromEntity,
-        std::shared_ptr<IVisualAttack> visualAttack, std::shared_ptr<IAttackSearch> attackSearch)
+        std::shared_ptr<IVisualAttack> visual, std::shared_ptr<IAttackSearch> search)
     : m_possibleAttack(possibleAttack)
     , m_possibleAttackFromEntity(possibleAttackFromEntity)
-    , m_visualAttack(std::move(visualAttack))
-    , m_attackSearch(std::move(attackSearch)) { }
+    , m_visual(std::move(visual))
+    , m_search(std::move(search)) { }
 
     bool isPossibleAttack(TileType tileType) const { return m_possibleAttack(tileType); }
     bool isPossibleAttackFromEntity(BaseEntity* entity) const
         { entity->acceptVisit(m_possibleAttackFromEntity); return m_possibleAttackFromEntity->getReturnValue().value_or(false); }
-    std::shared_ptr<IVisualAttack> getVisual() const { return m_visualAttack; } 
-    std::shared_ptr<IAttackSearch> getSearch() const { return m_attackSearch; }
+    std::shared_ptr<IVisualAttack> getVisual() const { return m_visual; } 
+    std::shared_ptr<IAttackSearch> getSearch() const { return m_search; }
     
 private:
     PossibleAttackDelegate m_possibleAttack;
     PossibleAttackFromEntity m_possibleAttackFromEntity;
-    std::shared_ptr<IVisualAttack> m_visualAttack;
-    std::shared_ptr<IAttackSearch> m_attackSearch;
+    std::shared_ptr<IVisualAttack> m_visual;
+    std::shared_ptr<IAttackSearch> m_search;
 };
 
 struct AttackWithDamage

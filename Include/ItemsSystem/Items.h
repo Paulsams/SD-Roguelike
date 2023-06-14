@@ -17,8 +17,8 @@ public:
     static ConsumableItem* createConsumable(World* world, const std::string& name)
         { return instance.m_createConsumables.at(name)(world); }
 
-    static Accessory* createAccessory(World* world, const ItemInfo& info)
-        { return instance.m_createAccessories.at(info.name)(world); }
+    static Accessory* createAccessory(World* world, const std::string& name)
+        { return instance.m_createAccessories.at(name)(world); }
 
     static std::vector<std::string> getConsumables();
 
