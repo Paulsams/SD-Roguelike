@@ -105,8 +105,8 @@ Tilemap* RGWB::generateWorld() const
         {
             cocos2d::ValueMap currNormalMob;
             currNormalMob["name"] = "NormalMobs";
-//            currNormalMob["gid"] = genFromVec(m_config->getNormalMobs());
-            currNormalMob["gid"] = 176;
+            currNormalMob["gid"] = genFromVec(m_config->getNormalMobs());
+//            currNormalMob["gid"] = 176;
             currNormalMob["x"] = (room.m_cont.m_pos.x + pos.x - 1) * tileMap->getTileSize().width;
             currNormalMob["y"] = (room.m_cont.m_pos.y + pos.y - 1) * tileMap->getTileSize().height;
             currNormalMob["width"] = tileMap->getTileSize().width;
@@ -118,8 +118,8 @@ Tilemap* RGWB::generateWorld() const
         {
             cocos2d::ValueMap currEliteMob;
             currEliteMob["name"] = "EliteMobs";
-//            currNormalMob["gid"] = genFromVec(m_config->getNormalMobs());
-            currEliteMob["gid"] = 375;
+            currEliteMob["gid"] = genFromVec(m_config->getEliteMobs());
+//            currEliteMob["gid"] = 375;
             currEliteMob["x"] = (room.m_cont.m_pos.x + pos.x - 1) * tileMap->getTileSize().width;
             currEliteMob["y"] = (room.m_cont.m_pos.y + pos.y - 1) * tileMap->getTileSize().height;
             currEliteMob["width"] = tileMap->getTileSize().width;
@@ -131,8 +131,8 @@ Tilemap* RGWB::generateWorld() const
         {
             cocos2d::ValueMap currBossMob;
             currBossMob["name"] = "BossMobs";
-//            currNormalMob["gid"] = genFromVec(m_config->getNormalMobs());
-            currBossMob["gid"] = 129;
+            currBossMob["gid"] = genFromVec(m_config->getBossMobs());
+//            currBossMob["gid"] = 129;
             currBossMob["x"] = (room.m_cont.m_pos.x + pos.x - 1) * tileMap->getTileSize().width;
             currBossMob["y"] = (room.m_cont.m_pos.y + pos.y - 1) * tileMap->getTileSize().height;
             currBossMob["width"] = tileMap->getTileSize().width;
@@ -144,8 +144,8 @@ Tilemap* RGWB::generateWorld() const
         {
             cocos2d::ValueMap currPassiveMob;
             currPassiveMob["name"] = "PassiveMobs";
-//            currNormalMob["gid"] = genFromVec(m_config->getNormalMobs());
-            currPassiveMob["gid"] = 228;
+            currPassiveMob["gid"] = genFromVec(m_config->getPassiveMobs());
+//            currPassiveMob["gid"] = 228;
             currPassiveMob["x"] = (room.m_cont.m_pos.x + pos.x - 1) * tileMap->getTileSize().width;
             currPassiveMob["y"] = (room.m_cont.m_pos.y + pos.y - 1) * tileMap->getTileSize().height;
             currPassiveMob["width"] = tileMap->getTileSize().width;

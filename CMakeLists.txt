@@ -57,53 +57,6 @@ if(APPLE OR WINDOWS)
     cocos_mark_multi_resources(common_res_files RES_TO "Resources" FOLDERS ${GAME_RES_FOLDER})
 endif()
 
-# add cross-platforms source files and header files 
-list(APPEND GAME_SOURCE
-    Source/AppDelegate.cpp
-    Source/GameScene.cpp
-
-    Source/GameLoop/GameLoop.cpp
-
-    Source/Player/Backpack.cpp
-    Source/Player/Player.cpp
-    Source/Player/PlayerInput.cpp
-
-    Source/ItemsSystem/AttackHandler.cpp
-    Source/ItemsSystem/Attacks.cpp
-    Source/ItemsSystem/BaseItem.cpp
-    Source/ItemsSystem/Items.cpp
-    Source/ItemsSystem/Weapon.cpp
-
-    Source/Mobs/Mob.cpp
-    Source/Mobs/Strategy/StateMachine.cpp
-    Source/Mobs/Strategy/StrategyWithStates.cpp
-    Source/Mobs/Strategy/Normal.cpp
-    Source/Mobs/Behaviour/AggressiveBehaviour.cpp
-    Source/Mobs/Behaviour/CowardlyBehaviour.cpp
-    Source/Mobs/Behaviour/PassiveBehaviour.cpp
-
-    Source/Pathfinder/PathfinderAStar.cpp
-
-    Source/Stats/StatsContainer.cpp
-    Source/Stats/Modificators/StatWithModificators.cpp
-
-    Source/UI/Canvas.cpp
-    Source/UI/InventoryView.cpp
-    Source/UI/MenuItemForInventory.cpp
-    Source/UI/PlayerItemsOnUI.cpp
-    Source/UI/StatBar.cpp
-    Source/UI/StepCounter.cpp
-    
-    Source/Utils/Common.cpp
-    Source/Utils/TMXGenerator.cpp
-    
-    Source/WorldSystem/BaseEntity.cpp
-    Source/WorldSystem/DamageIndicatorsSystems.cpp
-    Source/WorldSystem/World.cpp
-    Source/WorldSystem/ReadFileWorldBuilder.cpp
-    Source/WorldSystem/RandomGeneratorWorldBuilder.cpp
-    )
-
 list(APPEND GAME_HEADER
     Include/AppDelegate.h
     Include/GameScene.h
@@ -188,6 +141,54 @@ list(APPEND GAME_HEADER
     Include/WorldSystem/IVisitorEntities.h
     Include/WorldSystem/World.h
     Include/WorldSystem/WorldTileConfig.h
+    )
+
+# add cross-platforms source files and header files
+list(APPEND GAME_SOURCE
+    Source/AppDelegate.cpp
+    Source/GameScene.cpp
+
+    Source/GameLoop/GameLoop.cpp
+
+    Source/Player/Backpack.cpp
+    Source/Player/Player.cpp
+    Source/Player/PlayerInput.cpp
+
+    Source/ItemsSystem/AttackHandler.cpp
+    Source/ItemsSystem/Attacks.cpp
+    Source/ItemsSystem/BaseItem.cpp
+    Source/ItemsSystem/Items.cpp
+    Source/ItemsSystem/Weapon.cpp
+
+    Source/Mobs/Mob.cpp
+    Source/Mobs/Strategy/StateMachine.cpp
+    Source/Mobs/Strategy/StrategyWithStates.cpp
+    Source/Mobs/Strategy/Normal.cpp
+    Source/Mobs/Behaviour/AggressiveBehaviour.cpp
+    Source/Mobs/Behaviour/CowardlyBehaviour.cpp
+    Source/Mobs/Behaviour/PassiveBehaviour.cpp
+    Source/Mobs/Factory/MobsConfig.cpp
+
+    Source/Pathfinder/PathfinderAStar.cpp
+
+    Source/Stats/StatsContainer.cpp
+    Source/Stats/Modificators/StatWithModificators.cpp
+
+    Source/UI/Canvas.cpp
+    Source/UI/InventoryView.cpp
+    Source/UI/MenuItemForInventory.cpp
+    Source/UI/PlayerItemsOnUI.cpp
+    Source/UI/StatBar.cpp
+    Source/UI/StepCounter.cpp
+
+    Source/Utils/Common.cpp
+    Source/Utils/TMXGenerator.cpp
+
+    Source/WorldSystem/BaseEntity.cpp
+    Source/WorldSystem/DamageIndicatorsSystems.cpp
+    Source/WorldSystem/World.cpp
+    Source/WorldSystem/ReadFileWorldBuilder.cpp
+    Source/WorldSystem/RandomGeneratorWorldBuilder.cpp
     )
 
 if(LINUX)
