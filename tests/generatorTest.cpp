@@ -28,7 +28,7 @@ struct GeneratorTestsFixture : public testing::TestWithParam<std::tuple<int, int
 
     void TearDown() override {}
 
-    const std::shared_ptr<LevelTileConfig> config = std::make_shared<WorldTileConfig>("../Resources/World.json")->getLevelsTileConfig().at(0);
+    const std::shared_ptr<LevelTileConfig> config = std::make_shared<WorldTileConfig>("Resources/World.json")->getLevelsTileConfig().at(0);
 };
 
 INSTANTIATE_TEST_SUITE_P(
@@ -52,7 +52,7 @@ TEST_P(GeneratorTestsFixture, generatorTest)
                         .setWidth(width)
                         .setHeight(height)
                         .setIterCount(iterCount)
-                        .setPath((std::filesystem::current_path().parent_path() / "Resources"/ "Template.tmx").string())
+                        .setPath("Resources/Template.tmx")
                         .build();
 
     uint32_t* wallsLayer = tileMap->getLayer("Walls")->getTiles();
