@@ -136,7 +136,7 @@ bool Canvas::init()
     
     Backpack& backpack = m_player->getBackpack();
     auto backpackSpellsView = InventoryView::create(backpack.getObservableSpells(),
-        {SPELL}, Paths::toSpellInventoryCell, cellInventorySize, backpack.getObservableSpells().size(), padding);
+        {SPELL}, Paths::toSpellInventoryCell, cellInventorySize, backpack.getObservableSpells()->size(), padding);
     backpackSpellsView->setLayoutParameter(leftParameter);
     backpackBox->addChild(backpackSpellsView);
 
@@ -150,7 +150,7 @@ bool Canvas::init()
     
     auto backpackAccessoriesView = InventoryView::create(backpack.getObservableAccessories(),
         {ACCESSORY}, Paths::toAccessoryInventoryCell, cellInventorySize,
-        backpack.getObservableAccessories().size(), padding);
+        backpack.getObservableAccessories()->size(), padding);
     backpackAccessoriesView->setLayoutParameter(horizontalParameter);
 
     const auto rightParameter = RelativeLayoutParameter::create();

@@ -255,6 +255,7 @@ void World::addPlayer(Player* player)
 
 void World::removePlayer(Player* player)
 {
+    player->throwAllItems();
     removeEntity(player);
 
     DamageIndicatorsSystems* newIndicators = m_playersDamageIndicators.at(player);

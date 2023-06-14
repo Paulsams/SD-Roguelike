@@ -1,5 +1,5 @@
 ﻿#include "ItemsSystem/Attacks.h"
-#include "ItemsSystem/AttackSearch/AttackSearchFromDFS.h"
+#include "ItemsSystem/AttackSearch/AttackSearchFromStraightLines.h"
 
 inline const Attacks Attacks::instance = Attacks();
 
@@ -57,7 +57,7 @@ void Attacks::initWeaponsAndAttacks()
         .setDecoration([](Decoration*) { return true; })
         .build();
 
-    const auto defaultAttackInfo = std::make_shared<AttackInfo>(dontHitObstacle, hitMobsAndDecorations, nullptr, std::make_shared<AttackSearchFromDFS>());
+    const auto defaultAttackInfo = std::make_shared<AttackInfo>(dontHitObstacle, hitMobsAndDecorations, nullptr, std::make_shared<AttackSearchFromStraightLines>());
 
     m_createDefault = createCreatedFunc(3010, {{simpleRange, defaultAttackInfo, 1}});
 
