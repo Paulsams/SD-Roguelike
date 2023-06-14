@@ -2,7 +2,7 @@
 
 PlayerItemsOnUI::PlayerItemsOnUI(InventoryView* inventory, InventoryView* weapons,
     InventoryView* accessories, InventoryView* spells)
-    : m_selectedDelegate(CC_CALLBACK_1(PlayerItemsOnUI::OnSelected, this))
+    : m_selectedDelegate(CC_CALLBACK_1(PlayerItemsOnUI::onSelected, this))
     , m_inventory(inventory)
     , m_weapons(weapons)
     , m_accessories(accessories)
@@ -14,16 +14,43 @@ PlayerItemsOnUI::PlayerItemsOnUI(InventoryView* inventory, InventoryView* weapon
     m_spells->selected += m_selectedDelegate;
 }
 
-void PlayerItemsOnUI::OnSelected(InventoryView::SelectedItemInfo selectedInfo)
+PlayerItemsOnUI::~PlayerItemsOnUI()
+{
+    m_inventory->selected -= m_selectedDelegate;
+    m_weapons->selected -= m_selectedDelegate;
+    m_accessories->selected -= m_selectedDelegate;
+    m_spells->selected -= m_selectedDelegate;
+}
+
+void PlayerItemsOnUI::onSelected(InventoryView::SelectedItemInfo selectedInfo)
 {
     if (!m_selectedInfo.has_value())
     {
-        if (selectedInfo.menuItem->getItem() == nullptr)
-            return;
+        BaseItem* item = selectedInfo.menuItem->getItem();
         
-        m_selectedInfo = selectedInfo;
-        m_selectedInfo->menuItem->choice();
-        return;
+        if (item == nullptr)
+            return;
+
+        if (selectedInfo.selectType == InventoryView::USE)
+        {
+            if (item->interact())
+            {
+                selectedInfo.inventory->setItemFromIndex(selectedInfo.index, nullptr);
+                selectedInfo.menuItem->unchoice();
+                return;
+            }
+        
+            m_selectedInfo = selectedInfo;
+            m_selectedInfo->menuItem->choice();
+        }
+        else
+        {
+            selectedInfo.inventory->setItemFromIndex(selectedInfo.index, nullptr);
+            selectedInfo.menuItem->unchoice();
+            item->throwOff();
+        }
+        
+        return; 
     }
 
     if (m_selectedInfo->inventory == selectedInfo.inventory)

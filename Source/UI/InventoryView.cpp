@@ -1,6 +1,11 @@
 ﻿#include "UI/InventoryView.h"
 
+#include "CCDirector.h"
+#include "CCEventDispatcher.h"
+#include "CCEventListenerMouse.h"
+#include "2d/CCCamera.h"
 #include "2d/CCMenu.h"
+#include "2d/CCScene.h"
 
 InventoryView* InventoryView::create(Inventory& observableItems, const std::vector<ItemTypeSlot>& availableSlots,
                                      const SpriteWithRect& spriteWithRect, cocos2d::Size itemSize, int columns, cocos2d::Vec2 padding)
@@ -17,23 +22,43 @@ InventoryView* InventoryView::create(Inventory& observableItems, const std::vect
 
 bool InventoryView::initWithGrid(cocos2d::Size itemSize, int columns)
 {
+    cocos2d::Menu* menu = cocos2d::Menu::create();
+    if (!menu)
+        return false;
+    
     const std::vector<BaseItem*> items = m_observableItems.getCollection();
     for (size_t i = 0; i < items.size(); ++i)
     {
         MenuItemForInventory* menuItem = MenuItemForInventory::create(itemSize, m_backgroundFrame,
             [this, i](Ref* ref)
             {
-              MenuItemForInventory* menuItem = dynamic_cast<MenuItemForInventory*>(ref);
-              this->selected.invoke(SelectedItemInfo(this, menuItem, i));
+                const auto menuItem = dynamic_cast<MenuItemForInventory*>(ref);
+                selected(SelectedItemInfo(this, menuItem, i, USE));
             });
         menuItem->setItem(items[i]);
 
         m_menuItems.push_back(menuItem);
     }
 
-    cocos2d::Menu* menu = cocos2d::Menu::create();
-    if (!menu)
-        return false;
+    const auto mouseListener = cocos2d::EventListenerMouse::create();
+    mouseListener->onMouseDown = [this, menu](cocos2d::EventMouse* event)
+    {
+        const cocos2d::Size winSize = cocos2d::Director::getInstance()->getWinSize();
+        
+        for (int i = 0; i < m_menuItems.size(); ++i)
+        {
+            MenuItemForInventory* menuItem = m_menuItems[i];
+            if (event->getMouseButton() == cocos2d::EventMouse::MouseButton::BUTTON_RIGHT &&
+                isScreenPointInRect({event->getLocation().x, winSize.height - event->getLocation().y},
+                getScene()->getDefaultCamera(),menuItem->getWorldToNodeTransform(), {{0.0f, 0.0f},
+                menuItem->getContentSize()}, nullptr)) 
+            {
+                selected(SelectedItemInfo(this, menuItem, i, DROP));
+                return;
+            }
+        }
+    };
+    this->getEventDispatcher()->addEventListenerWithFixedPriority(mouseListener, 1);
         
     for (const auto& item : m_menuItems)
     {

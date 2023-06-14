@@ -23,6 +23,11 @@ Weapon::Weapon(World* world, const cocos2d::Rect& rect, ItemTypeSlot itemTypeSlo
     , m_damages(damages)
 {
     m_statsContainer->add(LEVEL, std::make_shared<StatWithModificators>(0));
+
+    m_attackHandler->attacked += [this](BaseEntity* entity, float damage)
+    {
+        attacked(entity, damage);
+    };
 }
 
 void Weapon::setModificatorDamage(const IDamageModificator* modificator)

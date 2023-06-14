@@ -17,11 +17,12 @@ public:
     const std::shared_ptr<IStatsContainer> getStats() const override { return m_statsContainer; }
     ItemTypeSlot getItemTypeFromSlot() const override { return m_itemTypeSlot; }
 
-    void scheduleDrawIndicators(DamageIndicatorsSystems* indicators, const BaseEntity* entity, Direction direction) const
+    void scheduleDrawIndicators(DamageIndicatorsSystems* indicators, const BaseEntity* entity,
+        const std::vector<Direction>& directions) const
     {
-        indicators->scheduleDraw([this, entity, direction](const std::function<void(DrawDamageInfo)>& drawFunc)
+        indicators->scheduleDraw([this, entity, &directions](const std::function<void(DrawDamageInfo)>& drawFunc)
         {
-            m_attackHandler->drawIndicators(getWorld(), entity->getPositionOnMap(), direction, drawFunc);
+            m_attackHandler->drawIndicatorsWithNonUnion(getWorld(), entity->getPositionOnMap(), directions, drawFunc);
         });
     }
 
@@ -29,6 +30,8 @@ public:
     {
         m_attackHandler->attack(getWorld(), position, direction);
     }
+
+    EventContainer<BaseEntity*, float> attacked; 
 
 private:
     ItemTypeSlot m_itemTypeSlot;

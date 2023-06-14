@@ -25,3 +25,9 @@ void BaseEntity::moveOnMapTo(Vec2Int endPosition, float time)
     Node::runAction(moveTo);
     m_position = endPosition;
 }
+
+void BaseEntity::destroyEntity()
+{
+    deleted(this);
+    m_world->removeEntity(this);
+}

@@ -8,10 +8,12 @@
 #include "UI/InventoryView.h"
 #include "UI/PlayerItemsOnUI.h"
 #include "UI/StatBar.h"
+#include "ui/UIButton.h"
 #include "ui/UIHBox.h"
 #include "ui/UIImageView.h"
 #include "ui/UIRelativeBox.h"
 #include "ui/UIVBox.h"
+#include "Utils/FontsTTF.h"
 
 using namespace cocos2d;
 using namespace cocos2d::ui; 
@@ -40,7 +42,7 @@ bool Canvas::init()
     rightBox->setBackGroundColor(Colors::background);
     this->addChild(rightBox);
     
-    const auto playerStatsBox = VBox::create({widthRightPanel, 120.0f});
+    const auto playerStatsBox = VBox::create({widthRightPanel, 180.0f});
     playerStatsBox->setBackGroundColorType(Layout::BackGroundColorType::SOLID);
     playerStatsBox->setBackGroundColor(Colors::backgroundForStatBar);
     rightBox->addChild(playerStatsBox);
@@ -53,12 +55,15 @@ bool Canvas::init()
     marginParameter->setGravity(LinearLayoutParameter::LinearGravity::CENTER_HORIZONTAL);
 
     const std::shared_ptr<IStatsContainer> playerStats = m_player->getStats();
+
+    const Size sizeStat = Size(playerStatsBox->getContentSize().width - 10.0f,
+                               playerStatsBox->getContentSize().height / 3) - marginSizeOffset;
     
     std::shared_ptr<IStat> playerHpStat;
     if (playerStats->tryGet(HEALTH, playerHpStat))
     {
         const auto playerHp = StatBar::create(marginParameter,
-            Size(playerStatsBox->getContentSize().width - 10.0f, playerStatsBox->getContentSize().height / 2) - marginSizeOffset,
+            sizeStat,
             Paths::toHealthBar,
             playerHpStat);
         playerStatsBox->addChild(playerHp);
@@ -68,10 +73,38 @@ bool Canvas::init()
     if (playerStats->tryGet(MANA, playerManaStat))
     {
         const auto playerMana = StatBar::create(marginParameter,
-            Size(playerStatsBox->getContentSize().width - 10.0f, playerStatsBox->getContentSize().height / 2) - marginSizeOffset,
+            sizeStat,
             Paths::toManaBar,
             playerManaStat);
         playerStatsBox->addChild(playerMana);
+    }
+
+    std::shared_ptr<IStat> playerLevelStat;
+    std::shared_ptr<IStat> playerLevelPointsStat;
+    if (playerStats->tryGet(LEVEL, playerLevelStat) &&
+        playerStats->tryGet(LEVEL_POINTS, playerLevelPointsStat))
+    {
+        constexpr float widthLabel = 50.0f;
+        
+        HBox* levelBox = HBox::create(sizeStat);
+        levelBox->setLayoutParameter(marginParameter);
+        
+        const auto playerLevelPoints = StatBar::create(nullptr,
+            {levelBox->getContentSize().width - widthLabel, levelBox->getContentSize().height},
+            Paths::toExperiencePointsBar, 
+            playerLevelPointsStat);
+        levelBox->addChild(playerLevelPoints);
+
+        Label* level = Label::createWithTTF("1", FontsTTF::onUI, 32);
+        playerLevelStat->changed += [level](IStat::currentValue currentValue, IStat::changedValue, IStat::wantedChangeValue)
+        {
+            level->setString(std::to_string(static_cast<int>(currentValue)));
+        };
+        level->setPosition({playerLevelPoints->getContentSize().width + widthLabel / 2,
+             levelBox->getContentSize().height / 2});
+        levelBox->addChild(level);
+
+        playerStatsBox->addChild(levelBox);
     }
     
     const auto stepCounter = StepCounter::create(m_gameLoop->currentStep);
@@ -86,7 +119,7 @@ bool Canvas::init()
     inventoryView->setLayoutParameter(marginParameter);
     rightBox->addChild(inventoryView);
 
-    const float cellMargin = 5.0f;
+    constexpr float cellMargin = 5.0f;
     Margin horizontalMargin = {cellMargin, 0.0f, cellMargin, 0.0f};
     Margin verticalMargin = {0.0f, cellMargin, 0.0f, cellMargin};
 
@@ -137,6 +170,36 @@ bool Canvas::init()
     m_allItemsPlayer = std::make_shared<PlayerItemsOnUI>(inventoryView, backpackWeaponView, backpackAccessoriesView, backpackSpellsView);
 
     return true;
+}
+
+void Canvas::showRestartScreen(const std::string& text, const std::function<void()>& restartCallback)
+{
+    m_allItemsPlayer.reset();
+
+    Layout* layout = Layout::create();
+    layout->setContentSize(getContentSize());
+    layout->setBackGroundColorType(Layout::BackGroundColorType::SOLID);
+    layout->setBackGroundColor(Color3B::BLACK);
+    layout->setOpacity(0);
+    this->addChild(layout);
+
+    FadeIn* fadeAction = FadeIn::create(2.0f);
+    layout->runAction(fadeAction);
+
+    Label* gameOverLabel = Label::createWithTTF(text, FontsTTF::onUI, 40);
+    gameOverLabel->setPosition(getContentSize() / 2);
+    layout->addChild(gameOverLabel);
+
+    Button* restartButton = Button::create("ButtonNormal.png", "ButtonPressed.png");
+    restartButton->setContentSize({300.0f, 300.0f});
+    restartButton->setPosition(getContentSize() / 2);
+    restartButton->setPositionY(restartButton->getPositionY() - restartButton->getContentSize().height);
+    restartButton->addClickEventListener([restartCallback](Ref*) { restartCallback(); });
+    restartButton->setTitleFontName(FontsTTF::onUI);
+    restartButton->setTitleText("Restart");
+    restartButton->setTitleFontSize(32);
+
+    layout->addChild(restartButton);
 }
 
 void Canvas::update(float delta)

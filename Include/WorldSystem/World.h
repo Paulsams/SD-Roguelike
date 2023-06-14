@@ -2,6 +2,7 @@
 
 #include "BaseEntity.h"
 #include "DamageIndicatorsSystems.h"
+#include "FunctionVisitorEntities.h"
 #include "GameLoop/IUpdatable.h"
 #include "Mobs/Factory/BaseMobAbstractFactory.h"
 #include "Pathfinder/Graph.h"
@@ -49,6 +50,8 @@ public:
         Vec2Int{gid % 64, gid / 64} * 32, {32, 32}); }
 
     void addPlayer(Player* player);
+    void removePlayer(Player* player);
+    
     const Player* getNearestPlayer(cocos2d::Vec2 position) const;
 
     TileType getTileType(Vec2Int position) const;
@@ -60,30 +63,28 @@ public:
     DamageIndicatorsSystems* getDamageIndicatorsForMobs() const { return m_damageIndicatorsMobs; }
     DamageIndicatorsSystems* getDamageIndicatorsForPlayer(const Player* player) const { return m_playersDamageIndicators.at(player); }
 
+    EventContainer<const std::vector<mob::Mob*>> bossCountChanged;
+
 private:
     explicit World(Tilemap* tilemap, std::shared_ptr<mob::BaseMobAbstractFactory> mobFactory);
 
     void tryInitDecorations(const cocos2d::TMXObjectGroup* decorationsGroup, cocos2d::Size tileSize);
     void tryInitChests(const cocos2d::TMXObjectGroup* chestsGroup, cocos2d::Size tileSize);
-    bool spawnItem(BaseEntity* entity, Vec2Int direction, const std::function<BaseItem*()>& createFunc);
+    bool spawnItem(Vec2Int position, const std::function<BaseItem*()>& createFunc);
 
     void checkMoveEntities();
     void trySpawnMobs(const cocos2d::TMXObjectGroup* group, cocos2d::Size tileSize,
-                      std::function<mob::Mob*(mob::BaseMobAbstractFactory*, World*, int)> createFunc);
+                      const std::function<mob::Mob*(mob::BaseMobAbstractFactory*, World*, int)>& createFunc);
 
     void updateTileType(Vec2Int position) const;
     size_t getIndexFromVec2(Vec2Int position) const { return position.x + position.y * getSize().width; }
-
-    void internalRemoveEntity(BaseEntity* entity);
-    void onDeletedEntity(BaseEntity* entity);
-
-    FunctionHandler<BaseEntity*> m_deletedEntityDelegate;
     
     TilemapLayer* m_ground = nullptr;
     TilemapLayer* m_walls = nullptr;
 
     std::shared_ptr<mob::BaseMobAbstractFactory> m_mobFactory;
     std::vector<mob::Mob*> m_mobs;
+    std::vector<mob::Mob*> m_bosses;
     std::vector<std::vector<BaseEntity*>> m_entities;
 
     Player* m_player = nullptr;
@@ -97,4 +98,8 @@ private:
     
     std::set<Vec2Int> m_currentMovedEntities;
     std::map<BaseEntity*, std::pair<Vec2Int, Vec2Int>> m_movedEntities;
+
+    std::shared_ptr<FunctionVisitorEntitiesReturnVoid> m_visitorFromAddEntity;
+    std::shared_ptr<FunctionVisitorEntitiesReturnVoid> m_visitorFromRemoveEntity;
+    std::shared_ptr<FunctionVisitorEntities<bool>> m_visitorFindPath;
 };

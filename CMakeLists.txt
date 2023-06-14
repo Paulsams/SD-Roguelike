@@ -110,6 +110,7 @@ list(APPEND GAME_HEADER
     Include/Stats/IHaveStats.h
     Include/Stats/IStat.h
     Include/Stats/IStatsContainer.h
+    Include/Stats/LevelHandler.h
     Include/Stats/StatsContainer.h
     Include/Stats/StatType.h
 

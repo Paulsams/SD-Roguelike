@@ -39,8 +39,13 @@ namespace mob
         return m_visionRange;
     }
 
+    float Mob::getExperiencePoints() const {
+        return m_experiencePoints;
+    }
+
     Mob::Mob(World* world, const MobInfo& info)
         : BaseEntity(world)
+        , m_experiencePoints(info.experiencePoints)
         , m_visionRange(info.visionRange)
         , m_strategy(info.strategy)
         , m_behaviour(info.startBehaviour)
@@ -50,7 +55,7 @@ namespace mob
         mobHpStat->addModificator(std::make_shared<BoundsModificator>(MinMax(0, info.health)));
         m_stats->add(HEALTH, mobHpStat);
 
-        mobHpStat->changed += [this](IStat::oldValue, IStat::currentValue current, IStat::changedValue)
+        mobHpStat->changed += [this](IStat::currentValue current, IStat::changedValue, IStat::wantedChangeValue)
         {
             if (current <= 0.0f)
                 destroyEntity();

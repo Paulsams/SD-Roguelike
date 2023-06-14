@@ -16,6 +16,8 @@ public:
     bool init() override;
     void update(float delta) override;
 
+    void showRestartScreen(const std::string& text, const std::function<void()>& restartCallback);
+
 private:
     Canvas(World* world, Player* player, std::shared_ptr<GameLoop> gameLoop);
 

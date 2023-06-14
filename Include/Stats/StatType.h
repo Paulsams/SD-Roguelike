@@ -5,4 +5,5 @@ enum StatType
     HEALTH,
     MANA,
     LEVEL,
+    LEVEL_POINTS,
 };

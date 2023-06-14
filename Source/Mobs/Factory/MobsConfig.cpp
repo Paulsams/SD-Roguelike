@@ -38,7 +38,7 @@ MobInfo MobsConfig::createNormalMobInfoWithLowPanic()
     std::shared_ptr<BaseStateStrategy> panicState = std::make_shared<Panic>(cowardlyBeh);
 
     auto strategy = createStrategy(typeid(Normal).hash_code(), transitionFunction, normalState, panicState);
-    return {10, 5, strategy, aggressiveBeh};
+    return {10, 7, 5, strategy, aggressiveBeh};
 }
 
 
@@ -75,7 +75,7 @@ MobInfo MobsConfig::createNormalMobInfoWithHighPanic()
     std::shared_ptr<BaseStateStrategy> panicState = std::make_shared<Panic>(cowardlyBeh);
 
     auto strategy = createStrategy(typeid(Normal).hash_code(), transitionFunction, normalState, panicState);
-    return {7, 7, strategy, aggressiveBeh};
+    return {7, 10, 7, strategy, aggressiveBeh};
 }
 
 
@@ -87,7 +87,7 @@ MobInfo MobsConfig::createEliteMobInfo()
     auto aggressiveBeh = createAggressiveBehaviour(attack);
     auto strategy = createStrategy();
 
-    return {15, 6, strategy, aggressiveBeh};
+    return {15, 50, 6, strategy, aggressiveBeh};
 }
 
 
@@ -99,7 +99,7 @@ MobInfo MobsConfig::createBossMobInfo()
     auto aggressiveBeh = createAggressiveBehaviour(attack);
     auto strategy = createStrategy();
 
-    return {25, 7, strategy, aggressiveBeh};
+    return {25, 100, 7, strategy, aggressiveBeh};
 }
 
 
@@ -136,7 +136,7 @@ MobInfo MobsConfig::createStrongPassiveMobInfo()
     std::shared_ptr<BaseStateStrategy> aggressiveState = std::make_shared<Panic>(aggressiveBeh);
 
     auto strategy = createStrategy(typeid(Normal).hash_code(), transitionFunction, normalState, aggressiveState);
-    return {15, 4, strategy, passiveBeh};
+    return {15, 3, 4, strategy, passiveBeh};
 }
 
 
@@ -173,5 +173,5 @@ MobInfo MobsConfig::createPassiveMobInfo()
     std::shared_ptr<BaseStateStrategy> aggressiveState = std::make_shared<Panic>(aggressiveBeh);
 
     auto strategy = createStrategy(typeid(Normal).hash_code(), transitionFunction, normalState, aggressiveState);
-    return {10, 5, strategy, passiveBeh};
+    return {10, 1, 5, strategy, passiveBeh};
 }

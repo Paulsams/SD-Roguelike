@@ -9,7 +9,7 @@
 
 using namespace cocos2d;
 
-Scene* GameScene::createScene()
+std::pair<Scene*, GameScene*> GameScene::createScene()
 {
     Scene* scene = Scene::create();
     
@@ -21,8 +21,10 @@ Scene* GameScene::createScene()
     camera->setPositionZ(cameraZ);
     
     GameScene* gameScene = GameScene::create(camera);
+    gameScene->scheduleUpdate();
     scene->addChild(gameScene);
     
+    Director::getInstance()->getEventDispatcher()->removeCustomEventListeners(GLViewImpl::EVENT_WINDOW_RESIZED);
     Director::getInstance()->getEventDispatcher()->addCustomEventListener(GLViewImpl::EVENT_WINDOW_RESIZED,
         [gameScene, camera](Event*)
     {
@@ -35,12 +37,12 @@ Scene* GameScene::createScene()
         gameScene->m_canvas->setContentSize(size);
     });
 
-    return scene;
+    return {scene, gameScene};
 }
 
 GameScene* GameScene::create(Camera* camera)
 {
-    GameScene* scenePointer = new (std::nothrow) GameScene(); 
+    auto* scenePointer = new (std::nothrow) GameScene(); 
     if (scenePointer && scenePointer->init(camera))
     {
         scenePointer->autorelease();
@@ -103,32 +105,54 @@ bool GameScene::init(Camera* camera)
     m_world->updateCullingRect(Rect(viewPoint, winSize));
     m_camera->setPosition(viewPoint);
 
-    m_player->moved += [this](const BaseEntity*, Vec2Int, Vec2Int endPosition)
+    m_player->moved += movedPlayerDelegate;
+    m_player->attacked += attackPlayerDelegate;
+
+    m_world->bossCountChanged += [this](const std::vector<mob::Mob*>& bosses)
     {
-        static constexpr int moveCameraTag = 10;
-        static constexpr float moveCameraTime = 0.4f;
-        static constexpr float coefficientOffsetSize = 0.4f;
-
-        const Size winSize = Director::getInstance()->getWinSize();
-        Point viewPoint = getViewPointCenter(m_world->convertToMapSpace(endPosition) * m_world->getScale());
-        m_camera->stopActionByTag(moveCameraTag);
-        
-        auto moveTo = MoveTo::create(moveCameraTime, {viewPoint.x, viewPoint.y, m_camera->getPositionZ()});
-        moveTo->setTag(moveCameraTag);
-        m_camera->runAction(moveTo);
-        
-        m_world->updateCullingRect(Rect(viewPoint - (winSize * coefficientOffsetSize / 2.0f),
-            winSize * (1.0f + coefficientOffsetSize)));
-
-        this->m_gameLoop->step();
+        if (bosses.empty())
+        {
+            m_canvas->showRestartScreen("Win game!!!", restarted);
+        }
     };
 
-    m_player->attacked += [this]()
+    std::shared_ptr<IStat> healthStat;
+    if (m_player->getStats()->tryGet(HEALTH, healthStat))
     {
-        m_gameLoop->step();
-    };
+        healthStat->changed += [this](IStat::currentValue currentValue, IStat::changedValue, IStat::wantedChangeValue)
+        {
+            if (currentValue > 0.0f)
+                return;
+            
+            m_runningScene = false;
+            schedule([this](float)
+            {
+                m_gameLoop->step();
+            }, 0.5f, "UpdateGameLoop");
+
+            m_canvas->showRestartScreen("Game Over", restarted);
+        };
+    }
     
     return true;
+}
+
+void GameScene::onExit()
+{
+    Layer::onExit();
+}
+
+void GameScene::update(float delta)
+{
+    Layer::update(delta);
+
+    if (!m_runningScene)
+    {
+        m_player->moved -= movedPlayerDelegate;
+        m_player->attacked -= attackPlayerDelegate;
+        m_world->removePlayer(m_player);
+        m_runningScene = true;
+    }
 }
 
 void GameScene::createPlayer()
@@ -140,17 +164,39 @@ void GameScene::createPlayer()
     m_world->addPlayer(m_player);
 
     constexpr int templatePeopleId = 2210 - 1;
-    m_player->setClothe(Player::TemplatePeople, {Paths::toGameTileset,
+    m_player->setClothe(Player::TEMPLATE_PEOPLE, {Paths::toGameTileset,
         Rect(Vec2{templatePeopleId % 64, templatePeopleId / 64} * sizeRect.width, sizeRect)});
 
     constexpr int bibId = 2149 - 1;
-    m_player->setClothe(Player::Bib, {Paths::toGameTileset,
+    m_player->setClothe(Player::BIB, {Paths::toGameTileset,
         Rect(Vec2{bibId % 64, bibId / 64} * sizeRect.width, sizeRect)});
 
     constexpr int helmetId = 1957 - 1;
-    m_player->setClothe(Player::Helmet, {Paths::toGameTileset,
+    m_player->setClothe(Player::HELMET, {Paths::toGameTileset,
         Rect(Vec2{helmetId % 64, helmetId / 64} * sizeRect.width, sizeRect)});
 }
+
+GameScene::GameScene()
+    : movedPlayerDelegate([this](BaseEntity*, BaseEntity::oldPosition, BaseEntity::newPosition endPosition)
+    {
+        static constexpr int moveCameraTag = 10;
+        static constexpr float moveCameraTime = 0.4f;
+        static constexpr float coefficientOffsetSize = 0.4f;
+
+        const Size winSize = Director::getInstance()->getWinSize();
+        Point viewPoint = getViewPointCenter(m_world->convertToMapSpace(endPosition) * m_world->getScale());
+        m_camera->stopActionByTag(moveCameraTag);
+                
+        auto moveTo = MoveTo::create(moveCameraTime, {viewPoint.x, viewPoint.y, m_camera->getPositionZ()});
+        moveTo->setTag(moveCameraTag);
+        m_camera->runAction(moveTo);
+                
+        m_world->updateCullingRect(Rect(viewPoint - (winSize * coefficientOffsetSize / 2.0f),
+            winSize * (1.0f + coefficientOffsetSize)));
+
+        this->m_gameLoop->step();
+    })
+    , attackPlayerDelegate([this]() { m_gameLoop->step(); }) { }
 
 Point GameScene::getViewPointCenter(Point position) const
 {

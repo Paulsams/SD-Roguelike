@@ -38,7 +38,6 @@ public:
 
         m_isOpen = true;
         m_onInteractedFunc(this);
-        destroyEntity(); 
     }
 
 private:

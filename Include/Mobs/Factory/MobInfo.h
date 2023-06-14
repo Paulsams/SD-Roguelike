@@ -15,14 +15,16 @@ class IMobStrategy;
 struct MobInfo
 {
     int health;
+    int experiencePoints;
     int visionRange;
     std::shared_ptr<IMobStrategy> strategy;
     std::shared_ptr<IMobBehaviour> startBehaviour;
 
     MobInfo() = delete;
 
-    MobInfo(int health, int visionRange, std::shared_ptr<IMobStrategy> strategy, std::shared_ptr<IMobBehaviour> startBehaviour)
+    MobInfo(int health, int experiencePoints, int visionRange, std::shared_ptr<IMobStrategy> strategy, std::shared_ptr<IMobBehaviour> startBehaviour)
         : health(health)
+        , experiencePoints(experiencePoints)
         , visionRange(visionRange)
         , strategy(std::move(strategy))
         , startBehaviour(std::move(startBehaviour))

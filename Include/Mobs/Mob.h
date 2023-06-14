@@ -21,12 +21,15 @@ namespace mob {
         void changeBehaviour(std::shared_ptr<IMobBehaviour>);
         const std::shared_ptr<IStatsContainer> getStats() const override;
         int getVisionRange() const;
+        float getExperiencePoints() const;
         
         void acceptVisit(std::shared_ptr<IVisitorEntities> visitor) override { visitor->visitMob(this); }
 
     private:
 
         Mob(World* world, const MobInfo& info);
+        
+        float m_experiencePoints;
         int m_visionRange;
         std::shared_ptr<IMobStrategy> m_strategy;
         std::shared_ptr<IMobBehaviour> m_behaviour;

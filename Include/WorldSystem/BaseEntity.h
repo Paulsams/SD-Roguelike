@@ -20,6 +20,8 @@ public:
     void setPositionOnMapWithoutNotify(Vec2Int cellPosition);
     void moveOnMapTo(Vec2Int endPosition, float time);
     
+    void destroyEntity();
+    
     EventContainer<BaseEntity*, oldPosition, newPosition> moved;
     EventContainer<BaseEntity*> deleted;
 
@@ -29,12 +31,6 @@ protected:
     explicit BaseEntity(World* world)
         : m_world(world) { }
 
-    void destroyEntity()
-    {
-        deleted(this);
-        getParent()->removeChild(this);
-    }
-    
 private:
     Vec2Int m_position;
     World* m_world;

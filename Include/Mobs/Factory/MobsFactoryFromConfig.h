@@ -14,33 +14,34 @@ namespace mob {
         
         Mob* createNormal(World* world, int gid) override
         {
-            return createMob(world, gid, m_mobsConfig->normals);
+            return createMob(world, gid, m_mobsConfig->normals, Paths::toHealthBar);
         }
 
         Mob* createElite(World* world, int gid) override
         {
-            return createMob(world, gid, m_mobsConfig->elites);
+            return createMob(world, gid, m_mobsConfig->elites, Paths::toHealthBar);
         }
 
         Mob* createBoss(World* world, int gid) override
         {
-            return createMob(world, gid, m_mobsConfig->bosses);
+            return createMob(world, gid, m_mobsConfig->bosses, Paths::toHealthBar);
         }
 
         Mob* createPassive(World* world, int gid) override
         {
-            return createMob(world, gid, m_mobsConfig->passives);
+            return createMob(world, gid, m_mobsConfig->passives, Paths::toExperiencePointsBar);
         }
 
     private:
-        Mob* createMob(World* world, int gid, const std::unordered_map<int, MobInfo>& createMap)
+        Mob* createMob(World* world, int gid, const std::unordered_map<int, MobInfo>& createMap,
+            const std::string& pathToBar)
         {
             Mob* mob = Mob::create(world, createSpriteFromGid(world, gid), createMap.at(gid));
             std::shared_ptr<IStat> healthStat;
             if (mob->getStats()->tryGet(HEALTH, healthStat))
             {
                 StatBar* statBar = StatBar::create(nullptr, {40.0f, 20.0f},
-                                                   Paths::toHealthBar, healthStat);
+                                                   pathToBar, healthStat);
                 statBar->setPosition({(mob->getContentSize().width - statBar->getContentSize().width) * 0.5f, 30.0f});
                 mob->addChild(statBar);
             }

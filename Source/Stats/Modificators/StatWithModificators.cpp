@@ -16,7 +16,7 @@ void StatWithModificators::changeValueBy(float value)
     const float oldValue = m_value;
     m_value += value;
     m_value = getValue();
-    changed(oldValue, m_value, m_value - oldValue);
+    changed(m_value, m_value - oldValue, value);
 }
 
 IStat& StatWithModificators::addModificator(std::shared_ptr<IStatModificator> statModificator)

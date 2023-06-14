@@ -4,6 +4,7 @@
 #include "Backpack.h"
 #include "PlayerInput.h"
 #include "ItemsSystem/BaseItem.h"
+#include "Stats/LevelHandler.h"
 #include "WorldSystem/BaseEntity.h"
 #include "WorldSystem/FunctionVisitorEntities.h"
 
@@ -12,9 +13,9 @@ class Player : public BaseEntity
 public:
     enum ClotheType
     {
-        Helmet = 0,
-        Bib = 1,
-        TemplatePeople = 2,
+        HELMET = 0,
+        BIB = 1,
+        TEMPLATE_PEOPLE = 2,
     };
     
     static Player* create(World* world);
@@ -44,14 +45,19 @@ private:
     void onInteracted();
     
     FunctionHandler<Direction> m_moveDelegate;
-    FunctionHandler<> m_attackedDelegate;
+    FunctionHandler<> m_attackedInputDelegate;
     FunctionHandler<> m_interactedDelegate;
-    
+
     PlayerInput m_input;
     std::unordered_map<ClotheType, cocos2d::Sprite*> m_clothes;
     Backpack m_backpack;
     std::shared_ptr<StatsContainer> m_statsContainer;
     ObservableVector<BaseItem*> m_items;
+    
+    std::shared_ptr<LevelHandler> m_levelHandler;
 
     std::optional<Direction> m_choicedDirection;
+
+    std::shared_ptr<FunctionVisitorEntitiesReturnVoid> m_killVisitor;
+    FunctionHandler<BaseEntity*, float> m_attackedDelegate;
 };
