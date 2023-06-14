@@ -213,10 +213,8 @@ set(all_code_files
     ${GAME_HEADER}
     ${GAME_SOURCE}
     )
-if(NOT ANDROID)
-    add_executable(${APP_NAME} ${all_code_files})
-endif()
 
+add_executable(${APP_NAME} ${all_code_files})
 target_link_libraries(${APP_NAME} cocos2d)
 target_include_directories(${APP_NAME}
         PRIVATE Classes
@@ -235,6 +233,7 @@ if(LINUX OR WINDOWS)
     cocos_copy_target_res(${APP_NAME} LINK_TO ${APP_RES_DIR} FOLDERS ${GAME_RES_FOLDER})
 endif()
 
+
 #enable google tests
 include(FetchContent)
 FetchContent_Declare(
@@ -247,20 +246,20 @@ enable_testing()
 include(GoogleTest)
 
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ../tests)
-add_executable(baseTest tests/baseTest.cpp)
-add_executable(pathfinderTest tests/pathfinderTests.cpp Source/Pathfinder/PathfinderAStar.cpp)
-add_executable(stateMachineTest tests/stateMachineTests.cpp)
+add_executable(test_base tests/baseTest.cpp)
+add_executable(test_pathfinder tests/pathfinderTests.cpp Source/Pathfinder/PathfinderAStar.cpp)
+add_executable(test_stateMachine tests/stateMachineTests.cpp)
 
-add_executable(generatorTest tests/generatorTest.cpp ${all_code_files})
+add_executable(test_generator tests/generatorTest.cpp ${all_code_files})
 
-target_link_libraries( baseTest  PRIVATE  GTest::gtest_main  cocos2d)
-target_link_libraries( pathfinderTest  PUBLIC  GTest::gtest_main  cocos2d)
-target_link_libraries( stateMachineTest  PRIVATE  GTest::gtest_main  cocos2d)
-target_link_libraries( generatorTest  PRIVATE  GTest::gtest_main  cocos2d)
+target_link_libraries( test_base  PRIVATE  GTest::gtest_main  cocos2d)
+target_link_libraries( test_pathfinder  PUBLIC  GTest::gtest_main  cocos2d)
+target_link_libraries( test_stateMachine  PRIVATE  GTest::gtest_main  cocos2d)
+target_link_libraries( test_generator  PRIVATE  GTest::gtest_main  cocos2d)
 
 if(WINDOWS)
-    cocos_copy_target_dll(pathfinderTest)
-    cocos_copy_target_dll(stateMachineTest)
-    cocos_copy_target_dll(generatorTest)
+    cocos_copy_target_dll(test_pathfinder)
+    cocos_copy_target_dll(test_stateMachine)
+    cocos_copy_target_dll(test_generator)
 endif()
 

@@ -1,3 +1,44 @@
+# Как запустить? 
+В проекте используется cocos2d, который уже встроен в репозиторий, и GoogleTests. GoogleTests загружаются с помощью Cmake.
+***
+Для сборки необходимо скачать необходимые зависимости
+#### Linux
+```shell
+    sudo apt-get install build-essential libgtk-3-dev
+    sudo apt install libglew-dev
+    sudo apt-get install curl
+    sudo apt-get install libssl-dev libcurl4-openssl-dev
+    sudo apt-get install libgl1-mesa-dev xorg-dev
+```
+#### Windows
+```shell
+  choco install ninja cmake
+```
+
+### Cборка
+
+При сборке используется cmake и тип сборки Release:
+
+#### Windows
+```shell
+  cmake -B ./build -AWin32 -DCMAKE_BUILD_TYPE=Release
+  cmake --build ./build --config Release
+```
+
+#### Linux
+```shell
+  cmake -B ./build -DCMAKE_BUILD_TYPE=Release
+  cmake --build ./build --config Release
+```
+
+Сам запуск:
+
+```shell
+    to do
+```
+### Тестирование
+Запуск тестов в директории tests/test_*
+
 # Архитектурная документация
 ***
 ## Служебная информация
