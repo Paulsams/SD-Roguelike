@@ -6,7 +6,7 @@
 
 using RGWB = RandomGeneratorWorldBuilder;
 
-Tilemap* RGWB::build() const
+cocos2d::TMXMapInfo* RGWB::build() const
 {
     if (m_path.empty()
         || m_height == 0
@@ -24,34 +24,45 @@ Tilemap* RGWB::build() const
 
 
 
-Tilemap* RGWB::generateWorld() const
+cocos2d::TMXMapInfo* RGWB::generateWorld() const
 {
-    Tilemap* tileMap = Tilemap::create(m_path);
+    cocos2d::TMXMapInfo* mapInfo = cocos2d::TMXMapInfo::create(m_path);
+
     cocos2d::Size size(m_width, m_height);
-    tileMap->setMapSize(size);
+    mapInfo->setMapSize(size);
 
     Container mainContainer(0, 0, m_width, m_height);
     std::shared_ptr<Tree> tree = splitContainer(mainContainer, m_iterCount);
 
+    cocos2d::Vector<cocos2d::TMXLayerInfo*>& layers = mapInfo->getLayers();
+    cocos2d::TMXLayerInfo* groundLayer;
+    cocos2d::TMXLayerInfo* wallsLayer;
+
+    for (cocos2d::TMXLayerInfo* info : layers)
+    {
+        if (info->_name == "Ground")
+        {
+            groundLayer = info;
+        }
+        else if (info->_name == "Walls")
+        {
+            wallsLayer = info;
+        }
+    }
+
     uint32_t* groundTiles = (uint32_t*)malloc(m_width * m_height * sizeof(uint32_t));
     std::memset(groundTiles, 0, m_width * m_height * sizeof(uint32_t));
 
-    TilemapLayer* groundLayer = tileMap->getLayer("Ground");
-    void* oldGroundTiles = groundLayer->getTiles();
-    free(oldGroundTiles);
-
-    groundLayer->setLayerSize(size);
-    groundLayer->setTiles(groundTiles);
+    free(groundLayer->_tiles);
+    groundLayer->_layerSize = size;
+    groundLayer->_tiles = groundTiles;
 
     uint32_t* wallsTiles = (uint32_t*)malloc(m_width * m_height * sizeof(uint32_t));
     std::memset(wallsTiles, 0, m_width * m_height * sizeof(uint32_t));
 
-    TilemapLayer* wallsLayer = tileMap->getLayer("Walls");
-    void* oldWallsTiles = wallsLayer->getTiles();
-    free(oldWallsTiles);
-
-    wallsLayer->setLayerSize(size);
-    wallsLayer->setTiles(wallsTiles);
+    free(wallsLayer->_tiles);
+    wallsLayer->_layerSize = size;
+    wallsLayer->_tiles = wallsTiles;
 
     std::vector<Room> rooms = generateRooms(tree);
 
@@ -63,15 +74,13 @@ Tilemap* RGWB::generateWorld() const
     drawWalls(wallsLayer);
     drawGround(wallsLayer, groundLayer, ground);
 
-    cocos2d::TMXObjectGroup* utilsGroup = tileMap->getObjectGroup("UtilsObjects");
-    cocos2d::ValueMap spawnPoint = utilsGroup->getObject("SpawnPoint");
-
     std::vector<cocos2d::Value> decorations;
     std::vector<cocos2d::Value> normalMobs;
     std::vector<cocos2d::Value> eliteMobs;
     std::vector<cocos2d::Value> bossMobs;
     std::vector<cocos2d::Value> passiveMobs;
     std::vector<cocos2d::Value> chests;
+    std::vector<cocos2d::Value> utils;
 
     const std::vector<std::string> consumables = Items::getConsumables();
     const std::vector<std::pair<std::string, int>> weapons = Attacks::getTiers();
@@ -79,12 +88,59 @@ Tilemap* RGWB::generateWorld() const
     int minTier = minIt->second;
     int maxTier = maxIt->second;
 
+    cocos2d::TMXObjectGroup* utilsObjectsGroup;
+    cocos2d::TMXObjectGroup* decorationsObjectsGroup;
+    cocos2d::TMXObjectGroup* normalMobsObjectsGroup;
+    cocos2d::TMXObjectGroup* eliteMobsObjectsGroup;
+    cocos2d::TMXObjectGroup* bossMobsObjectsGroup;
+    cocos2d::TMXObjectGroup* passiveMobsObjectsGroup;
+    cocos2d::TMXObjectGroup* chestsObjectsGroup;
+
+    auto tmp = mapInfo->getObjectGroups();
+    for (cocos2d::TMXObjectGroup* group : mapInfo->getObjectGroups())
+    {
+        const std::string& name = group->getGroupName();
+        if (name == "UtilsObjects")
+        {
+            utilsObjectsGroup = group;
+        }
+        else if (name == "Decorations")
+        {
+            decorationsObjectsGroup = group;
+        }
+        else if (name == "NormalMobs")
+        {
+            normalMobsObjectsGroup = group;
+        }
+        else if (name == "EliteMobs")
+        {
+            eliteMobsObjectsGroup = group;
+        }
+        else if (name == "BossMobs")
+        {
+            bossMobsObjectsGroup = group;
+        }
+        else if (name == "PassiveMobs")
+        {
+            passiveMobsObjectsGroup = group;
+        }
+        else if (name == "Chests")
+        {
+            chestsObjectsGroup = group;
+        }
+    }
+
     for (const Room& room : rooms)
     {
         if (room.m_type == RoomType::SPAWN)
         {
-            spawnPoint["x"] = room.m_cont.m_center.x * tileMap->getTileSize().width;
-            spawnPoint["y"] = room.m_cont.m_center.y * tileMap->getTileSize().height;
+            cocos2d::ValueMap spawnPoint;
+            spawnPoint["name"] = "SpawnPoint";
+            spawnPoint["x"] = room.m_cont.m_center.x * mapInfo->getTileSize().width;
+            spawnPoint["y"] = room.m_cont.m_center.y * mapInfo->getTileSize().height;
+            spawnPoint["width"] = mapInfo->getTileSize().width;
+            spawnPoint["height"] = mapInfo->getTileSize().height;
+            utils.push_back({cocos2d::Value(spawnPoint)});
         }
 
         for (const auto& pos : room.m_decorations)
@@ -92,10 +148,10 @@ Tilemap* RGWB::generateWorld() const
             cocos2d::ValueMap currDecoration;
             currDecoration["name"] = "Decoration";
             currDecoration["gid"] = genFromVec(m_config->getDecorations());
-            currDecoration["x"] = (room.m_cont.m_pos.x + pos.x - 1) * tileMap->getTileSize().width;
-            currDecoration["y"] = (room.m_cont.m_pos.y + pos.y - 1) * tileMap->getTileSize().height;
-            currDecoration["width"] = tileMap->getTileSize().width;
-            currDecoration["height"] = tileMap->getTileSize().height;
+            currDecoration["x"] = (room.m_cont.m_pos.x + pos.x - 1) * mapInfo->getTileSize().width;
+            currDecoration["y"] = (room.m_cont.m_pos.y + pos.y - 1) * mapInfo->getTileSize().height;
+            currDecoration["width"] = mapInfo->getTileSize().width;
+            currDecoration["height"] = mapInfo->getTileSize().height;
             if (cocos2d::random(0., 1.) >= 0.5)
                 currDecoration["loot"] = genFromVec(consumables);
             decorations.push_back({cocos2d::Value(currDecoration)});
@@ -106,11 +162,10 @@ Tilemap* RGWB::generateWorld() const
             cocos2d::ValueMap currNormalMob;
             currNormalMob["name"] = "NormalMobs";
             currNormalMob["gid"] = genFromVec(m_config->getNormalMobs());
-//            currNormalMob["gid"] = 176;
-            currNormalMob["x"] = (room.m_cont.m_pos.x + pos.x - 1) * tileMap->getTileSize().width;
-            currNormalMob["y"] = (room.m_cont.m_pos.y + pos.y - 1) * tileMap->getTileSize().height;
-            currNormalMob["width"] = tileMap->getTileSize().width;
-            currNormalMob["height"] = tileMap->getTileSize().height;
+            currNormalMob["x"] = (room.m_cont.m_pos.x + pos.x - 1) * mapInfo->getTileSize().width;
+            currNormalMob["y"] = (room.m_cont.m_pos.y + pos.y - 1) * mapInfo->getTileSize().height;
+            currNormalMob["width"] = mapInfo->getTileSize().width;
+            currNormalMob["height"] = mapInfo->getTileSize().height;
             normalMobs.push_back({cocos2d::Value(currNormalMob)});
         }
 
@@ -119,11 +174,10 @@ Tilemap* RGWB::generateWorld() const
             cocos2d::ValueMap currEliteMob;
             currEliteMob["name"] = "EliteMobs";
             currEliteMob["gid"] = genFromVec(m_config->getEliteMobs());
-//            currEliteMob["gid"] = 375;
-            currEliteMob["x"] = (room.m_cont.m_pos.x + pos.x - 1) * tileMap->getTileSize().width;
-            currEliteMob["y"] = (room.m_cont.m_pos.y + pos.y - 1) * tileMap->getTileSize().height;
-            currEliteMob["width"] = tileMap->getTileSize().width;
-            currEliteMob["height"] = tileMap->getTileSize().height;
+            currEliteMob["x"] = (room.m_cont.m_pos.x + pos.x - 1) * mapInfo->getTileSize().width;
+            currEliteMob["y"] = (room.m_cont.m_pos.y + pos.y - 1) * mapInfo->getTileSize().height;
+            currEliteMob["width"] = mapInfo->getTileSize().width;
+            currEliteMob["height"] = mapInfo->getTileSize().height;
             eliteMobs.push_back({cocos2d::Value(currEliteMob)});
         }
 
@@ -132,11 +186,10 @@ Tilemap* RGWB::generateWorld() const
             cocos2d::ValueMap currBossMob;
             currBossMob["name"] = "BossMobs";
             currBossMob["gid"] = genFromVec(m_config->getBossMobs());
-//            currBossMob["gid"] = 129;
-            currBossMob["x"] = (room.m_cont.m_pos.x + pos.x - 1) * tileMap->getTileSize().width;
-            currBossMob["y"] = (room.m_cont.m_pos.y + pos.y - 1) * tileMap->getTileSize().height;
-            currBossMob["width"] = tileMap->getTileSize().width;
-            currBossMob["height"] = tileMap->getTileSize().height;
+            currBossMob["x"] = (room.m_cont.m_pos.x + pos.x - 1) * mapInfo->getTileSize().width;
+            currBossMob["y"] = (room.m_cont.m_pos.y + pos.y - 1) * mapInfo->getTileSize().height;
+            currBossMob["width"] = mapInfo->getTileSize().width;
+            currBossMob["height"] = mapInfo->getTileSize().height;
             bossMobs.push_back({cocos2d::Value(currBossMob)});
         }
 
@@ -145,11 +198,10 @@ Tilemap* RGWB::generateWorld() const
             cocos2d::ValueMap currPassiveMob;
             currPassiveMob["name"] = "PassiveMobs";
             currPassiveMob["gid"] = genFromVec(m_config->getPassiveMobs());
-//            currPassiveMob["gid"] = 228;
-            currPassiveMob["x"] = (room.m_cont.m_pos.x + pos.x - 1) * tileMap->getTileSize().width;
-            currPassiveMob["y"] = (room.m_cont.m_pos.y + pos.y - 1) * tileMap->getTileSize().height;
-            currPassiveMob["width"] = tileMap->getTileSize().width;
-            currPassiveMob["height"] = tileMap->getTileSize().height;
+            currPassiveMob["x"] = (room.m_cont.m_pos.x + pos.x - 1) * mapInfo->getTileSize().width;
+            currPassiveMob["y"] = (room.m_cont.m_pos.y + pos.y - 1) * mapInfo->getTileSize().height;
+            currPassiveMob["width"] = mapInfo->getTileSize().width;
+            currPassiveMob["height"] = mapInfo->getTileSize().height;
             passiveMobs.push_back({cocos2d::Value(currPassiveMob)});
         }
 
@@ -164,55 +216,24 @@ Tilemap* RGWB::generateWorld() const
             else
                 currChest["gid"] = m_config->getChests().at(((float)weaponTier - minTier) / (maxTier - minTier) * (m_config->getChests().size() - 1));
 
-            currChest["x"] = (room.m_cont.m_pos.x + pos.x - 1) * tileMap->getTileSize().width;
-            currChest["y"] = (room.m_cont.m_pos.y + pos.y - 1) * tileMap->getTileSize().height;
-            currChest["width"] = tileMap->getTileSize().width;
-            currChest["height"] = tileMap->getTileSize().height;
+            currChest["x"] = (room.m_cont.m_pos.x + pos.x - 1) * mapInfo->getTileSize().width;
+            currChest["y"] = (room.m_cont.m_pos.y + pos.y - 1) * mapInfo->getTileSize().height;
+            currChest["width"] = mapInfo->getTileSize().width;
+            currChest["height"] = mapInfo->getTileSize().height;
             currChest["loot"] = weaponName + ':' + std::to_string(weaponTier);
             chests.push_back({cocos2d::Value(currChest)});
         }
     }
 
-    cocos2d::Vector<cocos2d::TMXObjectGroup*> newObjectGroups;
-    cocos2d::TMXObjectGroup* utilsObjects = new cocos2d::TMXObjectGroup();
-    cocos2d::TMXObjectGroup* decorationsObjects = new cocos2d::TMXObjectGroup();
-    cocos2d::TMXObjectGroup* normalMobsObjects = new cocos2d::TMXObjectGroup();
-    cocos2d::TMXObjectGroup* eliteMobsObjects = new cocos2d::TMXObjectGroup();
-    cocos2d::TMXObjectGroup* bossMobsObjects = new cocos2d::TMXObjectGroup();
-    cocos2d::TMXObjectGroup* passiveMobsObjects = new cocos2d::TMXObjectGroup();
-    cocos2d::TMXObjectGroup* chestsObjects = new cocos2d::TMXObjectGroup();
+    utilsObjectsGroup->setObjects(utils);
+    decorationsObjectsGroup->setObjects(decorations);
+    normalMobsObjectsGroup->setObjects(normalMobs);
+    eliteMobsObjectsGroup->setObjects(eliteMobs);
+    bossMobsObjectsGroup->setObjects(bossMobs);
+    passiveMobsObjectsGroup->setObjects(passiveMobs);
+    chestsObjectsGroup->setObjects(chests);
 
-    utilsObjects->setGroupName("UtilsObjects");
-    utilsObjects->setObjects({cocos2d::Value(spawnPoint)});
-
-    decorationsObjects->setGroupName("Decorations");
-    decorationsObjects->setObjects(decorations);
-
-    normalMobsObjects->setGroupName("NormalMobs");
-    normalMobsObjects->setObjects(normalMobs);
-
-    eliteMobsObjects->setGroupName("EliteMobs");
-    eliteMobsObjects->setObjects(eliteMobs);
-
-    bossMobsObjects->setGroupName("BossMobs");
-    bossMobsObjects->setObjects(bossMobs);
-
-    passiveMobsObjects->setGroupName("PassiveMobs");
-    passiveMobsObjects->setObjects(passiveMobs);
-
-    chestsObjects->setGroupName("Chests");
-    chestsObjects->setObjects(chests);
-
-    newObjectGroups.pushBack(utilsObjects);
-    newObjectGroups.pushBack(decorationsObjects);
-    newObjectGroups.pushBack(normalMobsObjects);
-    newObjectGroups.pushBack(eliteMobsObjects);
-    newObjectGroups.pushBack(bossMobsObjects);
-    newObjectGroups.pushBack(passiveMobsObjects);
-    newObjectGroups.pushBack(chestsObjects);
-    tileMap->setObjectGroups(newObjectGroups);
-
-    return tileMap;
+    return mapInfo;
 }
 
 
@@ -517,7 +538,7 @@ std::vector<RGWB::Container> RGWB::generateCorridors(const std::shared_ptr<Tree>
 
 
 
-void RGWB::drawWalls(TilemapLayer* layer) const
+void RGWB::drawWalls(cocos2d::TMXLayerInfo* layer) const
 {
     for (int i = 0; i < m_width; ++i)
     {
@@ -526,16 +547,18 @@ void RGWB::drawWalls(TilemapLayer* layer) const
             double alpha = cocos2d::random(0., 1.);
 
             if (alpha < m_normalTileRatio)
-                layer->setTileGID(genFromVec(m_config->getWalls()), cocos2d::Vec2(i, j));
+//                layer->setTileGID(genFromVec(m_config->getWalls()), cocos2d::Vec2(i, j));
+                layer->_tiles[i + m_width * j] = genFromVec(m_config->getWalls());
             else
-                layer->setTileGID(genFromVec(m_config->getRareWalls()), cocos2d::Vec2(i, j));
+//                layer->setTileGID(genFromVec(m_config->getRareWalls()), cocos2d::Vec2(i, j));
+                layer->_tiles[i + m_width * j] = genFromVec(m_config->getRareWalls());
         }
     }
 }
 
 
-
-void RGWB::drawGround(TilemapLayer* wallsLayer, TilemapLayer* groundLayer, const std::vector<Container>& ground) const
+//(int) pos.x + (int) pos.y * _layerSize.width
+void RGWB::drawGround(cocos2d::TMXLayerInfo* wallsLayer, cocos2d::TMXLayerInfo* groundLayer, const std::vector<Container>& ground) const
 {
     for (const Container& cont : ground)
     {
@@ -545,11 +568,14 @@ void RGWB::drawGround(TilemapLayer* wallsLayer, TilemapLayer* groundLayer, const
             {
                 double alpha = cocos2d::random(0., 1.);
                 if (alpha < m_normalTileRatio)
-                    groundLayer->setTileGID(genFromVec(m_config->getGround()), cocos2d::Vec2(i + cont.m_pos.x, m_height - (1 + j + cont.m_pos.y)));
+//                    groundLayer->setTileGID(genFromVec(m_config->getGround()), cocos2d::Vec2(i + cont.m_pos.x, m_height - (1 + j + cont.m_pos.y)));
+                    groundLayer->_tiles[i + cont.m_pos.x + m_width * (m_height - (1 + j + cont.m_pos.y))] = genFromVec(m_config->getGround());
                 else
-                    groundLayer->setTileGID(genFromVec(m_config->getRareGround()), cocos2d::Vec2(i + cont.m_pos.x, m_height - (1 + j + cont.m_pos.y)));
+//                    groundLayer->setTileGID(genFromVec(m_config->getRareGround()), cocos2d::Vec2(i + cont.m_pos.x, m_height - (1 + j + cont.m_pos.y)));
+                    groundLayer->_tiles[i + cont.m_pos.x + m_width * (m_height - (1 + j + cont.m_pos.y))] = genFromVec(m_config->getRareGround());
 
-                wallsLayer->setTileGID(0, cocos2d::Vec2(i + cont.m_pos.x, m_height - (1 + j + cont.m_pos.y)));
+//                wallsLayer->setTileGID(0, cocos2d::Vec2(i + cont.m_pos.x, m_height - (1 + j + cont.m_pos.y)));
+                wallsLayer->_tiles[i + cont.m_pos.x + m_width * (m_height - (1 + j + cont.m_pos.y))] = 0;
             }
         }
     }

@@ -7,28 +7,17 @@
 
 #include <memory>
 #include <functional>
+#include <algorithm>
 #include <filesystem>
 
 using namespace cocos2d;
 
-pathfinder::PathfinderAStar finder;
 
-std::function<bool(const pathfinder::Node*)> isValid = [] (const pathfinder::Node*) {return true;};
-
-struct GeneratorTestsFixture : public testing::TestWithParam<std::tuple<int, int, int>> {
-    void SetUp() override
-    {
-        auto director = Director::getInstance();
-        if(!director->getOpenGLView())
-        {
-            GLViewImpl* glView = GLViewImpl::create("Generator Test", false);
-            director->setOpenGLView(glView);
-        }
-    }
-
-    void TearDown() override {}
-
-    const std::shared_ptr<LevelTileConfig> config = std::make_shared<WorldTileConfig>("Resources/World.json")->getLevelsTileConfig().at(0);
+struct GeneratorTestsFixture : public testing::TestWithParam<std::tuple<int, int, int>>
+{
+    pathfinder::PathfinderAStar finder;
+    std::function<bool(const pathfinder::Node*)> isValid = [] (const pathfinder::Node*) {return true;};
+    std::shared_ptr<LevelTileConfig> config = std::make_shared<WorldTileConfig>("Resources/World.json")->getLevelsTileConfig().at(0);
 };
 
 INSTANTIATE_TEST_SUITE_P(
@@ -47,20 +36,22 @@ TEST_P(GeneratorTestsFixture, generatorTest)
     int height = std::get<1>(GetParam());
     int iterCount = std::get<2>(GetParam());
 
-    Tilemap* tileMap = RandomGeneratorWorldBuilder()
+    cocos2d::TMXMapInfo* mapInfo = RandomGeneratorWorldBuilder()
                         .setConfig(config)
                         .setWidth(width)
                         .setHeight(height)
                         .setIterCount(iterCount)
                         .setPath("Resources/Template.tmx")
+//                        .setPath(std::filesystem::current_path().parent_path() / "Resources"/ "Template.tmx")
                         .build();
 
-    uint32_t* wallsLayer = tileMap->getLayer("Walls")->getTiles();
+    auto itWalls = std::ranges::find_if(mapInfo->getLayers(), [](cocos2d::TMXLayerInfo* info) { return info->_name == "Walls"; });
+    uint32_t* walls = (*itWalls)->_tiles;
 
-    const TMXObjectGroup* bossMobsGroup = tileMap->getObjectGroup("BossMobs");
-    ASSERT_FALSE(bossMobsGroup->getObjects().empty());
+    auto itBosses = std::ranges::find_if(mapInfo->getObjectGroups(), [](cocos2d::TMXObjectGroup* group) { return group->getGroupName() == "BossMobs"; });
+    ASSERT_FALSE((*itBosses)->getObjects().empty());
 
-    pathfinder::Graph graph(cocos2d::Size(width, height), wallsLayer, [](uint32_t gid){ return gid == 0 ? TileType::GROUND : TileType::OBSTACLE; });
+    pathfinder::Graph graph(cocos2d::Size(width, height), walls, [](uint32_t gid){ return gid == 0 ? TileType::GROUND : TileType::OBSTACLE; });
     std::set<Vec2Int> not_visited;
 
     Vec2Int start(-1, -1);

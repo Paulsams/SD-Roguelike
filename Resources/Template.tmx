@@ -26,14 +26,17 @@
  <objectgroup id="5" name="BossMobs">
  </objectgroup>
  
- <objectgroup id="6" name="Decorations">
+ <objectgroup id="6" name="PassiveMobs">
  </objectgroup>
  
- <objectgroup id="7" name="Chests">
+ <objectgroup id="7" name="Decorations">
+ </objectgroup>
+ 
+ <objectgroup id="8" name="Chests">
   <object id="39" name="Chest" gid="2925" x="0" y="0" width="32" height="32"/>
  </objectgroup>
  
- <objectgroup id="8" name="UtilsObjects">
+ <objectgroup id="9" name="UtilsObjects">
   <object id="15" name="SpawnPoint" x="64" y="-64" width="32" height="32"/>
  </objectgroup>
  

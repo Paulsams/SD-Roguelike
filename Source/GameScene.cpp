@@ -62,30 +62,21 @@ bool GameScene::init(Camera* camera)
     const auto mobFactory = std::make_shared<mob::MobsFactoryFromConfig>(mobsConfig);
 
     m_worldTileConfig = std::make_shared<WorldTileConfig>("Resources/World.json");
-    
-//     const std::string tilemapInXML = generateXMLForTMXTiledMap(RandomGeneratorWorldBuilder()
-//         .setPath("Template.tmx")
-//         .setConfig(m_worldTileConfig->getLevelsTileConfig().at(0))
-//         .setWidth(100)
-//         .setHeight(100)
-//         .setIterCount(5)
-//         .build());
-//
+
+    m_gameLoop = std::make_shared<GameLoop>();
+
+    cocos2d::TMXMapInfo* mapInfo = RandomGeneratorWorldBuilder().setPath("Template.tmx").setConfig(m_worldTileConfig->getLevelsTileConfig().at(0)).setWidth(55).setHeight(55).setIterCount(4).build();
+
+    cocos2d::TMXTiledMap* tileMap = TileMapProxy::create(mapInfo);
+
+    m_world = World::create(tileMap, mobFactory);
+//    m_world = World::create(tileMap, mobFactory);
+//     m_world->setScale(0.5f);
+
+//    const std::string tilemapInXML = generateXMLForTMXTiledMap(tileMap);
 //     std::ofstream outfile ("Resources/test.tmx");
 //     outfile << tilemapInXML << std::endl;
 //     outfile.close();
-    
-    m_gameLoop = std::make_shared<GameLoop>();
-
-//    m_world = World::create(ReadFileWorldBuilder().setPath("TileMap.tmx").build());
-    Tilemap* tileMap = RandomGeneratorWorldBuilder().setPath("Template.tmx").setConfig(m_worldTileConfig->getLevelsTileConfig().at(0)).setWidth(55).setHeight(55).setIterCount(4).build();
-     m_world = World::create(tileMap, mobFactory);
-//     m_world->setScale(0.5f);
-
-    const std::string tilemapInXML = generateXMLForTMXTiledMap(tileMap);
-     std::ofstream outfile ("Resources/test.tmx");
-     outfile << tilemapInXML << std::endl;
-     outfile.close();
 
 //    m_world = World::create(ReadFileWorldBuilder().setPath("Custom.tmx").build(), mobFactory);
 //    m_world = World::create(RandomGeneratorWorldBuilder().setPath("Template.tmx").setConfig(m_worldTileConfig).setWidth(100).setHeight(100).setIterCount(5).build());

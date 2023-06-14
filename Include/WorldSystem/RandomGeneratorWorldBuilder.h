@@ -19,7 +19,7 @@ public:
         , m_gen(m_rd())
     {}
 
-    [[nodiscard]] Tilemap* build() const;
+    [[nodiscard]] cocos2d::TMXMapInfo* build() const;
 
     RandomGeneratorWorldBuilder& setPath(const std::string& path)
     {
@@ -119,8 +119,8 @@ private:
     [[nodiscard]] std::shared_ptr<Tree> splitContainer(const Container& cont, size_t iterCount) const;
 
     /// drawing
-    void drawWalls(TilemapLayer* layer) const;
-    void drawGround(TilemapLayer* wallsLayer, TilemapLayer* groundLayer, const std::vector<Container>& ground) const;
+    void drawWalls(cocos2d::TMXLayerInfo* layer) const;
+    void drawGround(cocos2d::TMXLayerInfo* wallsLayer, cocos2d::TMXLayerInfo* groundLayer, const std::vector<Container>& ground) const;
 
     [[nodiscard]] std::vector<Room> generateRooms(const std::shared_ptr<Tree>& tree) const;
     [[nodiscard]] std::vector<Container> generateCorridors(const std::shared_ptr<Tree>& tree) const;
@@ -133,7 +133,7 @@ private:
     void fillEliteRoom(Room& room) const;
     void fillTreasureRoom(Room& room) const;
 
-    [[nodiscard]] Tilemap* generateWorld() const;
+    [[nodiscard]] cocos2d::TMXMapInfo* generateWorld() const;
 
 private:
     /*
@@ -172,4 +172,6 @@ private:
     int m_width = 0;
 
     int m_iterCount = 0;
+
+    friend cocos2d::TMXTiledMap;
 };

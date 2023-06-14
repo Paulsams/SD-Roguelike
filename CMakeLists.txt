@@ -252,6 +252,8 @@ add_executable(pathfinderTest tests/pathfinderTests.cpp Source/Pathfinder/Pathfi
 add_executable(stateMachineTest tests/stateMachineTests.cpp)
 
 add_executable(generatorTest tests/generatorTest.cpp
+        Source/Mobs/Mob.cpp
+
         Source/Pathfinder/PathfinderAStar.cpp
 
         Source/WorldSystem/RandomGeneratorWorldBuilder.cpp
