@@ -3,14 +3,12 @@
 #include <utility>
 
 #include "cocos2d.h"
-#include "UI/StepCounter.h"
 #include "GameLoop/GameLoop.h"
 #include "UI/InventoryView.h"
 #include "UI/PlayerItemsOnUI.h"
 #include "UI/StatBar.h"
 #include "ui/UIButton.h"
 #include "ui/UIHBox.h"
-#include "ui/UIImageView.h"
 #include "ui/UIRelativeBox.h"
 #include "ui/UIVBox.h"
 #include "Utils/FontsTTF.h"
@@ -106,10 +104,6 @@ bool Canvas::init()
 
         playerStatsBox->addChild(levelBox);
     }
-    
-    const auto stepCounter = StepCounter::create(m_gameLoop->currentStep);
-    stepCounter->setContentSize({widthRightPanel, 30.0f});
-    rightBox->addChild(stepCounter);
 
     const Size cellInventorySize = {90.0f, 90.0f};
     const Size padding = {10.0f, 10.0f};

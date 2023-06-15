@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "PlayerItemsOnUI.h"
-#include "StepCounter.h"
 #include "2d/CCNode.h"
+#include "GameLoop/GameLoop.h"
 #include "WorldSystem/World.h"
 #include "Player/Player.h"
 
@@ -24,6 +24,5 @@ private:
     World* m_world;
     Player* m_player;
     std::shared_ptr<GameLoop> m_gameLoop;
-    std::shared_ptr<ui::StepCounter> m_stepCounter;
     std::shared_ptr<PlayerItemsOnUI> m_allItemsPlayer;
 };

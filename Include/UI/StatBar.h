@@ -24,7 +24,7 @@ private:
 
     std::string getTextView() const;
 
-    void OnChanged(IStat::currentValue currentValue, IStat::changedValue, IStat::wantedChangeValue);
+    void onChanged(IStat::currentValue currentValue, IStat::changedValue, IStat::wantedChangeValue);
 
     std::shared_ptr<IStat> m_stat;
     std::shared_ptr<BoundsModificator> m_boundsStat;

@@ -121,7 +121,6 @@ list(APPEND GAME_HEADER
     Include/UI/MenuItemForInventory.h
     Include/UI/PlayerItemsOnUI.h
     Include/UI/StatBar.h
-    Include/UI/StepCounter.h
 
     Include/Utils/Common.h
     Include/Utils/Direction.h
@@ -179,7 +178,6 @@ list(APPEND GAME_SOURCE
     Source/UI/MenuItemForInventory.cpp
     Source/UI/PlayerItemsOnUI.cpp
     Source/UI/StatBar.cpp
-    Source/UI/StepCounter.cpp
 
     Source/Utils/Common.cpp
     Source/Utils/TMXGenerator.cpp
