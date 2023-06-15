@@ -8,7 +8,7 @@ AttackInfo::PossibleAttackFromEntity hitOnlyPlayer = FunctionVisitorEntitiesBuil
 
 MobInfo MobsConfig::createNormalMobInfoWithLowPanic()
 {
-    const auto defaultAttackInfo = std::make_shared<AttackInfo>(dontHitObstacle, hitOnlyPlayer, nullptr, std::make_shared<AttackSearchFromDFS>());
+    const auto defaultAttackInfo = std::make_shared<AttackInfo>(dontHitObstacle, hitOnlyPlayer, nullptr, std::make_shared<AttackSearchFromStraightLines>());
 
     const std::shared_ptr<AttackHandler> attack = createAttack({{Attacks::simpleRange, defaultAttackInfo, 2}});
 
@@ -45,7 +45,7 @@ MobInfo MobsConfig::createNormalMobInfoWithLowPanic()
 
 MobInfo MobsConfig::createNormalMobInfoWithHighPanic()
 {
-    const auto defaultAttackInfo = std::make_shared<AttackInfo>(dontHitObstacle, hitOnlyPlayer, nullptr, std::make_shared<AttackSearchFromDFS>());
+    const auto defaultAttackInfo = std::make_shared<AttackInfo>(dontHitObstacle, hitOnlyPlayer, nullptr, std::make_shared<AttackSearchFromStraightLines>());
 
     const std::shared_ptr<AttackHandler> attack = createAttack({{Attacks::simpleRange, defaultAttackInfo, 3}});
 
@@ -82,7 +82,7 @@ MobInfo MobsConfig::createNormalMobInfoWithHighPanic()
 
 MobInfo MobsConfig::createEliteMobInfo()
 {
-    const auto defaultAttackInfo = std::make_shared<AttackInfo>(dontHitObstacle, hitOnlyPlayer, nullptr, std::make_shared<AttackSearchFromDFS>());
+    const auto defaultAttackInfo = std::make_shared<AttackInfo>(dontHitObstacle, hitOnlyPlayer, nullptr, std::make_shared<AttackSearchFromStraightLines>());
     const std::shared_ptr<AttackHandler> attack = createAttack({{Attacks::smallIRange, defaultAttackInfo, 5}});
     auto aggressiveBeh = createAggressiveBehaviour(attack);
     auto strategy = createStrategy();
@@ -94,7 +94,7 @@ MobInfo MobsConfig::createEliteMobInfo()
 
 MobInfo MobsConfig::createBossMobInfo()
 {
-    const auto defaultAttackInfo = std::make_shared<AttackInfo>(dontHitObstacle, hitOnlyPlayer, nullptr, std::make_shared<AttackSearchFromDFS>());
+    const auto defaultAttackInfo = std::make_shared<AttackInfo>(dontHitObstacle, hitOnlyPlayer, nullptr, std::make_shared<AttackSearchFromStraightLines>());
     const std::shared_ptr<AttackHandler> attack = createAttack({{Attacks::smallTRangeFlip, defaultAttackInfo, 7}});
     auto aggressiveBeh = createAggressiveBehaviour(attack);
     auto strategy = createStrategy();
@@ -106,7 +106,7 @@ MobInfo MobsConfig::createBossMobInfo()
 
 MobInfo MobsConfig::createStrongPassiveMobInfo()
 {
-    const auto defaultAttackInfo = std::make_shared<AttackInfo>(dontHitObstacle, hitOnlyPlayer, nullptr, std::make_shared<AttackSearchFromDFS>());
+    const auto defaultAttackInfo = std::make_shared<AttackInfo>(dontHitObstacle, hitOnlyPlayer, nullptr, std::make_shared<AttackSearchFromStraightLines>());
 
     const std::shared_ptr<AttackHandler> attack = createAttack({{Attacks::closeLineRange, defaultAttackInfo, 2}});
 
@@ -143,7 +143,7 @@ MobInfo MobsConfig::createStrongPassiveMobInfo()
 
 MobInfo MobsConfig::createPassiveMobInfo()
 {
-    const auto defaultAttackInfo = std::make_shared<AttackInfo>(dontHitObstacle, hitOnlyPlayer, nullptr, std::make_shared<AttackSearchFromDFS>());
+    const auto defaultAttackInfo = std::make_shared<AttackInfo>(dontHitObstacle, hitOnlyPlayer, nullptr, std::make_shared<AttackSearchFromStraightLines>());
 
     const std::shared_ptr<AttackHandler> attack = createAttack({{Attacks::simpleRange, defaultAttackInfo, 1}});
 

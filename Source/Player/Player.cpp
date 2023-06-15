@@ -19,6 +19,33 @@ Player* Player::create(World* world)
     return nullptr;
 }
 
+Player::~Player()
+{
+    const std::vector<BaseItem*> items = m_items->getCollection();
+    for (int i = 0; i < items.size(); ++i)
+    {
+        if (items[i])
+        {
+            m_items->setAt(i, nullptr);
+            items[i]->release();
+        }
+    }
+}
+
+void Player::throwAllItems()
+{
+    const std::vector<BaseItem*> items = m_items->getCollection();
+    for (int i = 0; i < items.size(); ++i)
+    {
+        if (items[i])
+        {
+            m_items->setAt(i, nullptr);
+            items[i]->throwOff();
+        }
+    }
+    m_backpack.throwAllItems();
+}
+
 bool Player::init()
 {
     createClothe(HELMET);
@@ -30,7 +57,7 @@ bool Player::init()
 
 void Player::update()
 {
-    //m_statsContainer->get(MANA)->changeValueBy(1);
+    m_statsContainer->get(MANA)->changeValueBy(1);
     scheduleDamageIndicators();
 }
 
@@ -105,7 +132,7 @@ Player::Player(World* world)
     , m_input(this)
     , m_backpack(Attacks::createDefaultWeapon(world))
     , m_statsContainer(std::make_shared<StatsContainer>())
-    , m_items(12)
+    , m_items(std::make_shared<ObservableVector<BaseItem*>>(12))
     , m_attackedDelegate([this](BaseEntity* entity, float damage)
     {
         std::shared_ptr<IStat> healthMobStat;
@@ -174,11 +201,11 @@ void Player::onInteracted()
     const auto itemVisitor = FunctionVisitorEntitiesBuilder<void>()
         .setItem([this](BaseItem* item)
         {
-            const std::vector<BaseItem*> items = m_items.getCollection();
+            const std::vector<BaseItem*> items = m_items->getCollection();
             const size_t insertIndex = std::ranges::find(items, nullptr) - items.begin();
-            if (insertIndex < m_items.size())
+            if (insertIndex < m_items->size())
             {
-                m_items.setAt(insertIndex, item);
+                m_items->setAt(insertIndex, item);
                 item->pickUp(this);
             }
         })

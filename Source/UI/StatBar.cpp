@@ -58,7 +58,7 @@ StatBar* StatBar::create(LinearLayoutParameter* marginParameter, Size contentSiz
 }
 
 StatBar::StatBar(std::shared_ptr<IStat> stat)
-    : m_changeStatDelegate(CC_CALLBACK_3(StatBar::OnChanged, this))
+    : m_changeStatDelegate(CC_CALLBACK_3(StatBar::onChanged, this))
     , m_stat(std::move(stat)) { }
 
 StatBar::~StatBar()
@@ -72,7 +72,7 @@ std::string StatBar::getTextView() const
         std::to_string(static_cast<int>(m_boundsStat->bounds.getMax()));
 }
 
-void StatBar::OnChanged(IStat::currentValue currentValue, IStat::changedValue, IStat::wantedChangeValue)
+void StatBar::onChanged(IStat::currentValue currentValue, IStat::changedValue, IStat::wantedChangeValue)
 {
     m_bar->setPercent(m_boundsStat->getValueFromPercent(currentValue));
     m_label->setString(getTextView());

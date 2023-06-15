@@ -3,7 +3,33 @@
 #include <cstdint>
 
 #include "2d/CCTMXTiledMap.h"
+#include "2d/CCTMXLayer.h"
+
 #include "math/Vec2.h"
+
+class TileMapProxy : public cocos2d::TMXTiledMap
+{
+public:
+    static TileMapProxy* create(cocos2d::TMXMapInfo* mapInfo)
+    {
+        TileMapProxy *ret = new (std::nothrow) TileMapProxy();
+        if (ret->initWithMapInfo(mapInfo))
+        {
+            ret->autorelease();
+            return ret;
+        }
+        CC_SAFE_DELETE(ret);
+        return nullptr;
+    }
+
+    bool initWithMapInfo(cocos2d::TMXMapInfo* mapInfo)
+    {
+        _tmxFile = mapInfo->getTMXFileName();
+        setContentSize(cocos2d::Size::ZERO);
+        buildWithMapInfo(mapInfo);
+        return true;
+    }
+};
 
 using Tilemap = cocos2d::TMXTiledMap;
 using TilemapLayer = cocos2d::TMXLayer;

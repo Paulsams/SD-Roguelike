@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ItemsSystem/AttackSearch/AttackSearchFromDFS.h"
+#include "ItemsSystem/AttackSearch/AttackSearchFromStraightLines.h"
 #include "Stats/Modificators/BoundsModificator.h"
 #include "Mobs/Behaviour/AggressiveBehaviour.h"
 #include "Mobs/Strategy/StrategyWithStates.h"

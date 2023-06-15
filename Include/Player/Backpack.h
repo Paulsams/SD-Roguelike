@@ -17,20 +17,37 @@ class Backpack : public IDamageModificator
     struct HandlerItems
     {
         HandlerItems(size_t size)
-            : observableCollection(size)
+            : observableCollection(std::make_shared<ObservableVector<BaseItem*>>(size))
             , m_changedDelegate(CC_CALLBACK_3(HandlerItems::onChange, this))
             , m_swappedDelegate(CC_CALLBACK_2(HandlerItems::onSwapped, this))
             , m_items(std::vector<T*>(size))
         {
-            observableCollection.changed += m_changedDelegate;
-            observableCollection.swapped += m_swappedDelegate;
+            observableCollection->changed += m_changedDelegate;
+            observableCollection->swapped += m_swappedDelegate;
+        }
+
+        ~HandlerItems()
+        {
+            observableCollection->changed -= m_changedDelegate;
+            observableCollection->swapped -= m_swappedDelegate;
+
+            const std::vector<BaseItem*> items = observableCollection->getCollection();
+            for (int i = 0; i < items.size(); ++i)
+            {
+                if (items[i])
+                {
+                    observableCollection->setAt(i, nullptr);
+                    items[i]->release();
+                }
+            }
         }
 
         const std::vector<T*>& get() const { return m_items; }
 
         EventContainer<size_t, typename ObservableVector<T*>::oldValue, typename ObservableVector<T*>::newValue> changed;
         EventContainer<size_t, size_t> swapped;
-        ObservableVector<BaseItem*> observableCollection;
+        
+        std::shared_ptr<ObservableVector<BaseItem*>> observableCollection;
 
     private:
         void onChange(size_t index, ObservableVector<BaseItem*>::oldValue,
@@ -67,9 +84,9 @@ public:
         m_defaultWeapon->release();
     }
 
-    ObservableVector<BaseItem*>& getObservableWeapons() { return m_weapon.observableCollection; }
-    ObservableVector<BaseItem*>& getObservableAccessories() { return m_accessories.observableCollection; }
-    ObservableVector<BaseItem*>& getObservableSpells() { return m_spells.observableCollection; }
+    std::shared_ptr<ObservableVector<BaseItem*>> getObservableWeapons() { return m_weapon.observableCollection; }
+    std::shared_ptr<ObservableVector<BaseItem*>> getObservableAccessories() { return m_accessories.observableCollection; }
+    std::shared_ptr<ObservableVector<BaseItem*>> getObservableSpells() { return m_spells.observableCollection; }
 
     Weapon* getCurrentWeapon() const
     {
@@ -83,6 +100,13 @@ public:
         return damage;
     }
 
+    void throwAllItems()
+    {
+        throwItems(m_weapon.observableCollection);
+        throwItems(m_accessories.observableCollection);
+        throwItems(m_spells.observableCollection);
+    }
+
     EventContainer<> changedCurrentWeapon;
 
 private:
@@ -94,6 +118,19 @@ private:
         if (newValue)
             newValue->setModificatorDamage(this);
         changedCurrentWeapon();
+    }
+
+    static void throwItems(const std::shared_ptr<ObservableVector<BaseItem*>>& observableItems)
+    {
+        const std::vector<BaseItem*> items = observableItems->getCollection();
+        for (int i = 0; i < items.size(); ++i)
+        {
+            if (items[i])
+            {
+                observableItems->setAt(i, nullptr);
+                items[i]->throwOff();
+            }
+        }
     }
 
     FunctionHandler<size_t, ObservableVector<Weapon*>::oldValue, ObservableVector<Weapon*>::newValue> m_changedDelegate;

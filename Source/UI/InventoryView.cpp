@@ -7,7 +7,7 @@
 #include "2d/CCMenu.h"
 #include "2d/CCScene.h"
 
-InventoryView* InventoryView::create(Inventory& observableItems, const std::vector<ItemTypeSlot>& availableSlots,
+InventoryView* InventoryView::create(std::shared_ptr<Inventory> observableItems, const std::vector<ItemTypeSlot>& availableSlots,
                                      const SpriteWithRect& spriteWithRect, cocos2d::Size itemSize, int columns, cocos2d::Vec2 padding)
 {
     auto inventoryView = new (std::nothrow) InventoryView(observableItems, spriteWithRect, availableSlots, padding);
@@ -26,7 +26,7 @@ bool InventoryView::initWithGrid(cocos2d::Size itemSize, int columns)
     if (!menu)
         return false;
     
-    const std::vector<BaseItem*> items = m_observableItems.getCollection();
+    const std::vector<BaseItem*> items = m_observableItems->getCollection();
     for (size_t i = 0; i < items.size(); ++i)
     {
         MenuItemForInventory* menuItem = MenuItemForInventory::create(itemSize, m_backgroundFrame,
@@ -40,8 +40,8 @@ bool InventoryView::initWithGrid(cocos2d::Size itemSize, int columns)
         m_menuItems.push_back(menuItem);
     }
 
-    const auto mouseListener = cocos2d::EventListenerMouse::create();
-    mouseListener->onMouseDown = [this, menu](cocos2d::EventMouse* event)
+    m_mouseListener = cocos2d::EventListenerMouse::create();
+    m_mouseListener->onMouseDown = [this](cocos2d::EventMouse* event)
     {
         const cocos2d::Size winSize = cocos2d::Director::getInstance()->getWinSize();
         
@@ -58,7 +58,7 @@ bool InventoryView::initWithGrid(cocos2d::Size itemSize, int columns)
             }
         }
     };
-    this->getEventDispatcher()->addEventListenerWithFixedPriority(mouseListener, 1);
+    this->getEventDispatcher()->addEventListenerWithFixedPriority(m_mouseListener, 1);
         
     for (const auto& item : m_menuItems)
     {
@@ -93,21 +93,23 @@ bool InventoryView::initWithGrid(cocos2d::Size itemSize, int columns)
 
 InventoryView::~InventoryView()
 {
-    // m_observableItems.changed -= m_changeItemDelegate;
-    // m_observableItems.swapped -= m_swappedItemsDelegate;
+    m_observableItems->changed -= m_changeItemDelegate;
+    m_observableItems->swapped -= m_swappedItemsDelegate;
+
+    this->Node::getEventDispatcher()->removeEventListener(m_mouseListener);
 }
 
-InventoryView::InventoryView(Inventory& observableItems, const SpriteWithRect& backgroundFrame,
+InventoryView::InventoryView(const std::shared_ptr<Inventory>& observableItems, const SpriteWithRect& backgroundFrame,
     const std::vector<ItemTypeSlot>& availableSlots, cocos2d::Vec2 padding)
-        : m_changeItemDelegate(CC_CALLBACK_3(InventoryView::onChangeItem, this))
-        , m_swappedItemsDelegate(CC_CALLBACK_2(InventoryView::onSwappedItems, this))
-        , m_backgroundFrame(backgroundFrame)
-        , m_availableSlots(availableSlots)
-        , m_observableItems(observableItems)
-        , m_padding(padding)
+    : m_changeItemDelegate(CC_CALLBACK_3(InventoryView::onChangeItem, this))
+    , m_swappedItemsDelegate(CC_CALLBACK_2(InventoryView::onSwappedItems, this))
+    , m_backgroundFrame(backgroundFrame)
+    , m_availableSlots(availableSlots)
+    , m_observableItems(observableItems)
+    , m_padding(padding)
 {
-    m_observableItems.changed += m_changeItemDelegate;
-    m_observableItems.swapped += m_swappedItemsDelegate;
+    m_observableItems->changed += m_changeItemDelegate;
+    m_observableItems->swapped += m_swappedItemsDelegate;
 }
 
 void InventoryView::onChangeItem(size_t indexChange, Inventory::oldValue, Inventory::newValue newItem) const

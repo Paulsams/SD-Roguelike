@@ -2,7 +2,6 @@
 #include <set>
 
 #include "IUpdatable.h"
-#include "UI/Canvas.h"
 #include "Utils/ValueNotifyChanged.h"
 
 class GameLoop

@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "CCEventListenerMouse.h"
 #include "MenuItemForInventory.h"
 #include "ui/UILayout.h"
 
@@ -29,7 +30,7 @@ public:
     
     using Inventory = ObservableVector<BaseItem*>;
     
-    static InventoryView* create(Inventory& observableItems, const std::vector<ItemTypeSlot>& availableSlots,
+    static InventoryView* create(std::shared_ptr<Inventory> observableItems, const std::vector<ItemTypeSlot>& availableSlots,
         const SpriteWithRect& spriteWithRect, cocos2d::Size itemSize, int columns, cocos2d::Vec2 padding);
 
     bool initWithGrid(cocos2d::Size itemSize, int columns);
@@ -39,15 +40,15 @@ public:
     bool isAvailable(ItemTypeSlot type) { return std::find(m_availableSlots.begin(),
                                                            m_availableSlots.end(), type) != m_availableSlots.end(); }
 
-    void swapItems(int firstIndex, int secondIndex) const { m_observableItems.swap(firstIndex, secondIndex); }
+    void swapItems(int firstIndex, int secondIndex) const { m_observableItems->swap(firstIndex, secondIndex); }
     
-    void setItemFromIndex(int index, BaseItem* item) const { m_observableItems.setAt(index, item); }
+    void setItemFromIndex(int index, BaseItem* item) const { m_observableItems->setAt(index, item); }
     
     EventContainer<SelectedItemInfo> selected;
 
 private:
-    InventoryView(Inventory& observableItems, const SpriteWithRect& backgroundFrame,
-        const std::vector<ItemTypeSlot>& availableSlots, cocos2d::Vec2 padding);
+    InventoryView(const std::shared_ptr<Inventory>& observableItems, const SpriteWithRect& backgroundFrame,
+                  const std::vector<ItemTypeSlot>& availableSlots, cocos2d::Vec2 padding);
 
     void onChangeItem(size_t indexChange, Inventory::oldValue, Inventory::newValue newItem) const;
 
@@ -59,6 +60,8 @@ private:
     std::vector<MenuItemForInventory*> m_menuItems;
     SpriteWithRect m_backgroundFrame;
     std::vector<ItemTypeSlot> m_availableSlots;
-    Inventory& m_observableItems;
+    std::shared_ptr<Inventory> m_observableItems;
     cocos2d::Vec2 m_padding;
+
+    cocos2d::EventListenerMouse* m_mouseListener;
 };

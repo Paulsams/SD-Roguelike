@@ -87,16 +87,6 @@ void DamageIndicatorsSystems::scheduleDraw(const std::function<void(std::functio
     m_deferredDraws.push_back(scheduleDrawFunc);
 }
 
-void DamageIndicatorsSystems::reset()
-{
-    for (const auto& [position, indicator] : m_showedObjects)
-    {
-        m_indicators.release(indicator);
-        indicator->setVisible(false);
-    }
-    m_showedObjects.clear();
-}
-
 void DamageIndicatorsSystems::update()
 {
     reset();
@@ -132,3 +122,14 @@ DamageIndicatorsSystems::DamageIndicatorsSystems(World* world)
             return damageIndicator;
         })
     , m_world(world) { }
+
+
+void DamageIndicatorsSystems::reset()
+{
+    for (const auto& [position, indicator] : m_showedObjects)
+    {
+        m_indicators.release(indicator);
+        indicator->setVisible(false);
+    }
+    m_showedObjects.clear();
+}

@@ -2,7 +2,6 @@
 #include <set>
 
 #include "EventsSystem.h"
-#include "Commands/ICommand.h"
 
 template <typename T>
 class ValueNotifyChanged

@@ -64,8 +64,6 @@ list(APPEND GAME_HEADER
     Include/GameLoop/GameLoop.h
     Include/GameLoop/IUpdatable.h
 
-    Include/Commands/ICommand.h
-
     Include/Player/Backpack.h
     Include/Player/Player.h
     Include/Player/PlayerInput.h
@@ -81,7 +79,7 @@ list(APPEND GAME_HEADER
     Include/ItemsSystem/IVisualAttack.h
     Include/ItemsSystem/Weapon.h
     
-    Include/ItemsSystem/AttackSearch/AttackSearchFromDFS.h
+    Include/ItemsSystem/AttackSearch/AttackSearchFromStraightLines.h
     Include/ItemsSystem/AttackSearch/IAttackSearch.h
 
     Include/Mobs/Mob.h
@@ -114,6 +112,7 @@ list(APPEND GAME_HEADER
     Include/Stats/StatsContainer.h
     Include/Stats/StatType.h
 
+    Include/Stats/Modificators/BoundsModificator.h
     Include/Stats/Modificators/IStatModificator.h
     Include/Stats/Modificators/StatWithModificators.h
 
@@ -122,7 +121,6 @@ list(APPEND GAME_HEADER
     Include/UI/MenuItemForInventory.h
     Include/UI/PlayerItemsOnUI.h
     Include/UI/StatBar.h
-    Include/UI/StepCounter.h
 
     Include/Utils/Common.h
     Include/Utils/Direction.h
@@ -180,7 +178,6 @@ list(APPEND GAME_SOURCE
     Source/UI/MenuItemForInventory.cpp
     Source/UI/PlayerItemsOnUI.cpp
     Source/UI/StatBar.cpp
-    Source/UI/StepCounter.cpp
 
     Source/Utils/Common.cpp
     Source/Utils/TMXGenerator.cpp

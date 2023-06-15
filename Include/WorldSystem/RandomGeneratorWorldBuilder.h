@@ -13,13 +13,13 @@
 
 class RandomGeneratorWorldBuilder
 {
-public:
-    RandomGeneratorWorldBuilder()
-        : m_rd()
-        , m_gen(m_rd())
-    {}
+private:
+    using LayerInfo = cocos2d::TMXLayerInfo;
 
-    [[nodiscard]] Tilemap* build() const;
+public:
+    RandomGeneratorWorldBuilder() = default;
+
+    cocos2d::TMXMapInfo* build() const;
 
     RandomGeneratorWorldBuilder& setPath(const std::string& path)
     {
@@ -66,74 +66,75 @@ private:
     template <typename ValueType>
     static const ValueType& genFromVec(const std::vector<ValueType>& vec)
     {
-        CCASSERT(!vec.empty(), "Attempt to generate from empty vector");
         return vec.at(cocos2d::random((size_t)0, vec.size() - 1));
     }
 
-    struct Container
+    struct Box
     {
-        Container() = default;
-        Container(Vec2Int pos, int w, int h);
-        Container(int x, int y, int w, int h);
+        Box() = default;
+        Box(Vec2Int pos, int w, int h);
+        Box(int x, int y, int w, int h);
 
-        Vec2Int m_pos;
-        Vec2Int m_center;
-        int m_width = 0;
-        int m_height = 0;
+        int getArea() const { return width * height; }
+
+        Vec2Int pos;
+        Vec2Int center;
+        int width = 0;
+        int height = 0;
     };
 
     struct Room
     {
-        explicit Room(const Container& cont);
+        explicit Room(const Box& _box);
+
+        void createSpawnEnv();
+        void createBossEnv();
+        void createNormalEnv();
+        void createEliteEnv();
+        void createTreasureEnv();
+
+        void fillEntities(std::vector<Vec2Int>& mobs, int amount);
 
         static constexpr int s_partDiv = 5;
 
-        Container m_cont;
+        Box box;
 
-        RoomType m_type = RoomType::NONE;
+        RoomType type = RoomType::NONE;
 
-        std::set<Vec2Int> m_engaged;
-
-        std::vector<Vec2Int> m_normalMobs;
-        std::vector<Vec2Int> m_eliteMobs;
-        std::vector<Vec2Int> m_bossMobs;
-        std::vector<Vec2Int> m_passiveMobs;
-
-        std::vector<Vec2Int> m_decorations;
-        std::vector<Vec2Int> m_chests;
+        std::set<Vec2Int> engaged;
+        std::vector<Vec2Int> normalMobs;
+        std::vector<Vec2Int> eliteMobs;
+        std::vector<Vec2Int> bossMobs;
+        std::vector<Vec2Int> passiveMobs;
+        std::vector<Vec2Int> decorations;
+        std::vector<Vec2Int> chests;
     };
 
     struct Tree
     {
-        explicit Tree(const Container& leaf) : m_leaf(leaf) {}
+        explicit Tree(const Box& _leaf) : leaf(_leaf) {}
 
-        [[nodiscard]] std::list<Container> getLeafs() const;
+        [[nodiscard]] std::list<Box> getLeafs() const;
         [[nodiscard]] std::list<std::pair<Vec2Int, Vec2Int>> getPaths() const;
 
-        Container m_leaf;
-        std::shared_ptr<Tree> m_left;
-        std::shared_ptr<Tree> m_right;
+        Box leaf;
+        std::shared_ptr<Tree> left;
+        std::shared_ptr<Tree> right;
     };
 
-    [[nodiscard]] std::pair<Container, Container> randomSplit(const Container& cont) const;
-    [[nodiscard]] std::shared_ptr<Tree> splitContainer(const Container& cont, size_t iterCount) const;
+    std::pair<Box, Box> randomSplit(const Box& cont) const;
+    std::shared_ptr<Tree> splitContainer(const Box& cont, size_t iterCount) const;
 
     /// drawing
-    void drawWalls(TilemapLayer* layer) const;
-    void drawGround(TilemapLayer* wallsLayer, TilemapLayer* groundLayer, const std::vector<Container>& ground) const;
+    void drawWalls(LayerInfo* layer) const;
+    void drawGround(LayerInfo* wallsLayer, LayerInfo* groundLayer, const std::vector<Box>& ground) const;
 
-    [[nodiscard]] std::vector<Room> generateRooms(const std::shared_ptr<Tree>& tree) const;
-    [[nodiscard]] std::vector<Container> generateCorridors(const std::shared_ptr<Tree>& tree) const;
+    std::vector<Room> generateRooms(const std::shared_ptr<Tree>& tree) const;
+    std::vector<Box> generateCorridors(const std::shared_ptr<Tree>& tree) const;
 
-    void fillRoomVec2int(Room& room, std::vector<Vec2Int>& mobs, int counter, int tryCounter) const;
+    cocos2d::TMXMapInfo* generateWorld() const;
 
-    void fillSpawnRoom(Room& room) const;
-    void fillSingleBossRoom(Room& room) const;
-    void fillNormalRoom(Room& room) const;
-    void fillEliteRoom(Room& room) const;
-    void fillTreasureRoom(Room& room) const;
-
-    [[nodiscard]] Tilemap* generateWorld() const;
+    static void fillObjectMetaInfo(cocos2d::ValueMap& object, cocos2d::TMXMapInfo* mapInfo, const Room& room, Vec2Int pos);
 
 private:
     /*
@@ -142,24 +143,24 @@ private:
      *  Spawn room -> the smallest room
      *  Bosses rooms -> the farthest rooms from spawn
     */
-    std::random_device m_rd;
-    mutable std::mt19937 m_gen;
+    static std::random_device s_rd;
+    static std::mt19937 s_gen;
 
     double m_normalRoomRatio = 0.7;
-    double m_treasureRoomRatio = 0.05;
+    double m_treasureRoomRatio = 0.03;
 
-    double m_minRoomFillBound = 0.025;
-    double m_maxRoomFillBound = 0.05;
+    static constexpr double s_minRoomFillBound = 0.025;
+    static constexpr double s_maxRoomFillBound = 0.075;
 
-    double m_normalRoomTreasureMean = 3;
-    double m_eliteRoomTreasureMean = 4;
-    double m_bossRoomTreasureMean = 5;
-    double m_treasureRoomTreasureMean = 6;
+    static constexpr double s_normalRoomTreasureMean = 3;
+    static constexpr double s_eliteRoomTreasureMean = 3.5;
+    static constexpr double s_bossRoomTreasureMean = 4.0;
+    static constexpr double s_treasureRoomTreasureMean = 5;
 
-    double m_normalTileRatio = 0.7;
+    double m_normalTileRatio = 0.75;
 
-    static constexpr int m_meanCorridorWidth = 3;
-    static constexpr int m_sigmaCorridorWidth = 1;
+    static constexpr int s_meanCorridorWidth = 3.0;
+    static constexpr int s_sigmaCorridorWidth = 1.0;
 
     double m_widthRatio = 0.45;
     double m_heightRatio = 0.45;

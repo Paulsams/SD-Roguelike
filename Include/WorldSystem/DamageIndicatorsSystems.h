@@ -46,11 +46,12 @@ public:
     static DamageIndicatorsSystems* create(World* world);
 
     void scheduleDraw(const std::function<void(std::function<void(DrawDamageInfo)>)>& scheduleDrawFunc);
-    void reset();
     void update() override;
 
 private:
     DamageIndicatorsSystems(World* world);
+
+    void reset();
     
     std::map<Vec2Int, DamageIndicator*> m_showedObjects;
     PoolObjects<DamageIndicator> m_indicators;

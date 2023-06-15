@@ -19,11 +19,13 @@ public:
     };
     
     static Player* create(World* world);
+    ~Player();
 
     const std::shared_ptr<IStatsContainer> getStats() const override { return m_statsContainer; }
     
-    ObservableVector<BaseItem*>& getInventory() { return m_items; }
+    std::shared_ptr<ObservableVector<BaseItem*>> getInventory() { return m_items; }
     Backpack& getBackpack() { return m_backpack; }
+    void throwAllItems();
 
     bool init() override;
 
@@ -52,7 +54,7 @@ private:
     std::unordered_map<ClotheType, cocos2d::Sprite*> m_clothes;
     Backpack m_backpack;
     std::shared_ptr<StatsContainer> m_statsContainer;
-    ObservableVector<BaseItem*> m_items;
+    std::shared_ptr<ObservableVector<BaseItem*>> m_items;
     
     std::shared_ptr<LevelHandler> m_levelHandler;
 
