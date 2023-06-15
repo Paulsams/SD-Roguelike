@@ -247,7 +247,31 @@ add_executable(test_base tests/baseTest.cpp)
 add_executable(test_pathfinder tests/pathfinderTests.cpp Source/Pathfinder/PathfinderAStar.cpp)
 add_executable(test_stateMachine tests/stateMachineTests.cpp)
 
-add_executable(test_generator tests/generatorTest.cpp ${all_code_files})
+add_executable(test_generator tests/generatorTest.cpp
+        Source/Mobs/Mob.cpp
+
+        Source/Pathfinder/PathfinderAStar.cpp
+
+        Source/WorldSystem/RandomGeneratorWorldBuilder.cpp
+        Source/WorldSystem/BaseEntity.cpp
+        Source/WorldSystem/DamageIndicatorsSystems.cpp
+        Source/WorldSystem/World.cpp
+
+        Source/ItemsSystem/AttackHandler.cpp
+        Source/ItemsSystem/Attacks.cpp
+        Source/ItemsSystem/BaseItem.cpp
+        Source/ItemsSystem/Items.cpp
+        Source/ItemsSystem/Weapon.cpp
+
+        Source/Stats/StatsContainer.cpp
+        Source/Stats/Modificators/StatWithModificators.cpp
+
+        Source/Utils/Common.cpp
+        Source/Utils/TMXGenerator.cpp
+
+        Source/Player/Player.cpp
+        Source/Player/PlayerInput.cpp)
+
 
 target_link_libraries( test_base  PRIVATE  GTest::gtest_main  cocos2d)
 target_link_libraries( test_pathfinder  PUBLIC  GTest::gtest_main  cocos2d)
