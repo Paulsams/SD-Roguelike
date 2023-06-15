@@ -17,7 +17,7 @@ struct GeneratorTestsFixture : public testing::TestWithParam<std::tuple<int, int
 {
     pathfinder::PathfinderAStar finder;
     std::function<bool(const pathfinder::Node*)> isValid = [] (const pathfinder::Node*) {return true;};
-    std::shared_ptr<LevelTileConfig> config = std::make_shared<WorldTileConfig>((std::filesystem::current_path() / "Resources"/ "World.json").string())->getLevelsTileConfig().at(0);
+    std::shared_ptr<LevelTileConfig> config = std::make_shared<WorldTileConfig>((std::filesystem::current_path() / "Resources" / "World.json").string())->getLevelsTileConfig().at(0);
 };
 
 INSTANTIATE_TEST_SUITE_P(
@@ -41,9 +41,7 @@ TEST_P(GeneratorTestsFixture, generatorTest)
                         .setWidth(width)
                         .setHeight(height)
                         .setIterCount(iterCount)
-//                        .setPath("../Resources/Template.tmx")
-//                        .setPath((std::filesystem::current_path().parent_path() / "Resources"/ "Template.tmx").string())
-                        .setPath((std::filesystem::current_path() / "Resources"/ "Template.tmx").string())
+                        .setPath((std::filesystem::current_path() / "Resources" / "Template.tmx").string())
                         .build();
 
     auto itWalls = std::ranges::find_if(mapInfo->getLayers(), [](cocos2d::TMXLayerInfo* info) { return info->_name == "Walls"; });
