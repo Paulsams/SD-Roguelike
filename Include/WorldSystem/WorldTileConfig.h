@@ -12,7 +12,6 @@
 #include <vector>
 #include <fstream>
 #include <utility>
-#include <iostream>
 #include <concepts>
 #include <filesystem>
 
@@ -81,7 +80,6 @@ private:
 class WorldTileConfig
 {
 public:
-
     template <class STR = std::string>
     requires std::constructible_from<std::string, STR>
     WorldTileConfig(STR&& path)
@@ -92,15 +90,9 @@ public:
         rapidjson::IStreamWrapper isw(ifs);
         doc.ParseStream(isw);
 
-//        rapidjson::OStreamWrapper out(std::cout);
-//        rapidjson::Writer<rapidjson::OStreamWrapper> writer(out);
-//        doc.Accept(writer);
-//        std::cout << std::endl;
-
         const rapidjson::Value& jsonLevels = doc["Level"];
         for (auto it = jsonLevels.Begin(); it != jsonLevels.End(); ++it)
             m_levels.emplace_back(std::make_shared<LevelTileConfig>(*it));
-
     }
 
     [[nodiscard]] const std::vector<std::shared_ptr<LevelTileConfig>>& getLevelsTileConfig() const { return m_levels; }

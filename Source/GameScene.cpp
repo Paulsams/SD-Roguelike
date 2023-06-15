@@ -73,10 +73,10 @@ bool GameScene::init(Camera* camera)
 //    m_world = World::create(tileMap, mobFactory);
 //     m_world->setScale(0.5f);
 
-//    const std::string tilemapInXML = generateXMLForTMXTiledMap(tileMap);
-//     std::ofstream outfile ("Resources/test.tmx");
-//     outfile << tilemapInXML << std::endl;
-//     outfile.close();
+     const std::string tilemapInXML = generateXMLForTMXTiledMap(tileMap);
+     std::ofstream outfile ("Resources/test.tmx");
+     outfile << tilemapInXML << std::endl;
+     outfile.close();
 
 //    m_world = World::create(ReadFileWorldBuilder().setPath("Custom.tmx").build(), mobFactory);
 //    m_world = World::create(RandomGeneratorWorldBuilder().setPath("Template.tmx").setConfig(m_worldTileConfig).setWidth(100).setHeight(100).setIterCount(5).build());
