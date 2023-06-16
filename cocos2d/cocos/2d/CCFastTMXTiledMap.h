@@ -189,6 +189,7 @@ public:
      *
      * @return Properties.
      */
+    ValueMap& getProperties() { return _properties; }
     const ValueMap& getProperties() const { return _properties; }
     
     /** Set properties. 

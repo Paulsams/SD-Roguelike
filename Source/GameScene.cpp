@@ -29,9 +29,10 @@ std::pair<Scene*, GameScene*> GameScene::createScene()
         [gameScene, camera](Event*)
     {
         Size size = Director::getInstance()->getWinSize();
+
+        const Vec2 position = gameScene->m_runningScene ? gameScene->m_player->getPosition() : camera->getPosition();
         camera->initOrthographic(size.width, size.height, 1, 100);
-        camera->setPosition(gameScene->getViewPointCenter(gameScene->m_player->getPosition()
-            * gameScene->m_world->getScale()));
+        camera->setPosition(gameScene->getViewPointCenter(position * gameScene->m_world->getScale()));
         camera->setPositionZ(cameraZ);
 
         gameScene->m_canvas->setContentSize(size);
@@ -65,9 +66,9 @@ bool GameScene::init(Camera* camera)
 
     m_gameLoop = std::make_shared<GameLoop>();
 
-    cocos2d::TMXMapInfo* mapInfo = RandomGeneratorWorldBuilder().setPath("Template.tmx").setConfig(m_worldTileConfig->getLevelsTileConfig().at(0)).setWidth(55).setHeight(55).setIterCount(4).build();
+    TMXMapInfo* mapInfo = RandomGeneratorWorldBuilder().setPath("Template.tmx").setConfig(m_worldTileConfig->getLevelsTileConfig().at(0)).setWidth(55).setHeight(55).setIterCount(4).build();
 
-    cocos2d::TMXTiledMap* tileMap = TileMapProxy::create(mapInfo);
+    Tilemap* tileMap = TileMapProxy::create(mapInfo);
 
     m_world = World::create(tileMap, mobFactory);
 //    m_world = World::create(tileMap, mobFactory);
@@ -91,9 +92,9 @@ bool GameScene::init(Camera* camera)
     m_canvas->setContentSize(Director::getInstance()->getWinSize());
     this->addChild(m_canvas, 1);
 
-    Size winSize = Director::getInstance()->getWinSize();
-    Point viewPoint = getViewPointCenter(m_player->getPosition() * m_world->getScale());
-    m_world->updateCullingRect(Rect(viewPoint, winSize));
+    const Size winSize = Director::getInstance()->getWinSize();
+    const Point viewPoint = getViewPointCenter(m_player->getPosition() * m_world->getScale());
+    m_world->updateCullingRect(Rect(viewPoint / m_world->getScale(), winSize));
     m_camera->setPosition(viewPoint);
 
     m_player->moved += movedPlayerDelegate;
@@ -142,7 +143,8 @@ void GameScene::update(float delta)
         m_player->moved -= movedPlayerDelegate;
         m_player->attacked -= attackPlayerDelegate;
         m_world->removePlayer(m_player);
-        m_runningScene = true;
+        unscheduleUpdate();
+        m_world->update();
     }
 }
 
@@ -182,7 +184,7 @@ GameScene::GameScene()
         moveTo->setTag(moveCameraTag);
         m_camera->runAction(moveTo);
                 
-        m_world->updateCullingRect(Rect(viewPoint - (winSize * coefficientOffsetSize / 2.0f),
+        m_world->updateCullingRect(Rect((viewPoint / m_world->getScale() - winSize * coefficientOffsetSize / 2.0f),
             winSize * (1.0f + coefficientOffsetSize)));
 
         this->m_gameLoop->step();

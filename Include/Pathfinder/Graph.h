@@ -26,7 +26,7 @@ namespace pathfinder {
 
     public:
 
-        Graph(cocos2d::Size worldSize, uint32_t* tiles, std::function<TileType (int)> fToTileType) : worldSize(worldSize) {
+        Graph(cocos2d::Size worldSize, const uint32_t* tiles, std::function<TileType (int)> fToTileType) : worldSize(worldSize) {
             int totalSize = worldSize.width * worldSize.height;
             nodes.resize(totalSize);
             visited.resize(totalSize, false);
@@ -35,7 +35,7 @@ namespace pathfinder {
 
         }
 
-        void initNodes(uint32_t* tiles, const std::function<TileType (int)>& fToTileType) {
+        void initNodes(const uint32_t* tiles, const std::function<TileType (int)>& fToTileType) {
             int width = worldSize.width, height = worldSize.height;
             for(int x = 0; x < width; ++x) {
                 for (int y = 0; y < height; ++y) {
