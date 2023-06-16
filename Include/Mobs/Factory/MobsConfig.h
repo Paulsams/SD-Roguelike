@@ -23,6 +23,9 @@ namespace mob
 template <typename T>
 concept has_hash_code = requires(T &&args) { args->getTypeId(); };
 
+/**
+ * Configures all mobs in the game
+ */
 class MobsConfig
 {
 private:
@@ -126,6 +129,11 @@ public:
         });
     }
 
+    /**
+     * Creating an attack for mobs
+     * @param ranges - attack pattern
+     * @return attack handler
+     */
     std::shared_ptr<AttackHandler> createAttack(const std::vector<std::tuple<const std::vector<Vec2Int>, std::shared_ptr<AttackInfo>, float>>& ranges)
     {
         AttackHandlerBuilder builder;

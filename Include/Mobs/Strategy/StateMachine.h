@@ -17,6 +17,11 @@ namespace mob
         interfaceClass.getTypeId();
     };
 
+    /**
+     * State machine with transition function
+     * @tparam T - type of state
+     * @tparam U - type for witch the states change
+     */
     template <typename T, typename U>
     requires is_required_interface<T, U>
     class StateMachine
@@ -40,15 +45,27 @@ namespace mob
         StateMachine(const StateMachine& other):  m_currentState(other.m_currentState),
                                                   m_states(other.m_states),
                                                   m_functions(other.m_functions) {}
-
+        /**
+         * Get current state
+         * @return current state
+         */
         std::shared_ptr<T> get() const {
             return m_currentState;
         }
-        void changeState(size_t newState_id, U* mob) {
-            m_currentState->disable(mob);
+        /**
+         * Change current state
+         * @param newState_id - state id
+         * @param mob - object for witch states change
+         */
+        void changeState(size_t newState_id, U* obj) {
+            m_currentState->disable(obj);
             m_currentState = m_states[newState_id];
-            m_currentState->enable(mob);
+            m_currentState->enable(obj);
         }
+        /**
+         * Update the current state if possible
+         * @param obj  object for witch update in progress
+         */
         void update(U* obj) {
             for (auto& [function, state_id]: m_functions[m_currentState->getTypeId()]) {
                 if (function(obj))

@@ -12,6 +12,9 @@ namespace mob
 class IMobBehaviour;
 class IMobStrategy;
 
+/**
+ * Container for storing information about the mob
+ */
 struct MobInfo
 {
     int health;
@@ -32,13 +35,6 @@ struct MobInfo
 
     MobInfo(const MobInfo& other) = default;
     MobInfo(MobInfo&& other) noexcept = default;
-
-//    MobInfo(MobInfo&& other) noexcept
-//        : health(other.health)
-//        , visionRange(other.visionRange)
-//        , strategy(std::move(other.strategy))
-//        , startBehaviour(std::move(other.startBehaviour))
-//    {}
 
 };
 

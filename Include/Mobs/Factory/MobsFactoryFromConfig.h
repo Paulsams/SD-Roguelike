@@ -11,22 +11,43 @@ namespace mob {
     public:
         explicit MobsFactoryFromConfig(std::shared_ptr<MobsConfig> mobsConfig)
             : m_mobsConfig(mobsConfig) { }
-        
+
+        /**
+         * Spawns a normal mob
+         * @param world - game world
+         * @param gid - tile id
+         * @return pointer to normal Mob
+         */
         Mob* createNormal(World* world, int gid) override
         {
             return createMob(world, gid, m_mobsConfig->normals, Paths::toHealthBar);
         }
-
+        /**
+        * Spawns a elite mob
+        * @param world - game world
+        * @param gid - tile id
+        * @return pointer to elite Mob
+        */
         Mob* createElite(World* world, int gid) override
         {
             return createMob(world, gid, m_mobsConfig->elites, Paths::toHealthBar);
         }
-
+        /**
+        * Spawns a boss mob
+        * @param world - game world
+        * @param gid - tile id
+        * @return pointer to boss Mob
+        */
         Mob* createBoss(World* world, int gid) override
         {
             return createMob(world, gid, m_mobsConfig->bosses, Paths::toHealthBar);
         }
-
+        /**
+        * Spawns a neutral mob
+        * @param world - game world
+        * @param gid - tile id
+        * @return pointer to neutral Mob
+        */
         Mob* createPassive(World* world, int gid) override
         {
             return createMob(world, gid, m_mobsConfig->passives, Paths::toExperiencePointsBar);

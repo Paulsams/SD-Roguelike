@@ -17,12 +17,29 @@ namespace mob {
     public:
         static Mob* create(World* world, cocos2d::Sprite* sprite, const MobInfo& info);
 
+        /**
+         * Update this mob
+         */
         void update() override;
+        /**
+         * Change behaviour to new
+         */
         void changeBehaviour(std::shared_ptr<IMobBehaviour>);
+        /**
+         * Get mob stats
+         */
         const std::shared_ptr<IStatsContainer> getStats() const override;
+        /**
+         * Get mob vision range
+         */
         int getVisionRange() const;
+        /**
+         * Get mob experience points
+         */
         float getExperiencePoints() const;
-        
+        /**
+         * Visit mob
+         */
         void acceptVisit(std::shared_ptr<IVisitorEntities> visitor) override { visitor->visitMob(this); }
 
     private:
