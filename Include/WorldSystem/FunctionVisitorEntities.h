@@ -12,16 +12,16 @@ class FunctionVisitorEntities : public IVisitorEntities
 {
     friend struct FunctionVisitorEntitiesBuilder<ReturnType>;
 public:
-    void visitMob(mob::Mob* mob) override { if (m_visitMob) m_returnType = m_visitMob(mob); }
-    void visitPlayer(Player* player) override { if (m_visitPlayer) m_returnType = m_visitPlayer(player); }
-    void visitItem(BaseItem* item) override { if (m_visitItem) m_returnType = m_visitItem(item); }
-    void visitChest(Chest* chest) override { if (m_visitChest) m_returnType = m_visitChest(chest); }
-    void visitDecoration(Decoration* decoration) override { if (m_visitDecoration) m_returnType = m_visitDecoration(decoration); }
+    void visitMob(mob::Mob* mob) override { if (m_visitMob) m_returnValue = m_visitMob(mob); }
+    void visitPlayer(Player* player) override { if (m_visitPlayer) m_returnValue = m_visitPlayer(player); }
+    void visitItem(BaseItem* item) override { if (m_visitItem) m_returnValue = m_visitItem(item); }
+    void visitChest(Chest* chest) override { if (m_visitChest) m_returnValue = m_visitChest(chest); }
+    void visitDecoration(Decoration* decoration) override { if (m_visitDecoration) m_returnValue = m_visitDecoration(decoration); }
 
     std::optional<ReturnType> getReturnValue()
     {
-        std::optional<ReturnType> copied = m_returnType;
-        m_returnType.reset();
+        std::optional<ReturnType> copied = m_returnValue;
+        m_returnValue.reset();
         return copied;
     }
 
@@ -44,7 +44,7 @@ private:
     std::function<ReturnType(Chest*)> m_visitChest;
     std::function<ReturnType(Decoration*)> m_visitDecoration;
 
-    std::optional<ReturnType> m_returnType;
+    std::optional<ReturnType> m_returnValue;
 };
 
 class FunctionVisitorEntitiesReturnVoid : public IVisitorEntities
