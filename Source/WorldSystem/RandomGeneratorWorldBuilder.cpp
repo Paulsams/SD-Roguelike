@@ -12,9 +12,6 @@ std::mt19937 RGWB::s_gen(s_rd());
 cocos2d::TMXMapInfo* RGWB::build() const
 {
     if (m_path.empty()
-     || m_height == 0
-     || m_width == 0
-     || m_iterCount == 0
      || std::pow(2, m_iterCount) > m_width * (1 - 1.0/Room::s_partDiv)
      || std::pow(2, m_iterCount) > m_height * (1 - 1.0/Room::s_partDiv)
      || !m_config
@@ -222,8 +219,8 @@ RGWB::Room::Room(const Box& b)
     int diffWidth = cocos2d::random(1, std::max(2, width/s_partDiv));
     int diffHeight = cocos2d::random(1, std::max(2, height/s_partDiv));
 
-    width -= (width - diffWidth > 2) ? diffWidth : 1;
-    height -= (height - diffHeight > 2) ? diffHeight : 1;
+    width -= (width - diffWidth > 2) ? diffWidth : (width == 1 ? 0 : 1);
+    height -= (height - diffHeight > 2) ? diffHeight : (height == 1 ? 0 : 1);
 
     box = Box{x, y, width, height};
 }

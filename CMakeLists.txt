@@ -7,7 +7,6 @@ endif()
 set(APP_NAME roguelike)
 
 project(${APP_NAME})
-
 include_directories(Include)
 
 if(XCODE)
@@ -28,20 +27,15 @@ set(CMAKE_CXX_STANDARD 20)
 
 if(MSVC)
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-#        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /WX")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
     else()
-#        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /WX /O3")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /O3")
     endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
 else()
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 #        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fsanitize=address -fno-omit-frame-pointer")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
     else()
-#        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wpedantic -Wextra -Wunused-parameter \
-#        -Wcast-align -Wcast-qual -Wduplicated-branches \
-#        -Wduplicated-cond -Wextra-semi -Wfloat-equal -Wlogical-op \
-#        -Wnon-virtual-dtor -Wsign-promo \
-#        -pedantic-errors \
-#        -O3")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
     endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif()
@@ -53,6 +47,7 @@ set(GAME_HEADER)
 set(GAME_RES_FOLDER
     "${CMAKE_CURRENT_SOURCE_DIR}/Resources"
     )
+
 if(APPLE OR WINDOWS)
     cocos_mark_multi_resources(common_res_files RES_TO "Resources" FOLDERS ${GAME_RES_FOLDER})
 endif()
@@ -214,8 +209,8 @@ set(all_code_files
 add_executable(${APP_NAME} ${all_code_files})
 target_link_libraries(${APP_NAME} cocos2d)
 target_include_directories(${APP_NAME}
-        PRIVATE Classes
-        PRIVATE ${COCOS2DX_ROOT_PATH}/cocos/audio/include/
+    PRIVATE Classes
+    PRIVATE ${COCOS2DX_ROOT_PATH}/cocos/audio/include/
 )
 
 # mark app resources
@@ -234,49 +229,51 @@ endif()
 #enable google tests
 include(FetchContent)
 FetchContent_Declare(
-        googletest
-        URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
+    googletest
+    URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
 )
 
 FetchContent_MakeAvailable(googletest)
 enable_testing()
 include(GoogleTest)
 
-set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ../tests)
+set_target_properties(${APP_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ../tests)
 add_executable(test_base tests/baseTest.cpp)
 add_executable(test_pathfinder tests/pathfinderTests.cpp Source/Pathfinder/PathfinderAStar.cpp)
 add_executable(test_stateMachine tests/stateMachineTests.cpp)
 
 add_executable(test_generator tests/generatorTest.cpp
-        Source/Mobs/Mob.cpp
+    Source/Mobs/Mob.cpp
 
-        Source/Pathfinder/PathfinderAStar.cpp
+    Source/Pathfinder/PathfinderAStar.cpp
 
-        Source/WorldSystem/RandomGeneratorWorldBuilder.cpp
-        Source/WorldSystem/BaseEntity.cpp
-        Source/WorldSystem/DamageIndicatorsSystems.cpp
-        Source/WorldSystem/World.cpp
+    Source/WorldSystem/RandomGeneratorWorldBuilder.cpp
+    Source/WorldSystem/BaseEntity.cpp
+    Source/WorldSystem/DamageIndicatorsSystems.cpp
+    Source/WorldSystem/World.cpp
 
-        Source/ItemsSystem/AttackHandler.cpp
-        Source/ItemsSystem/Attacks.cpp
-        Source/ItemsSystem/BaseItem.cpp
-        Source/ItemsSystem/Items.cpp
-        Source/ItemsSystem/Weapon.cpp
+    Source/ItemsSystem/AttackHandler.cpp
+    Source/ItemsSystem/Attacks.cpp
+    Source/ItemsSystem/BaseItem.cpp
+    Source/ItemsSystem/Items.cpp
+    Source/ItemsSystem/Weapon.cpp
 
-        Source/Stats/StatsContainer.cpp
-        Source/Stats/Modificators/StatWithModificators.cpp
+    Source/Stats/StatsContainer.cpp
+    Source/Stats/Modificators/StatWithModificators.cpp
 
-        Source/Utils/Common.cpp
-        Source/Utils/TMXGenerator.cpp
+    Source/Utils/Common.cpp
+    Source/Utils/TMXGenerator.cpp
 
-        Source/Player/Player.cpp
-        Source/Player/PlayerInput.cpp)
+    Source/Player/Player.cpp
+    Source/Player/PlayerInput.cpp
+    )
 
 
-target_link_libraries( test_base  PRIVATE  GTest::gtest_main  cocos2d)
-target_link_libraries( test_pathfinder  PUBLIC  GTest::gtest_main  cocos2d)
-target_link_libraries( test_stateMachine  PRIVATE  GTest::gtest_main  cocos2d)
-target_link_libraries( test_generator  PRIVATE  GTest::gtest_main  cocos2d)
+target_link_libraries(test_base  PRIVATE  GTest::gtest_main  cocos2d)
+target_link_libraries(test_pathfinder  PUBLIC  GTest::gtest_main  cocos2d)
+target_link_libraries(test_stateMachine  PRIVATE  GTest::gtest_main  cocos2d)
+target_link_libraries(test_generator  PRIVATE  GTest::gtest_main  cocos2d)
 
 if(WINDOWS)
     cocos_copy_target_dll(test_pathfinder)

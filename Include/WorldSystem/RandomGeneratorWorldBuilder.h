@@ -35,19 +35,19 @@ public:
 
     RandomGeneratorWorldBuilder& setHeight(int height)
     {
-        m_height = height;
+        m_height = std::max(16, height);
         return *this;
     }
 
     RandomGeneratorWorldBuilder& setWidth(int width)
     {
-        m_width = width;
+        m_width = std::max(16, width);
         return *this;
     }
 
     RandomGeneratorWorldBuilder& setIterCount(int iterCount)
     {
-        m_iterCount = iterCount;
+        m_iterCount = std::max(2, iterCount);
         return *this;
     }
 
@@ -137,12 +137,6 @@ private:
     static void fillObjectMetaInfo(cocos2d::ValueMap& object, cocos2d::TMXMapInfo* mapInfo, const Room& room, Vec2Int pos);
 
 private:
-    /*
-     *  Elite room ratio -> 1 - m_normalRoomRatio - m_treasureRoomRatio;
-     *  Number of bosses -> m_iterCount;
-     *  Spawn room -> the smallest room
-     *  Bosses rooms -> the farthest rooms from spawn
-    */
     static std::random_device s_rd;
     static std::mt19937 s_gen;
 
@@ -169,8 +163,8 @@ private:
 
     std::shared_ptr<LevelTileConfig> m_config;
 
-    int m_height = 0;
-    int m_width = 0;
+    int m_height = 16;
+    int m_width = 16;
 
-    int m_iterCount = 0;
+    int m_iterCount = 2;
 };
