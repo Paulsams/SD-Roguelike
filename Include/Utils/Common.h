@@ -2,12 +2,16 @@
 
 #include <cstdint>
 
+#include "2d/CCFastTMXTiledMap.h"
 #include "2d/CCTMXTiledMap.h"
 #include "2d/CCTMXLayer.h"
 
 #include "math/Vec2.h"
 
-class TileMapProxy : public cocos2d::TMXTiledMap
+using Tilemap = cocos2d::FastTMXTiledMap;
+using TilemapLayer = cocos2d::FastTMXLayer;
+
+class TileMapProxy : public Tilemap
 {
 public:
     static TileMapProxy* create(cocos2d::TMXMapInfo* mapInfo)
@@ -24,15 +28,12 @@ public:
 
     bool initWithMapInfo(cocos2d::TMXMapInfo* mapInfo)
     {
-        _tmxFile = mapInfo->getTMXFileName();
+        // _tmxFile = mapInfo->getTMXFileName();
         setContentSize(cocos2d::Size::ZERO);
         buildWithMapInfo(mapInfo);
         return true;
     }
 };
-
-using Tilemap = cocos2d::TMXTiledMap;
-using TilemapLayer = cocos2d::TMXLayer;
 
 template<class T, class U>
 concept Derived = std::is_base_of_v<U, T>;

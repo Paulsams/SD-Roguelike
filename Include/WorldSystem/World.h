@@ -33,7 +33,8 @@ public:
 
     void updateCullingRect(cocos2d::Rect rect)
     {
-//        m_background->setCullingRect(rect);
+        m_ground->setCullingRect(rect);
+        m_walls->setCullingRect(rect);
     }
 
     cocos2d::Vec2 convertToMapSpace(Vec2Int cellPosition) const
