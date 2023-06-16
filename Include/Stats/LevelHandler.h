@@ -32,29 +32,31 @@ public:
         m_bounds->bounds = MinMax(0.0f, m_levelsUp[0].pointsNeeded);
     }
     
-    void changeExperiencePoints(IStat::changedValue changedValue) const
+    void changeExperiencePoints(IStat::changedValue value) const
     {
-        if (m_level->getValue() == m_levelsUp.size())
+        const size_t currentLevel = std::lround(m_level->getValue());
+        if (currentLevel == m_levelsUp.size())
             return;
         
-        const float overflowValue = (m_levelPoints->getValue() + changedValue) - m_bounds->bounds.getMax();
+        const float overflowValue = (m_levelPoints->getValue() + value) - m_bounds->bounds.getMax();
         if (overflowValue >= 0.0f)
         {
             m_level->changeValueBy(1);
-            if (m_level->getValue() == m_levelsUp.size())
+            if (currentLevel == m_levelsUp.size())
             {
-                m_levelPoints->changeValueBy(changedValue);
+                m_levelPoints->changeValueBy(value);
             }
             else
             {
-                const LevelUpInfo& levelUpInfo = m_levelsUp[m_level->getValue()];
+                const LevelUpInfo& levelUpInfo = m_levelsUp[currentLevel];
                 m_bounds->bounds = MinMax(0.0f, levelUpInfo.pointsNeeded);
+                // TODO: если получить очков больше, чем нужно для этого уровня + для следующего, то очки сверху потеряются в никуда, так как заклемпятся по максимуму
                 m_levelPoints->changeValueBy(-m_levelPoints->getValue() + overflowValue);
                 m_levelUpFunc(levelUpInfo);
             }
         } else
         {
-            m_levelPoints->changeValueBy(changedValue);
+            m_levelPoints->changeValueBy(value);
         }
     }
 
