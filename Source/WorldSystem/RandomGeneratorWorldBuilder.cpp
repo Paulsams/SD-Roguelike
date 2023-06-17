@@ -219,8 +219,8 @@ RGWB::Room::Room(const Box& b)
     int diffWidth = cocos2d::random(1, std::max(2, width/s_partDiv));
     int diffHeight = cocos2d::random(1, std::max(2, height/s_partDiv));
 
-    width -= (width - diffWidth > 2) ? diffWidth : (width == 1 ? 0 : 1);
-    height -= (height - diffHeight > 2) ? diffHeight : (height == 1 ? 0 : 1);
+    width = std::max(width - diffWidth, 2);
+    height = std::max(height - diffHeight, 2);
 
     box = Box{x, y, width, height};
 }
