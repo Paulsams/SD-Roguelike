@@ -37,6 +37,7 @@ void PlayerItemsOnUI::onSelected(InventoryView::SelectedItemInfo selectedInfo)
             {
                 selectedInfo.inventory->setItemFromIndex(selectedInfo.index, nullptr);
                 selectedInfo.menuItem->unchoice();
+                item->release();
                 return;
             }
         

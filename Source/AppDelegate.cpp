@@ -22,6 +22,9 @@ bool AppDelegate::applicationDidFinishLaunching() {
     }
     director->setProjection(Director::Projection::_2D);
 
+    // ИЛЮХА, НЕ УДАЛЯЙ, ДЯДЯ!!! ПАМЯТЬ АТО ПОТЕЧЁТ!!!
+    cocos2d::backend::ShaderCache::getInstance();
+
 #ifdef _DEBUG
     director->setDisplayStats(true);
 #endif
