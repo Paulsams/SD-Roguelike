@@ -24,10 +24,10 @@ INSTANTIATE_TEST_SUITE_P(
         GeneratorTests,
         GeneratorTestsFixture,
         testing::Values(
-                std::make_tuple(15, 15, 2),
-                std::make_tuple(30, 30, 3),
-                std::make_tuple(55, 55, 4),
-                std::make_tuple(110, 110, 5)
+                std::make_tuple(16, 16, 2),
+                std::make_tuple(32, 32, 3),
+                std::make_tuple(64, 64, 4),
+                std::make_tuple(128, 128, 5)
         ));
 
 TEST_P(GeneratorTestsFixture, generatorTest)
