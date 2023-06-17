@@ -1,37 +1,17 @@
-#/****************************************************************************
-# Copyright (c) 2013-2014 cocos2d-x.org
-# Copyright (c) 2015-2017 Chukong Technologies Inc.
-#
-# http://www.cocos2d-x.org
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
+cmake_minimum_required(VERSION 3.18.3)
 
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-# ****************************************************************************/
-
-cmake_minimum_required(VERSION 3.6)
+if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.24.0")
+    cmake_policy(SET CMP0135 NEW)
+endif()
 
 set(APP_NAME roguelike)
 
 project(${APP_NAME})
+include_directories(Include)
 
 if(XCODE)
     if(NOT DEFINED CMAKE_XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET)
-        SET (CMAKE_XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET 8.0)
+        set(CMAKE_XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET 8.0)
     endif()
 endif()
 
@@ -43,6 +23,23 @@ if(NOT DEFINED BUILD_ENGINE_DONE) # to test roguelike into root project
     add_subdirectory(${COCOS2DX_ROOT_PATH}/cocos ${ENGINE_BINARY_PATH}/cocos/core)
 endif()
 
+set(CMAKE_CXX_STANDARD 20)
+
+if(MSVC)
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+    else()
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /O3")
+    endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
+else()
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fsanitize=address -fno-omit-frame-pointer")
+#        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+    else()
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
+    endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
+endif()
+
 # record sources, headers, resources...
 set(GAME_SOURCE)
 set(GAME_HEADER)
@@ -50,27 +47,144 @@ set(GAME_HEADER)
 set(GAME_RES_FOLDER
     "${CMAKE_CURRENT_SOURCE_DIR}/Resources"
     )
+
 if(APPLE OR WINDOWS)
     cocos_mark_multi_resources(common_res_files RES_TO "Resources" FOLDERS ${GAME_RES_FOLDER})
 endif()
 
-# add cross-platforms source files and header files 
-list(APPEND GAME_SOURCE
-     Classes/AppDelegate.cpp
-     Classes/HelloWorldScene.cpp
-     )
 list(APPEND GAME_HEADER
-     Classes/AppDelegate.h
-     Classes/HelloWorldScene.h
-     )
+    Include/AppDelegate.h
+    Include/GameScene.h
 
-if(ANDROID)
-    # change APP_NAME to the share library name for Android, it's value depend on AndroidManifest.xml
-    set(APP_NAME MyGame)
-    list(APPEND GAME_SOURCE
-         proj.android/app/jni/hellocpp/main.cpp
-         )
-elseif(LINUX)
+    Include/GameLoop/GameLoop.h
+    Include/GameLoop/IUpdatable.h
+
+    Include/Player/Backpack.h
+    Include/Player/Player.h
+    Include/Player/PlayerInput.h
+
+    Include/ItemsSystem/Accessory.h
+    Include/ItemsSystem/AttackWithDamage.h
+    Include/ItemsSystem/AttackHandler.h
+    Include/ItemsSystem/Attacks.h
+    Include/ItemsSystem/BaseItem.h
+    Include/ItemsSystem/ConsumableItem.h
+    Include/ItemsSystem/Damage.h
+    Include/ItemsSystem/Items.h
+    Include/ItemsSystem/IVisualAttack.h
+    Include/ItemsSystem/Weapon.h
+    
+    Include/ItemsSystem/AttackSearch/AttackSearchFromStraightLines.h
+    Include/ItemsSystem/AttackSearch/IAttackSearch.h
+
+    Include/Mobs/Mob.h
+    Include/Mobs/Strategy/BaseStateStrategy.h
+    Include/Mobs/Strategy/IState.h
+    Include/Mobs/Strategy/NothingStrategy.h
+    Include/Mobs/Strategy/IMobStrategy.h
+    Include/Mobs/Strategy/StateMachine.h
+    Include/Mobs/Strategy/StrategyWithStates.h
+    Include/Mobs/Strategy/Normal.h
+    Include/Mobs/Strategy/Panic.h
+    Include/Mobs/Behaviour/IMobBehaviour.h
+    Include/Mobs/Behaviour/AggressiveBehaviour.h
+    Include/Mobs/Behaviour/CowardlyBehaviour.h
+    Include/Mobs/Behaviour/PassiveBehaviour.h
+    Include/Mobs/Factory/BaseMobAbstractFactory.h
+    Include/Mobs/Factory/MobsConfig.h
+    Include/Mobs/Factory/MobInfo.h
+    Include/Mobs/Factory/MobsFactoryFromConfig.h
+    
+    Include/Pathfinder/Graph.h
+    Include/Pathfinder/Node.h
+    Include/Pathfinder/PathfinderAStar.h
+    Include/Pathfinder/IPathfindingAlgorithm.h
+
+    Include/Stats/IHaveStats.h
+    Include/Stats/IStat.h
+    Include/Stats/IStatsContainer.h
+    Include/Stats/LevelHandler.h
+    Include/Stats/StatsContainer.h
+    Include/Stats/StatType.h
+
+    Include/Stats/Modificators/BoundsModificator.h
+    Include/Stats/Modificators/IStatModificator.h
+    Include/Stats/Modificators/StatWithModificators.h
+
+    Include/UI/Canvas.h
+    Include/UI/InventoryView.h
+    Include/UI/MenuItemForInventory.h
+    Include/UI/PlayerItemsOnUI.h
+    Include/UI/StatBar.h
+
+    Include/Utils/Common.h
+    Include/Utils/Direction.h
+    Include/Utils/EventsSystem.h
+    Include/Utils/FontsTTF.h
+    Include/Utils/PoolObjects.h
+    Include/Utils/TMXGenerator.h
+    Include/Utils/ValueNotifyChanged.h
+    
+    Include/WorldSystem/BaseEntity.h
+    Include/WorldSystem/Chest.h
+    Include/WorldSystem/DamageIndicatorsSystems.h
+    Include/WorldSystem/Decoration.h
+    Include/WorldSystem/FunctionVisitorEntities.h
+    Include/WorldSystem/RandomGeneratorWorldBuilder.h
+    Include/WorldSystem/ReadFileWorldBuilder.h
+    Include/WorldSystem/IVisitorEntities.h
+    Include/WorldSystem/World.h
+    Include/WorldSystem/WorldTileConfig.h
+    )
+
+# add cross-platforms source files and header files
+list(APPEND GAME_SOURCE
+    Source/AppDelegate.cpp
+    Source/GameScene.cpp
+
+    Source/GameLoop/GameLoop.cpp
+
+    Source/Player/Backpack.cpp
+    Source/Player/Player.cpp
+    Source/Player/PlayerInput.cpp
+
+    Source/ItemsSystem/AttackHandler.cpp
+    Source/ItemsSystem/Attacks.cpp
+    Source/ItemsSystem/BaseItem.cpp
+    Source/ItemsSystem/Items.cpp
+    Source/ItemsSystem/Weapon.cpp
+
+    Source/Mobs/Mob.cpp
+    Source/Mobs/Strategy/StateMachine.cpp
+    Source/Mobs/Strategy/StrategyWithStates.cpp
+    Source/Mobs/Strategy/Normal.cpp
+    Source/Mobs/Behaviour/AggressiveBehaviour.cpp
+    Source/Mobs/Behaviour/CowardlyBehaviour.cpp
+    Source/Mobs/Behaviour/PassiveBehaviour.cpp
+    Source/Mobs/Factory/MobsConfig.cpp
+
+    Source/Pathfinder/PathfinderAStar.cpp
+
+    Source/Stats/StatsContainer.cpp
+    Source/Stats/Modificators/StatWithModificators.cpp
+
+    Source/UI/Canvas.cpp
+    Source/UI/InventoryView.cpp
+    Source/UI/MenuItemForInventory.cpp
+    Source/UI/PlayerItemsOnUI.cpp
+    Source/UI/StatBar.cpp
+
+    Source/Utils/Common.cpp
+    Source/Utils/TMXGenerator.cpp
+
+    Source/WorldSystem/BaseEntity.cpp
+    Source/WorldSystem/DamageIndicatorsSystems.cpp
+    Source/WorldSystem/World.cpp
+    Source/WorldSystem/ReadFileWorldBuilder.cpp
+    Source/WorldSystem/RandomGeneratorWorldBuilder.cpp
+    )
+
+if(LINUX)
     list(APPEND GAME_SOURCE
          proj.linux/main.cpp
          )
@@ -84,36 +198,6 @@ elseif(WINDOWS)
          proj.win32/game.rc
          ${common_res_files}
          )
-elseif(APPLE)
-    if(IOS)
-        list(APPEND GAME_HEADER
-             proj.ios_mac/ios/AppController.h
-             proj.ios_mac/ios/RootViewController.h
-             )
-        set(APP_UI_RES
-            proj.ios_mac/ios/LaunchScreen.storyboard
-            proj.ios_mac/ios/LaunchScreenBackground.png
-            proj.ios_mac/ios/Images.xcassets
-            )
-        list(APPEND GAME_SOURCE
-             proj.ios_mac/ios/main.m
-             proj.ios_mac/ios/AppController.mm
-             proj.ios_mac/ios/RootViewController.mm
-             proj.ios_mac/ios/Prefix.pch
-             ${APP_UI_RES}
-             )
-    elseif(MACOSX)
-        set(APP_UI_RES
-            proj.ios_mac/mac/Icon.icns
-            proj.ios_mac/mac/Info.plist
-            )
-        list(APPEND GAME_SOURCE
-             proj.ios_mac/mac/main.cpp
-             proj.ios_mac/mac/Prefix.pch
-             ${APP_UI_RES}
-             )
-    endif()
-    list(APPEND GAME_SOURCE ${common_res_files})
 endif()
 
 # mark app complie info and libs info
@@ -121,35 +205,18 @@ set(all_code_files
     ${GAME_HEADER}
     ${GAME_SOURCE}
     )
-if(NOT ANDROID)
-    add_executable(${APP_NAME} ${all_code_files})
-else()
-    add_library(${APP_NAME} SHARED ${all_code_files})
-    add_subdirectory(${COCOS2DX_ROOT_PATH}/cocos/platform/android ${ENGINE_BINARY_PATH}/cocos/platform)
-    target_link_libraries(${APP_NAME} -Wl,--whole-archive cpp_android_spec -Wl,--no-whole-archive)
-endif()
 
+add_executable(${APP_NAME} ${all_code_files})
 target_link_libraries(${APP_NAME} cocos2d)
 target_include_directories(${APP_NAME}
-        PRIVATE Classes
-        PRIVATE ${COCOS2DX_ROOT_PATH}/cocos/audio/include/
+    PRIVATE Classes
+    PRIVATE ${COCOS2DX_ROOT_PATH}/cocos/audio/include/
 )
 
 # mark app resources
 setup_cocos_app_config(${APP_NAME})
-if(APPLE)
-    set_target_properties(${APP_NAME} PROPERTIES RESOURCE "${APP_UI_RES}")
 
-    if(MACOSX)
-        set_xcode_property(${APP_NAME} INFOPLIST_FILE "${CMAKE_CURRENT_SOURCE_DIR}/proj.ios_mac/mac/Info.plist")
-    elseif(IOS)
-        set_xcode_property(${APP_NAME} INFOPLIST_FILE "${CMAKE_CURRENT_SOURCE_DIR}/proj.ios_mac/ios/Info.plist")
-        set_xcode_property(${APP_NAME} ASSETCATALOG_COMPILER_APPICON_NAME "AppIcon")
-    endif()
-
-    # For code-signing, set the DEVELOPMENT_TEAM:
-    #set_xcode_property(${APP_NAME} DEVELOPMENT_TEAM "GRLXXXX2K9")
-elseif(WINDOWS)
+if(WINDOWS)
     cocos_copy_target_dll(${APP_NAME})
 endif()
 
@@ -157,3 +224,60 @@ if(LINUX OR WINDOWS)
     cocos_get_resource_path(APP_RES_DIR ${APP_NAME})
     cocos_copy_target_res(${APP_NAME} LINK_TO ${APP_RES_DIR} FOLDERS ${GAME_RES_FOLDER})
 endif()
+
+
+#enable google tests
+include(FetchContent)
+FetchContent_Declare(
+    googletest
+    URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
+)
+
+FetchContent_MakeAvailable(googletest)
+enable_testing()
+include(GoogleTest)
+
+set_target_properties(${APP_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ../tests)
+add_executable(test_base tests/baseTest.cpp)
+add_executable(test_pathfinder tests/pathfinderTests.cpp Source/Pathfinder/PathfinderAStar.cpp)
+add_executable(test_stateMachine tests/stateMachineTests.cpp)
+
+add_executable(test_generator tests/generatorTest.cpp
+    Source/Mobs/Mob.cpp
+
+    Source/Pathfinder/PathfinderAStar.cpp
+
+    Source/WorldSystem/RandomGeneratorWorldBuilder.cpp
+    Source/WorldSystem/BaseEntity.cpp
+    Source/WorldSystem/DamageIndicatorsSystems.cpp
+    Source/WorldSystem/World.cpp
+
+    Source/ItemsSystem/AttackHandler.cpp
+    Source/ItemsSystem/Attacks.cpp
+    Source/ItemsSystem/BaseItem.cpp
+    Source/ItemsSystem/Items.cpp
+    Source/ItemsSystem/Weapon.cpp
+
+    Source/Stats/StatsContainer.cpp
+    Source/Stats/Modificators/StatWithModificators.cpp
+
+    Source/Utils/Common.cpp
+    Source/Utils/TMXGenerator.cpp
+
+    Source/Player/Player.cpp
+    Source/Player/PlayerInput.cpp
+    )
+
+
+target_link_libraries(test_base  PRIVATE  GTest::gtest_main  cocos2d)
+target_link_libraries(test_pathfinder  PUBLIC  GTest::gtest_main  cocos2d)
+target_link_libraries(test_stateMachine  PRIVATE  GTest::gtest_main  cocos2d)
+target_link_libraries(test_generator  PRIVATE  GTest::gtest_main  cocos2d)
+
+if(WINDOWS)
+    cocos_copy_target_dll(test_pathfinder)
+    cocos_copy_target_dll(test_stateMachine)
+    cocos_copy_target_dll(test_generator)
+endif()
+
