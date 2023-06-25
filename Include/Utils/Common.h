@@ -1,18 +1,20 @@
 #pragma once
 
-#include <cstdint>
-
 #include "2d/CCFastTMXTiledMap.h"
 #include "2d/CCTMXTiledMap.h"
 #include "2d/CCTMXLayer.h"
-
 #include "math/Vec2.h"
+
+#include <cstdint>
 
 using Tilemap = cocos2d::FastTMXTiledMap;
 using TilemapLayer = cocos2d::FastTMXLayer;
 
 using GID = int;
 
+/**
+ * Proxy from TileMap creation without rendering
+ */
 class TileMapProxy : public Tilemap
 {
 public:
@@ -41,6 +43,9 @@ concept Derived = std::is_base_of_v<U, T>;
 
 using SpriteWithRect = std::pair<std::string, cocos2d::Rect>;
 
+/**
+ * Paths to game resources
+ */
 struct Paths
 {
     static const std::string toUITileset;
@@ -59,6 +64,10 @@ struct Paths
     static const SpriteWithRect whiteCell;
 };
 
+
+/**
+ * UI colors
+ */
 struct Colors
 {
     static const cocos2d::Color3B background;
@@ -67,6 +76,10 @@ struct Colors
     static const cocos2d::Color3B backgroundForStat;
 };
 
+
+/**
+ * Mathematical integer 2-dimension point
+ */
 struct Vec2Int
 {
     Vec2Int() = default;
@@ -212,14 +225,6 @@ struct Vec2Int
     friend bool operator!=(const Vec2Int& lhs, const Vec2Int& rhs)
     {
         return !(lhs == rhs);
-    }
-
-    static std::size_t hash_value(const Vec2Int& obj)
-    {
-        std::size_t seed = 0x02BEF05A;
-        seed ^= (seed << 6) + (seed >> 2) + 0x1DBA603F + static_cast<std::size_t>(obj.x);
-        seed ^= (seed << 6) + (seed >> 2) + 0x224CB762 + static_cast<std::size_t>(obj.y);
-        return seed;
     }
 
     int x = 0;

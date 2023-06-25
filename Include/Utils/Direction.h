@@ -10,16 +10,25 @@ enum DirectionType
     DOWN
 };
 
+
+/**
+ * 4-way direction
+ */
 struct Direction
 {
     const DirectionType type;
     
     Direction(DirectionType type)
-        : type(type) { }
+        : type(type)
+    {}
 
     Direction(const cocos2d::Vec2 vector)
-        : type(getDirectionFromVector(vector)) { }
+        : type(getDirectionFromVector(vector))
+    {}
 
+    /**
+     * @return DirectionType from math point
+     */
     Vec2Int getVector() const
     {
         switch (type)
@@ -37,6 +46,11 @@ struct Direction
         }
     }
 
+    /**
+     * Rotate given vector with current direction
+     * @param vector vector
+     * @return Rotated vector
+     */
     Vec2Int rotate(Vec2Int vector) const
     {
         switch (type)

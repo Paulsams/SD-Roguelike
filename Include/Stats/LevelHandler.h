@@ -1,18 +1,26 @@
 ﻿#pragma once
-#include <Stats/Modificators/BoundsModificator.h>
+
+#include "Stats/Modificators/BoundsModificator.h"
 #include "Stats/IHaveStats.h"
 #include "Stats/IStat.h"
+#include "Modificators/StatWithModificators.h"
 
 #include <vector>
 
-#include "Modificators/StatWithModificators.h"
-
+/**
+ * Level up Info
+ */
 struct LevelUpInfo
 {
-    const int pointsNeeded;
-    const int hpIncrease;
+    const int pointsNeeded; /// experience points till new level
+    const int hpIncrease; /// hp increase with level up
 };
 
+/**
+ * Level handler class
+ *
+ * Manages all experience changes of the player
+ */
 class LevelHandler
 {
 public:
@@ -31,7 +39,11 @@ public:
         
         m_bounds->bounds = MinMax(0.0f, m_levelsUp[0].pointsNeeded);
     }
-    
+
+    /**
+     * Change experience points of the player
+     * @param value experience points change
+     */
     void changeExperiencePoints(IStat::changedValue value) const
     {
         const size_t currentLevel = std::lround(m_level->getValue());

@@ -1,14 +1,22 @@
 ﻿#pragma once
+
 #include <functional>
 #include <stack>
 
+/**
+ * Pool objects pattern implementation
+ */
 template <typename T>
 class PoolObjects
 {
 public:
     PoolObjects(std::function<T*()> createFunc)
-        : m_createFunc(createFunc) { }
-    
+        : m_createFunc(createFunc)
+    {}
+
+    /**
+     * @return object from pool
+     */
     T* get()
     {
         if (m_stack.empty())
@@ -19,6 +27,9 @@ public:
         return top;
     }
 
+    /**
+     * Push object to pool
+     */
     void release(T* obj)
     {
         m_stack.push(obj);

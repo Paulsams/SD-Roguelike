@@ -1,10 +1,11 @@
 #pragma once
 
-#include "IStatModificator.h"
+#include "Stats/Modificators/IStatModificator.h"
 #include "Stats/IStat.h"
 
 #include <vector>
 #include <ranges>
+
 
 class StatWithModificators final : public IStat
 {
@@ -18,9 +19,29 @@ public:
 
     std::shared_ptr<IStat> clone() const override { return std::make_shared<StatWithModificators>(*this); }
 
+    /**
+     * @return stat value
+     */
     float getValue() const override;
+
+    /**
+     * Change current stats with given value
+     * @param value value
+     */
     void changeValueBy(float value) override;
+
+    /**
+     * Add stat modificator
+     * @param statModificator stat modificator
+     * @return this stat
+     */
     IStat& addModificator(std::shared_ptr<IStatModificator> statModificator) override;
+
+    /**
+     * Remove stat modificator
+     * @param statModificator stat modificator
+     * @return this stat
+     */
     IStat& removeModificator(std::shared_ptr<IStatModificator> statModificator) override;
 
 protected:
