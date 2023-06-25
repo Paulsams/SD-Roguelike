@@ -3,6 +3,9 @@
 #include "IPathfindingAlgorithm.h"
 
 namespace pathfinder {
+    /**
+     * Implements the pathfinding algorithm A*
+     */
     class PathfinderAStar : public IPathfindingAlgorithm {
 
         inline static float heuristic(Node* lhs, Node* rhs) {
@@ -10,6 +13,9 @@ namespace pathfinder {
         }
         
     public:
+        /**
+         * Finding the shortest path between two nodes
+         */
         std::vector<Vec2Int> findPath(Graph& graph, Node* start, Node* end,
             const std::function<bool(const Node*)>& isValidMove) override;
     };

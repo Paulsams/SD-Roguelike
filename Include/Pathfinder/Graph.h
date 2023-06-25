@@ -4,6 +4,9 @@
 #include <functional>
 
 namespace pathfinder {
+    /**
+     * Implements a graph that represents the terrain of the world
+     */
     class Graph {
         // {y, x}
         inline static std::vector<std::pair<int, int>> direction {
@@ -35,6 +38,11 @@ namespace pathfinder {
 
         }
 
+        /**
+         * Create a vector of nodes from an array of tiles
+         * @param tiles - a array of tiles
+         * @param fToTileType - function returning tile type by tile id
+         */
         void initNodes(uint32_t* tiles, const std::function<TileType (int)>& fToTileType) {
             int width = worldSize.width, height = worldSize.height;
             for(int x = 0; x < width; ++x) {
@@ -51,35 +59,70 @@ namespace pathfinder {
             }
         }
 
+        /**
+         * Get node position
+         * @param node - graph node
+         * @return position in the vector of nodes
+         */
         int getNodePos(Node* node) const{
             return node->pos.y * worldSize.width + node->pos.x;
         }
 
+        /**
+         * Get node by position in vector
+         * @param pos - Vec2Int position
+         * @return Node in position
+         */
         Node* getNodeByPos(Vec2Int pos) {
             return &nodes[pos.y * worldSize.width + pos.x];
         }
-
+        /**
+         * Get node by position in vector
+         * @param x - x coordinate
+         * @param y - y coordinate
+         * @return Node in position
+         */
         Node* getNodeByPos(int x, int y) {
             return &nodes[y * worldSize.width + x];
         }
 
+        /**
+         * Mark node as visited
+         * @param node
+         */
         void setVisitedNode(Node* node) {
             visited[getNodePos(node)] = true;
         }
 
+        /**
+         * Set parent of the passed Node
+         * @param node - the node for which the parent is specified
+         * @param parent - parent node
+         */
         void setParentNode(Node* node, Node* parent) {
             parents[getNodePos(node)] = parent;
         }
-        
+
+        /**
+         * Get visited status for node
+         * @param node - Node
+         * @return true if visited, otherwise false
+         */
         bool getVisitedNode(Node* node) const {
             return visited[getNodePos(node)];
         }
-
+        /**
+         * Get parent for node
+         * @param node - Node
+         * @return parent node
+         */
         Node* getParentNode(Node* node) const {
             return parents[getNodePos(node)];
         }
 
-
+        /**
+         * Clear all graph
+         */
         void clear() noexcept {
             std::fill(visited.begin(), visited.end(), false);
             std::fill(parents.begin(), parents.end(), nullptr);
