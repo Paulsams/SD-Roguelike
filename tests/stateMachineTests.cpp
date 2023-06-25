@@ -4,27 +4,44 @@
 #include <gtest/gtest.h>
 
 #include <unordered_map>
+#include <memory>
 
-struct test_struct {
+struct test_struct
+{
     int health = 100;
-
 };
 
-struct test_state {
+struct test_state
+{
     virtual void disable(test_struct*) {}
     virtual void enable(test_struct*) {}
     virtual void update(test_struct*) {}
+    virtual std::shared_ptr<test_state> clone() const = 0;
     virtual size_t getTypeId() = 0;
 };
 
-struct normal: test_state {
-    virtual size_t getTypeId()  {
+struct normal : test_state
+{
+    virtual std::shared_ptr<test_state> clone() const override
+    {
+        return std::make_shared<normal>();
+    }
+
+    virtual size_t getTypeId()
+    {
         return typeid(normal).hash_code();
     }
 };
 
-struct panic: test_state {
-    virtual size_t getTypeId()  {
+struct panic: test_state
+{
+    virtual std::shared_ptr<test_state> clone() const override
+    {
+        return std::make_shared<panic>();
+    }
+
+    virtual size_t getTypeId()
+    {
         return typeid(panic).hash_code();
     }
 };

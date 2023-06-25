@@ -90,6 +90,7 @@ list(APPEND GAME_HEADER
     Include/Mobs/Behaviour/AggressiveBehaviour.h
     Include/Mobs/Behaviour/CowardlyBehaviour.h
     Include/Mobs/Behaviour/PassiveBehaviour.h
+    Include/Mobs/Behaviour/ReplicativeBehaviour.h
     Include/Mobs/Factory/BaseMobAbstractFactory.h
     Include/Mobs/Factory/MobsConfig.h
     Include/Mobs/Factory/MobInfo.h
