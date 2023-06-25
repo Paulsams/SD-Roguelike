@@ -13,17 +13,19 @@ public:
     virtual ~AppDelegate();
 
     /**
-     * Do this after launch
+     * The handler of the entry point to the game
+     * @return true    Initialize success, app continue
+     * @return false   Initialize failed, app terminate
      */
     virtual bool applicationDidFinishLaunching();
-
+    
     /**
-     * Do this after entering background
+     * Called when the application moves to the background
      */
     virtual void applicationDidEnterBackground();
-
+    
     /**
-     * Do this before entering background
+     * Called when the application reenters the foreground
      */
     virtual void applicationWillEnterForeground();
 

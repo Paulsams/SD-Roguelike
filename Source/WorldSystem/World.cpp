@@ -234,7 +234,7 @@ void World::removeEntity(BaseEntity* entity)
     entity->removeFromParent();
 }
 
-void World::scheduleMove(BaseEntity* entity, BaseEntity::oldPosition oldPosition, BaseEntity::newPosition newPosition)
+void World::scheduleMove(BaseEntity* entity, BaseEntity::OldPosition oldPosition, BaseEntity::NewPosition newPosition)
 {
     const auto finded = m_movedEntities.find(entity);
     if (finded != m_movedEntities.end())
