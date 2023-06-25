@@ -5,7 +5,9 @@
 #include "UI/StatBar.h"
 
 namespace mob {
-
+    /**
+     * Implements the creation of mobs different types
+     */
     class MobsFactoryFromConfig final : public BaseMobAbstractFactory {
         std::shared_ptr<MobsConfig> m_mobsConfig;
     public:

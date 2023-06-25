@@ -4,7 +4,9 @@
 
 namespace mob
 {
-
+/**
+ * Panic state for mobs
+ */
 class Panic : public BaseStateStrategy
 {
 private:
