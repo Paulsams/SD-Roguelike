@@ -2,6 +2,7 @@
 
 #include <memory>
 
+
 namespace mob
 {
 
@@ -11,8 +12,16 @@ class IMobBehaviour
 {
 public:
     virtual ~IMobBehaviour() = default;
-    virtual std::shared_ptr<IMobBehaviour> clone() const = 0;
+
+    /**
+     * update mob with this behaviour
+     */
     virtual void update(Mob* mob) = 0;
+
+    /**
+     * @return clone of this behaviour
+     */
+    virtual std::shared_ptr<IMobBehaviour> clone() const = 0;
 };
 
 }

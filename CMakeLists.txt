@@ -248,6 +248,7 @@ add_executable(test_stateMachine tests/stateMachineTests.cpp)
 
 add_executable(test_generator tests/generatorTest.cpp
     Source/Mobs/Mob.cpp
+    Source/Mobs/Factory/MobInfo.cpp
 
     Source/Pathfinder/PathfinderAStar.cpp
 
@@ -270,6 +271,8 @@ add_executable(test_generator tests/generatorTest.cpp
 
     Source/Player/Player.cpp
     Source/Player/PlayerInput.cpp
+
+    Source/UI/StatBar.cpp
     )
 
 

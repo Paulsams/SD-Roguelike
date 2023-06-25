@@ -1,11 +1,18 @@
 #pragma once
 
-#include "cocos2d.h"
 #include "Utils/Direction.h"
 #include "Utils/EventsSystem.h"
 
+#include "cocos2d.h"
+
+
 class Player;
 
+/**
+ * Player input class
+ *
+ * Manages all input of the player
+ */
 class PlayerInput
 {
 public:
@@ -15,9 +22,9 @@ public:
 
     explicit PlayerInput(Player* player);
 
-    EventContainer<Direction> moved;
-    EventContainer<> attacked;
-    EventContainer<> interacted;
+    EventContainer<Direction> moved; /// player move events
+    EventContainer<> attacked; /// player attack events
+    EventContainer<> interacted; /// player interaction events
 private:
     void onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event) const;
     void tryInvokeDirectionFromInput(cocos2d::EventKeyboard::KeyCode keyCode) const;

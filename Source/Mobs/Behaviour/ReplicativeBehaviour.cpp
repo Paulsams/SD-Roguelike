@@ -7,6 +7,11 @@ namespace mob
 
     void ReplicativeBehaviour::update(Mob* mob)
     {
+        static std::shared_ptr<FunctionVisitorEntities<bool>> visitor = FunctionVisitorEntitiesBuilder<bool>()
+                .setMob([](mob::Mob*)          { return false; })
+                .setPlayer([](Player*)         { return false; })
+                .build();
+
         const auto mobPos = mob->getPositionOnMap();
         const Player* player = mob->getWorld()->getNearestPlayer(mobPos);
 
@@ -20,14 +25,13 @@ namespace mob
                 auto delta =  playerPos - mobPos;
                 const auto direction = Direction(playerPos - mobPos);
 
-                if (const auto possiblePos = mobPos - direction.getVector();
-                        mob->getWorld()->getTileType(possiblePos) == TileType::GROUND)
+                if (const auto possiblePos = mobPos - direction.getVector(); mob->getWorld()->getTileType(possiblePos) == TileType::GROUND)
                 {
                     mob->setScheduleMovePositionOnMap(possiblePos);
                 }
             }
 
-            if (cocos2d::random(0.0, 1.0) < 0.5)
+            if (cocos2d::random(0.0, 1.0) < 0.25)
             {
                 Vec2Int pos = mob->getPositionOnMap();
                 for (int i = -1; i <= 1; ++i)
@@ -37,8 +41,20 @@ namespace mob
                         if (i == 0 && j == 0)
                             continue;
 
-                        if (mob->getWorld()->getTileType(pos + Vec2Int{i, j}) == TileType::GROUND)
+                        Vec2Int newPos = pos + Vec2Int{i, j};
+
+                        if (mob->getWorld()->getTileType(newPos) == TileType::GROUND)
                         {
+                            bool isSpawn = true;
+                            for (BaseEntity* entity : mob->getWorld()->getEntitiesFromCell(newPos))
+                            {
+                                mob->acceptVisit(visitor);
+                                isSpawn = visitor->getReturnValue().value_or(true);
+                                if (!isSpawn)
+                                    break;
+                            }
+                            if (!isSpawn)
+                                continue;
                             Mob* clone = mob->clone();
                             clone->setPositionOnMapWithoutNotify(pos + Vec2Int{i, j});
                             mob->getWorld()->addEntity(clone);
@@ -48,7 +64,6 @@ namespace mob
                     }
                 }
             }
-
             return;
         }
 

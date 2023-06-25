@@ -1,14 +1,21 @@
 #pragma once
+
+#include "Mobs/Mob.h"
+
 #include <memory>
 #include <unordered_map>
 #include <vector>
 #include <functional>
 
-#include "Mobs/Mob.h"
 
 namespace mob
 {
 
+/**
+ * Check if T satisfies mob state machine state class
+ * @tparam T interface
+ * @tparam U mob class
+ */
 template<typename T, typename U>
 concept is_required_interface = requires (T&& interfaceClass, U* mob)
 {
@@ -19,6 +26,10 @@ concept is_required_interface = requires (T&& interfaceClass, U* mob)
     { interfaceClass.clone() } -> std::same_as<std::shared_ptr<T>>;
 };
 
+
+/**
+ * Mob state machine class
+ */
 template <typename T, typename U>
 requires is_required_interface<T, U>
 class StateMachine
@@ -38,9 +49,6 @@ public:
     StateMachine(StateMachine&& other) noexcept = default;
 
     StateMachine(const StateMachine& other)
-//        : m_currentState(other.m_currentState)
-//        , m_states(other.m_states)
-//        , m_functions(other.m_functions)
         : m_functions(other.m_functions)
         , m_currentState(other.m_currentState->clone())
     {
@@ -50,8 +58,16 @@ public:
         }
     }
 
+    /**
+     * @return current state
+     */
     std::shared_ptr<T> get() const { return m_currentState; }
 
+    /**
+     * Change current state to new state and perform disable of current state and enable of new state
+     * @param newState_id new state id
+     * @param mob mob
+     */
     void changeState(size_t newState_id, U* mob)
     {
         m_currentState->disable(mob);
@@ -59,6 +75,9 @@ public:
         m_currentState->enable(mob);
     }
 
+    /**
+     * Update obj and change current state
+     */
     void update(U* obj)
     {
         for (auto& [function, state_id]: m_functions[m_currentState->getTypeId()])

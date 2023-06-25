@@ -1,10 +1,14 @@
 ﻿#pragma once
-#include <Stats/Modificators/BoundsModificator.h>
 
-#include "BaseItem.h"
 #include "Player/Player.h"
+#include "ItemsSystem/BaseItem.h"
+#include "Stats/Modificators/BoundsModificator.h"
 #include "Stats/StatType.h"
 
+
+/**
+ * Consumable item that can change player's stats
+ */
 class ConsumableStatItem : public BaseItem
 {
 public:
@@ -13,6 +17,10 @@ public:
         , m_statType(statType)
         , m_value(value) { }
 
+    /**
+     * Try to consume item and change player's stats
+     * @return true if sucessful, false otherwise
+     */
     bool interact() override
     {
         std::shared_ptr<IStat> stat;

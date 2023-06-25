@@ -7,20 +7,24 @@
 #include <utility>
 #include <functional>
 
+
 namespace mob
 {
 
 class IMobBehaviour;
 class IMobStrategy;
 
+/**
+ * Mob information
+ */
 struct MobInfo
 {
-    int health;
-    float experiencePoints;
-    int visionRange;
-    GID gid;
-    std::shared_ptr<IMobStrategy> strategy;
-    std::shared_ptr<IMobBehaviour> behaviour;
+    int health; /// max health points
+    float experiencePoints; /// experience points amount given by killing this mob
+    int visionRange; /// vision range
+    GID gid; /// pixel image id from tileset
+    std::shared_ptr<IMobStrategy> strategy; /// strategy
+    std::shared_ptr<IMobBehaviour> behaviour; /// behaviour
 
     MobInfo() = delete;
 

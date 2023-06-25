@@ -1,9 +1,11 @@
 ﻿#pragma once
-#include<optional>
 
 #include "ItemsSystem/Accessory.h"
 #include "ItemsSystem/Attacks.h"
 #include "ItemsSystem/Weapon.h"
+
+#include<optional>
+
 
 class Backpack : public IDamageModificator
 {
@@ -42,10 +44,13 @@ class Backpack : public IDamageModificator
             }
         }
 
+        /**
+         * @return items in yhe backpack
+         */
         const std::vector<T*>& get() const { return m_items; }
 
-        EventContainer<size_t, typename ObservableVector<T*>::oldValue, typename ObservableVector<T*>::newValue> changed;
-        EventContainer<size_t, size_t> swapped;
+        EventContainer<size_t, typename ObservableVector<T*>::oldValue, typename ObservableVector<T*>::newValue> changed; /// changes events
+        EventContainer<size_t, size_t> swapped; /// swap events
         
         std::shared_ptr<ObservableVector<BaseItem*>> observableCollection;
 
@@ -84,22 +89,46 @@ public:
         m_defaultWeapon->release();
     }
 
+    /**
+     * @return observable weapons
+     */
     std::shared_ptr<ObservableVector<BaseItem*>> getObservableWeapons() { return m_weapon.observableCollection; }
+
+    /**
+     *
+     * @return observable accessories
+     */
     std::shared_ptr<ObservableVector<BaseItem*>> getObservableAccessories() { return m_accessories.observableCollection; }
+
+    /**
+     * @return observable spells
+     */
     std::shared_ptr<ObservableVector<BaseItem*>> getObservableSpells() { return m_spells.observableCollection; }
 
+    /**
+     * @return active weapon
+     */
     Weapon* getCurrentWeapon() const
     {
         Weapon* weapon = m_weapon.get()[0];
         return weapon ? weapon : m_defaultWeapon;
     }
-    
+
+    /**
+     * Modify damage
+     * @param damage damage
+     * @param entity entity
+     * @return damage value
+     */
     float modify(float damage, BaseEntity* entity) const override
     {
         // TODO: Модифицировать с помощью акксесуаров
         return damage;
     }
 
+    /**
+     * Throw all items from backpack on the ground
+     */
     void throwAllItems()
     {
         throwItems(m_weapon.observableCollection);

@@ -1,11 +1,16 @@
 #pragma once
+
 #include "Mobs/Strategy/IMobStrategy.h"
-#include "StateMachine.h"
-#include "BaseStateStrategy.h"
+#include "Mobs/Strategy/StateMachine.h"
+#include "Mobs/Strategy/BaseStateStrategy.h"
+
 
 namespace mob
 {
 
+/**
+ * Mob strategy with state machine
+ */
 class StrategyWithStates : public IMobStrategy
 {
 private:
@@ -21,8 +26,14 @@ public:
         : m_stateContainer(stateContainer)
     {}
 
+    /**
+     * @return clone of this strategy
+     */
     std::shared_ptr<IMobStrategy> clone() const override { return std::make_shared<StrategyWithStates>(m_stateContainer); }
 
+    /**
+     * Update strategy
+     */
     void update(Mob *mob) override
     {
         m_stateContainer.update(mob);

@@ -2,6 +2,10 @@
 
 #include "IAttackSearch.h"
 
+
+/**
+ * Check if attack is reachable by straight lines from attacker
+ */
 class AttackSearchFromStraightLines : public IAttackSearch
 {
 public:

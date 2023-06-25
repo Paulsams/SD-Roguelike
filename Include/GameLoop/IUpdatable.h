@@ -1,5 +1,8 @@
 ﻿#pragma once
 
+/**
+ * Interface for updatable classes
+ */
 struct IUpdatable
 {
     virtual ~IUpdatable() = default;

@@ -1,23 +1,44 @@
 #pragma once
 
-#include "cocos2d.h"
 #include "GameLoop/GameLoop.h"
 #include "Player/Player.h"
 #include "UI/Canvas.h"
 #include "WorldSystem/World.h"
 #include "WorldSystem/WorldTileConfig.h"
 
+#include "cocos2d.h"
+
+
+/**
+ * Scene in the displayed window for user
+ */
 class GameScene final : public cocos2d::Layer
 {
 public:
     static std::pair<cocos2d::Scene*, GameScene*> createScene();
 
     static GameScene* create(cocos2d::Camera* camera);
+
+    /**
+     * Update GameScene
+     */
     void update(float delta) override;
 
+    /**
+     * @return view point center
+     */
     cocos2d::Point getViewPointCenter(cocos2d::Point position) const;
+
+    /**
+     * Init GameScene with camera
+     * @param camera
+     * @return true if successful, false otherwise
+     */
     bool init(cocos2d::Camera* camera);
 
+    /**
+     * Do this on exit
+     */
     void onExit() override;
     
     EventContainer<> restarted;

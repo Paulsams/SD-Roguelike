@@ -1,25 +1,38 @@
 ﻿#pragma once
-#include "Accessory.h"
-#include "ConsumableItem.h"
+
+#include "ItemsSystem/Accessory.h"
+#include "ItemsSystem/ConsumableItem.h"
 #include "ItemsSystem/BaseItem.h"
 
-struct ItemInfo
-{
-    const std::string name;
-    const int gid;
-};
 
+/**
+ * Singleton
+ * Holds all consumables and accessories in the game
+ */
 class Items
 {
 public:
-    static const ItemInfo healthPotion;
-
+    /**
+     * Create consumable with given name
+     * @param world world
+     * @param name consumable name
+     * @return consumable item
+     */
     static ConsumableItem* createConsumable(World* world, const std::string& name)
         { return instance.m_createConsumables.at(name)(world); }
 
+    /**
+     * Create accessory with given name
+     * @param world world
+     * @param name accessory name
+     * @return accessory
+     */
     static Accessory* createAccessory(World* world, const std::string& name)
         { return instance.m_createAccessories.at(name)(world); }
 
+    /**
+     * @return all game consumables
+     */
     static std::vector<std::string> getConsumables();
 
 private:

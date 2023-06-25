@@ -21,9 +21,16 @@
 namespace mob
 {
 
+/**
+ * Check if T is hashable
+ */
 template <typename T>
-concept has_hash_code = requires(T &&args) { args->getTypeId(); };
+concept has_hash_code = requires(T&& args) { args->getTypeId(); };
 
+
+/**
+ * Configuration of all mobs in the game
+ */
 class MobsConfig
 {
 private:
@@ -90,7 +97,6 @@ private:
     MobInfo createBossMobInfo(GID gid);
     MobInfo createStrongPassiveMobInfo(GID gid);
     MobInfo createPassiveMobInfo(GID gid);
-    MobInfo createReplicateNormalMobInfo(GID gid);
 
 public:
     MobsConfig()
@@ -126,13 +132,18 @@ public:
 
         passives.insert({
             {228, createPassiveMobInfo(228)},
-            {242, createPassiveMobInfo(142)},
+            {242, createPassiveMobInfo(242)},
             {293, createStrongPassiveMobInfo(293)},
             {295, createPassiveMobInfo(295)},
             {307, createStrongPassiveMobInfo(307)},
         });
     }
 
+    /**
+     * Create attack with given ranges
+     * @param ranges ranges
+     * @return AttackHandler
+     */
     std::shared_ptr<AttackHandler> createAttack(const std::vector<std::tuple<const std::vector<Vec2Int>, std::shared_ptr<AttackInfo>, float>>& ranges)
     {
         AttackHandlerBuilder builder;
@@ -143,10 +154,10 @@ public:
         return builder.build();
     }
 
-    std::unordered_map<int, MobInfo> normals;
-    std::unordered_map<int, MobInfo> elites;
-    std::unordered_map<int, MobInfo> bosses;
-    std::unordered_map<int, MobInfo> passives;
+    std::unordered_map<int, MobInfo> normals; /// normal mobs: GID to info
+    std::unordered_map<int, MobInfo> elites; /// elite mobs: GID to info
+    std::unordered_map<int, MobInfo> bosses; /// boss mobs: GID to info
+    std::unordered_map<int, MobInfo> passives; /// passive mobs: GID to info
 };
 
 }
