@@ -129,11 +129,6 @@ bool GameScene::init(Camera* camera)
     return true;
 }
 
-void GameScene::onExit()
-{
-    Layer::onExit();
-}
-
 void GameScene::update(float delta)
 {
     Layer::update(delta);
@@ -170,7 +165,7 @@ void GameScene::createPlayer()
 }
 
 GameScene::GameScene()
-    : movedPlayerDelegate([this](BaseEntity*, BaseEntity::oldPosition, BaseEntity::newPosition endPosition)
+    : movedPlayerDelegate([this](BaseEntity*, BaseEntity::OldPosition, BaseEntity::NewPosition endPosition)
     {
         static constexpr int moveCameraTag = 10;
         static constexpr float moveCameraTime = 0.4f;
