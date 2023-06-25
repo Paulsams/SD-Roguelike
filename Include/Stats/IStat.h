@@ -13,7 +13,9 @@ public:
     using wantedChangeValue = float;
 
     EventContainer<currentValue, changedValue, wantedChangeValue> changed; 
-    
+
+    virtual std::shared_ptr<IStat> clone() const = 0;
+
     virtual ~IStat() = default;
     virtual float getValue() const = 0;
     virtual void changeValueBy(float value) = 0;

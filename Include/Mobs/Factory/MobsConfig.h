@@ -6,6 +6,7 @@
 #include "Mobs/Strategy/StrategyWithStates.h"
 #include "Mobs/Behaviour/CowardlyBehaviour.h"
 #include "Mobs/Behaviour/PassiveBehaviour.h"
+#include "Mobs/Behaviour/ReplicativeBehaviour.h"
 #include "Mobs/Strategy/NothingStrategy.h"
 #include "Mobs/Strategy/Normal.h"
 #include "Mobs/Factory/MobInfo.h"
@@ -35,6 +36,11 @@ private:
     std::shared_ptr<IMobBehaviour> createCowardlyBehaviour(std::shared_ptr<AttackHandler> attack)
     {
         return std::make_shared<CowardlyBehaviour>(std::move(attack));
+    };
+
+    std::shared_ptr<IMobBehaviour> createReplicativeBehaviour(std::shared_ptr<AttackHandler> attack)
+    {
+        return std::make_shared<ReplicativeBehaviour>(std::move(attack));
     };
 
     std::shared_ptr<IMobBehaviour> createPassiveBehaviour()
@@ -78,51 +84,52 @@ private:
     };
 
 
-    MobInfo createNormalMobInfoWithLowPanic();
-    MobInfo createNormalMobInfoWithHighPanic();
-    MobInfo createEliteMobInfo();
-    MobInfo createBossMobInfo();
-    MobInfo createStrongPassiveMobInfo();
-    MobInfo createPassiveMobInfo();
+    MobInfo createNormalMobInfoWithLowPanic(GID gid);
+    MobInfo createNormalMobInfoWithHighPanic(GID gid);
+    MobInfo createEliteMobInfo(GID gid);
+    MobInfo createBossMobInfo(GID gid);
+    MobInfo createStrongPassiveMobInfo(GID gid);
+    MobInfo createPassiveMobInfo(GID gid);
+    MobInfo createReplicateNormalMobInfo(GID gid);
 
 public:
     MobsConfig()
     {
         normals.insert({
-            {174, createNormalMobInfoWithHighPanic()},
-            {175, createNormalMobInfoWithHighPanic()},
-            {176, createNormalMobInfoWithLowPanic()},
-            {177, createNormalMobInfoWithHighPanic()},
-            {178, createNormalMobInfoWithHighPanic()},
-            {179, createNormalMobInfoWithLowPanic()},
-            {180, createNormalMobInfoWithLowPanic()},
-            {181, createNormalMobInfoWithHighPanic()},
+            {174, createNormalMobInfoWithHighPanic(174)},
+            {175, createNormalMobInfoWithHighPanic(175)},
+            {176, createNormalMobInfoWithLowPanic(176)},
+            {177, createNormalMobInfoWithHighPanic(177)},
+            {178, createNormalMobInfoWithHighPanic(178)},
+            {179, createNormalMobInfoWithLowPanic(179)},
+            {180, createNormalMobInfoWithLowPanic(180)},
+            {181, createNormalMobInfoWithHighPanic(181)},
         });
 
         elites.insert({
-            {376, createEliteMobInfo()},
-            {377, createEliteMobInfo()},
-            {378, createEliteMobInfo()},
-            {379, createEliteMobInfo()},
-            {380, createEliteMobInfo()},
-            {381, createEliteMobInfo()},
-            {382, createEliteMobInfo()},
-            {383, createEliteMobInfo()},
-            {384, createEliteMobInfo()},
+            {376, createEliteMobInfo(376)},
+            {377, createEliteMobInfo(377)},
+            {378, createEliteMobInfo(378)},
+            {379, createEliteMobInfo(379)},
+            {380, createEliteMobInfo(380)},
+            {381, createEliteMobInfo(381)},
+            {382, createEliteMobInfo(382)},
+            {383, createEliteMobInfo(383)},
+            {384, createEliteMobInfo(384)},
         });
 
         bosses.insert({
-            {129, createBossMobInfo()},
-            {131, createBossMobInfo()},
-            {320, createBossMobInfo()},
+            {129, createBossMobInfo(129)},
+            {131, createBossMobInfo(131)},
+            {320, createBossMobInfo(320)},
         });
 
         passives.insert({
-            {228, createPassiveMobInfo()},
-            {242, createPassiveMobInfo()},
-            {293, createStrongPassiveMobInfo()},
-            {295, createPassiveMobInfo()},
-            {307, createStrongPassiveMobInfo()},
+            {228, createPassiveMobInfo(228)},
+            {242, createPassiveMobInfo(142)},
+            {293, createStrongPassiveMobInfo(293)},
+            {295, createPassiveMobInfo(295)},
+            {307, createStrongPassiveMobInfo(307)},
         });
     }
 

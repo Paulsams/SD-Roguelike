@@ -1,5 +1,14 @@
 #include "Stats/StatsContainer.h"
 
+StatsContainer::StatsContainer(const StatsContainer& other)
+{
+    for (const auto& [statType, stat] : other.m_stats)
+    {
+        m_stats[statType] = stat->clone();
+    }
+}
+
+
 bool StatsContainer::tryGet(StatType type, std::shared_ptr<IStat>& stat) const
 {
     auto finded = m_stats.find(type);

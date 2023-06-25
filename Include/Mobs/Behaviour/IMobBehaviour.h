@@ -1,14 +1,18 @@
 #pragma once
-#include "Mobs/Mob.h"
 
-namespace mob {
+#include <memory>
 
-    class Mob;
+namespace mob
+{
 
-    class IMobBehaviour {
-    public:
-        virtual ~IMobBehaviour() = default;
-        virtual void update(Mob* mob) = 0;
-    };
+class Mob;
+
+class IMobBehaviour
+{
+public:
+    virtual ~IMobBehaviour() = default;
+    virtual std::shared_ptr<IMobBehaviour> clone() const = 0;
+    virtual void update(Mob* mob) = 0;
+};
 
 }

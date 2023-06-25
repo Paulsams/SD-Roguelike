@@ -2,6 +2,7 @@
 
 #include "Mobs/Strategy/IMobStrategy.h"
 #include "Mobs/Behaviour/IMobBehaviour.h"
+#include "Utils/Common.h"
 
 #include <utility>
 #include <functional>
@@ -15,31 +16,17 @@ class IMobStrategy;
 struct MobInfo
 {
     int health;
-    int experiencePoints;
+    float experiencePoints;
     int visionRange;
+    GID gid;
     std::shared_ptr<IMobStrategy> strategy;
-    std::shared_ptr<IMobBehaviour> startBehaviour;
+    std::shared_ptr<IMobBehaviour> behaviour;
 
     MobInfo() = delete;
 
-    MobInfo(int health, int experiencePoints, int visionRange, std::shared_ptr<IMobStrategy> strategy, std::shared_ptr<IMobBehaviour> startBehaviour)
-        : health(health)
-        , experiencePoints(experiencePoints)
-        , visionRange(visionRange)
-        , strategy(std::move(strategy))
-        , startBehaviour(std::move(startBehaviour))
-    {}
-
-    MobInfo(const MobInfo& other) = default;
+    MobInfo(const MobInfo& other);
     MobInfo(MobInfo&& other) noexcept = default;
-
-//    MobInfo(MobInfo&& other) noexcept
-//        : health(other.health)
-//        , visionRange(other.visionRange)
-//        , strategy(std::move(other.strategy))
-//        , startBehaviour(std::move(other.startBehaviour))
-//    {}
-
+    MobInfo(int health, float experiencePoints, int visionRange, GID gid, std::shared_ptr<IMobStrategy> strategy, std::shared_ptr<IMobBehaviour> startBehaviour);
 };
 
 }

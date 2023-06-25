@@ -11,6 +11,8 @@
 using Tilemap = cocos2d::FastTMXTiledMap;
 using TilemapLayer = cocos2d::FastTMXLayer;
 
+using GID = int;
+
 class TileMapProxy : public Tilemap
 {
 public:
@@ -28,7 +30,6 @@ public:
 
     bool initWithMapInfo(cocos2d::TMXMapInfo* mapInfo)
     {
-        // _tmxFile = mapInfo->getTMXFileName();
         setContentSize(cocos2d::Size::ZERO);
         buildWithMapInfo(mapInfo);
         return true;

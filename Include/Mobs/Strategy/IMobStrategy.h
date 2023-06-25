@@ -1,5 +1,6 @@
 #pragma once
-#include "Mobs/Mob.h"
+
+#include <memory>
 
 namespace mob
 {
@@ -10,7 +11,7 @@ class IMobStrategy
 {
 public:
     virtual void update(Mob* mob) = 0;
-
+    virtual std::shared_ptr<IMobStrategy> clone() const = 0;
     virtual ~IMobStrategy() = default;
 };
 

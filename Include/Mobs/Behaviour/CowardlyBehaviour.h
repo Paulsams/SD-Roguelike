@@ -4,10 +4,14 @@
 
 namespace mob {
 
-    class CowardlyBehaviour: public IMobBehaviour {
-        std::shared_ptr<AttackHandler> m_attack;
-    public:
-        CowardlyBehaviour(std::shared_ptr<AttackHandler> attack): m_attack(attack) {}
-        void update(Mob* mob) override;
-    };
+class CowardlyBehaviour: public IMobBehaviour
+{
+private:
+    std::shared_ptr<AttackHandler> m_attack;
+public:
+    CowardlyBehaviour(std::shared_ptr<AttackHandler> attack): m_attack(attack) {}
+    std::shared_ptr<IMobBehaviour> clone() const override { return std::make_shared<CowardlyBehaviour>(m_attack); }
+    void update(Mob* mob) override;
+};
+
 }

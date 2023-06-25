@@ -3,6 +3,13 @@
 StatWithModificators::StatWithModificators(float startValue)
     : m_value(startValue) { }
 
+StatWithModificators::StatWithModificators(const StatWithModificators& other)
+    : m_value(other.m_value)
+{
+    for (const auto& m_modificator : other.m_modificators)
+        m_modificators.emplace_back(m_modificator->clone());
+}
+
 float StatWithModificators::getValue() const
 {
     float value = m_value;

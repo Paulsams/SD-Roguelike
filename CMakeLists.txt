@@ -161,7 +161,9 @@ list(APPEND GAME_SOURCE
     Source/Mobs/Behaviour/AggressiveBehaviour.cpp
     Source/Mobs/Behaviour/CowardlyBehaviour.cpp
     Source/Mobs/Behaviour/PassiveBehaviour.cpp
+    Source/Mobs/Behaviour/ReplicativeBehaviour.cpp
     Source/Mobs/Factory/MobsConfig.cpp
+    Source/Mobs/Factory/MobInfo.cpp
 
     Source/Pathfinder/PathfinderAStar.cpp
 

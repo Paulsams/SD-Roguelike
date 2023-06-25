@@ -30,5 +30,10 @@ struct BoundsModificator : IStatModificator
         return std::clamp(value, bounds.getMin(), bounds.getMax());
     }
 
+    std::shared_ptr<IStatModificator> clone() const override
+    {
+        return std::make_shared<BoundsModificator>(bounds);
+    }
+
     MinMax bounds;
 };

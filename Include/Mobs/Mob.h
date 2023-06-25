@@ -1,39 +1,43 @@
 #pragma once
 #include <memory>
 
+#include "Mobs/Factory/MobInfo.h"
 #include "Mobs/Behaviour/IMobBehaviour.h"
 #include "Mobs/Strategy/IMobStrategy.h"
-#include "Mobs/Factory/MobInfo.h"
 #include "GameLoop/IUpdatable.h"
 #include "WorldSystem/World.h"
 #include "Stats/IHaveStats.h"
 #include "WorldSystem/IVisitorEntities.h"
 
-namespace mob {
+namespace mob
+{
 
-    class IMobStrategy;
+class IMobStrategy;
 
-    class Mob : public BaseEntity, public IUpdatable {
-    public:
-        static Mob* create(World* world, cocos2d::Sprite* sprite, const MobInfo& info);
+class Mob : public BaseEntity, public IUpdatable
+{
+public:
+    static Mob* create(World* world, const MobInfo& info, const std::string& pathToBar, std::shared_ptr<StatsContainer> stats);
 
-        void update() override;
-        void changeBehaviour(std::shared_ptr<IMobBehaviour>);
-        const std::shared_ptr<IStatsContainer> getStats() const override;
-        int getVisionRange() const;
-        float getExperiencePoints() const;
-        
-        void acceptVisit(std::shared_ptr<IVisitorEntities> visitor) override { visitor->visitMob(this); }
+    Mob* clone() const;
 
-    private:
+    int getVisionRange() const;
+    float getExperiencePoints() const;
 
-        Mob(World* world, const MobInfo& info);
-        
-        float m_experiencePoints;
-        int m_visionRange;
-        std::shared_ptr<IMobStrategy> m_strategy;
-        std::shared_ptr<IMobBehaviour> m_behaviour;
-        std::shared_ptr<StatsContainer> m_stats;
-    };
+    void update() override;
+    void acceptVisit(std::shared_ptr<IVisitorEntities> visitor) override { visitor->visitMob(this); }
+    const std::shared_ptr<IStatsContainer> getStats() const override;
+
+    void changeBehaviour(std::shared_ptr<IMobBehaviour>);
+
+private:
+    Mob(World* world, const MobInfo& info, const std::string& pathToBar, std::shared_ptr<StatsContainer> stats);
+
+    void subscribeOnHealthChanged();
+
+    MobInfo m_mobInfo;
+    std::shared_ptr<StatsContainer> m_stats;
+    const std::string m_pathToBar;
+};
 
 }

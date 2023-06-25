@@ -6,7 +6,7 @@ using namespace mob;
 AttackInfo::PossibleAttackDelegate dontHitObstacle = [](TileType tileType) { return tileType == TileType::GROUND; };
 AttackInfo::PossibleAttackFromEntity hitOnlyPlayer = FunctionVisitorEntitiesBuilder<bool>().setPlayer([](Player*) { return true; }).build();
 
-MobInfo MobsConfig::createNormalMobInfoWithLowPanic()
+MobInfo MobsConfig::createNormalMobInfoWithLowPanic(GID gid)
 {
     const auto defaultAttackInfo = std::make_shared<AttackInfo>(dontHitObstacle, hitOnlyPlayer, nullptr, std::make_shared<AttackSearchFromStraightLines>());
 
@@ -38,12 +38,12 @@ MobInfo MobsConfig::createNormalMobInfoWithLowPanic()
     std::shared_ptr<BaseStateStrategy> panicState = std::make_shared<Panic>(cowardlyBeh);
 
     auto strategy = createStrategy(typeid(Normal).hash_code(), transitionFunction, normalState, panicState);
-    return {10, 7, 5, strategy, aggressiveBeh};
+    return {10, 7, 5, gid, strategy, aggressiveBeh};
 }
 
 
 
-MobInfo MobsConfig::createNormalMobInfoWithHighPanic()
+MobInfo MobsConfig::createNormalMobInfoWithHighPanic(GID gid)
 {
     const auto defaultAttackInfo = std::make_shared<AttackInfo>(dontHitObstacle, hitOnlyPlayer, nullptr, std::make_shared<AttackSearchFromStraightLines>());
 
@@ -62,49 +62,50 @@ MobInfo MobsConfig::createNormalMobInfoWithHighPanic()
                                     else
                                         return false;
                                 }
-                                      , typeid(Panic).hash_code()
+                                , typeid(Panic).hash_code()
                               }
                       }
                     },
             };
 
     auto aggressiveBeh = createAggressiveBehaviour(attack);
-    auto cowardlyBeh = createCowardlyBehaviour(attack);
+//    auto cowardlyBeh = createCowardlyBehaviour(attack);
+    auto cowardlyBeh = createReplicativeBehaviour(attack);
 
     std::shared_ptr<BaseStateStrategy> normalState = std::make_shared<Normal>(aggressiveBeh);
     std::shared_ptr<BaseStateStrategy> panicState = std::make_shared<Panic>(cowardlyBeh);
 
     auto strategy = createStrategy(typeid(Normal).hash_code(), transitionFunction, normalState, panicState);
-    return {7, 10, 7, strategy, aggressiveBeh};
+    return {7, 10, 7, gid, strategy, aggressiveBeh};
 }
 
 
 
-MobInfo MobsConfig::createEliteMobInfo()
+MobInfo MobsConfig::createEliteMobInfo(GID gid)
 {
     const auto defaultAttackInfo = std::make_shared<AttackInfo>(dontHitObstacle, hitOnlyPlayer, nullptr, std::make_shared<AttackSearchFromStraightLines>());
     const std::shared_ptr<AttackHandler> attack = createAttack({{Attacks::smallIRange, defaultAttackInfo, 5}});
     auto aggressiveBeh = createAggressiveBehaviour(attack);
     auto strategy = createStrategy();
 
-    return {15, 50, 6, strategy, aggressiveBeh};
+    return {15, 50, 6, gid, strategy, aggressiveBeh};
 }
 
 
 
-MobInfo MobsConfig::createBossMobInfo()
+MobInfo MobsConfig::createBossMobInfo(GID gid)
 {
     const auto defaultAttackInfo = std::make_shared<AttackInfo>(dontHitObstacle, hitOnlyPlayer, nullptr, std::make_shared<AttackSearchFromStraightLines>());
     const std::shared_ptr<AttackHandler> attack = createAttack({{Attacks::smallTRangeFlip, defaultAttackInfo, 7}});
     auto aggressiveBeh = createAggressiveBehaviour(attack);
     auto strategy = createStrategy();
 
-    return {25, 100, 7, strategy, aggressiveBeh};
+    return {25, 100, 7, gid, strategy, aggressiveBeh};
 }
 
 
 
-MobInfo MobsConfig::createStrongPassiveMobInfo()
+MobInfo MobsConfig::createStrongPassiveMobInfo(GID gid)
 {
     const auto defaultAttackInfo = std::make_shared<AttackInfo>(dontHitObstacle, hitOnlyPlayer, nullptr, std::make_shared<AttackSearchFromStraightLines>());
 
@@ -136,12 +137,12 @@ MobInfo MobsConfig::createStrongPassiveMobInfo()
     std::shared_ptr<BaseStateStrategy> aggressiveState = std::make_shared<Panic>(aggressiveBeh);
 
     auto strategy = createStrategy(typeid(Normal).hash_code(), transitionFunction, normalState, aggressiveState);
-    return {15, 3, 4, strategy, passiveBeh};
+    return {15, 3, 4, gid, strategy, passiveBeh};
 }
 
 
 
-MobInfo MobsConfig::createPassiveMobInfo()
+MobInfo MobsConfig::createPassiveMobInfo(GID gid)
 {
     const auto defaultAttackInfo = std::make_shared<AttackInfo>(dontHitObstacle, hitOnlyPlayer, nullptr, std::make_shared<AttackSearchFromStraightLines>());
 
@@ -173,5 +174,5 @@ MobInfo MobsConfig::createPassiveMobInfo()
     std::shared_ptr<BaseStateStrategy> aggressiveState = std::make_shared<Panic>(aggressiveBeh);
 
     auto strategy = createStrategy(typeid(Normal).hash_code(), transitionFunction, normalState, aggressiveState);
-    return {10, 1, 5, strategy, passiveBeh};
+    return {10, 1, 5, gid, strategy, passiveBeh};
 }

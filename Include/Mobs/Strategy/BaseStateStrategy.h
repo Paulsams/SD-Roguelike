@@ -11,6 +11,7 @@ public:
     virtual void update(Mob*) = 0;
     virtual size_t getTypeId() = 0;
     virtual ~BaseStateStrategy() = default;
+    virtual std::shared_ptr<BaseStateStrategy> clone() const = 0;
 };
 
 }

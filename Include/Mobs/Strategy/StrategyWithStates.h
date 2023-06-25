@@ -6,16 +6,28 @@
 namespace mob
 {
 
-    class StrategyWithStates : public IMobStrategy {
-        StateMachine<BaseStateStrategy, Mob> m_stateContainer;
-        StrategyWithStates() = delete;
-    public:
+class StrategyWithStates : public IMobStrategy
+{
+private:
+    StateMachine<BaseStateStrategy, Mob> m_stateContainer;
+    StrategyWithStates() = delete;
 
-        StrategyWithStates(StateMachine<BaseStateStrategy, Mob>&& stateContainer): m_stateContainer(std::move(stateContainer)) {}
-        StrategyWithStates(const StateMachine<BaseStateStrategy, Mob>& stateContainer): m_stateContainer(stateContainer) {}
-        void update(Mob *mob) override {
-            m_stateContainer.update(mob);
-            m_stateContainer.get()->update(mob);
-        }
-    };
+public:
+    StrategyWithStates(StateMachine<BaseStateStrategy, Mob>&& stateContainer) noexcept
+        : m_stateContainer(std::move(stateContainer))
+    {}
+
+    StrategyWithStates(const StateMachine<BaseStateStrategy, Mob>& stateContainer)
+        : m_stateContainer(stateContainer)
+    {}
+
+    std::shared_ptr<IMobStrategy> clone() const override { return std::make_shared<StrategyWithStates>(m_stateContainer); }
+
+    void update(Mob *mob) override
+    {
+        m_stateContainer.update(mob);
+        m_stateContainer.get()->update(mob);
+    }
+};
+
 }
