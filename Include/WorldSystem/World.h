@@ -84,7 +84,7 @@ private:
     TilemapLayer* m_walls = nullptr;
 
     std::shared_ptr<mob::BaseMobAbstractFactory> m_mobFactory;
-    std::vector<mob::Mob*> m_mobs;
+    std::list<mob::Mob*> m_mobs;
     std::vector<mob::Mob*> m_bosses;
     std::vector<std::vector<BaseEntity*>> m_entities;
 

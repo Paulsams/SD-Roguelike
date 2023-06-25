@@ -65,14 +65,14 @@ bool World::initWithTilemap()
     tryInitChests(chestsGroup, tileSize);
     
     trySpawnMobs(normalMobsGroup, tileSize, &mob::BaseMobAbstractFactory::createNormal);
-//    trySpawnMobs(eliteMobsGroup, tileSize, &mob::BaseMobAbstractFactory::createElite);
+    trySpawnMobs(eliteMobsGroup, tileSize, &mob::BaseMobAbstractFactory::createElite);
     trySpawnMobs(bossMobsGroup, tileSize, [this](mob::BaseMobAbstractFactory* factory, World* world, int gid)
     {
         mob::Mob* boss = factory->createBoss(world, gid);
         m_bosses.push_back(boss);
         return boss;
     });
-//    trySpawnMobs(passiveMobsGroup, tileSize, &mob::BaseMobAbstractFactory::createPassive);
+    trySpawnMobs(passiveMobsGroup, tileSize, &mob::BaseMobAbstractFactory::createPassive);
 
     m_damageIndicatorsMobs = DamageIndicatorsSystems::create(this);
     this->addChild(m_damageIndicatorsMobs);
@@ -347,7 +347,7 @@ World::World(Tilemap* tilemap, std::shared_ptr<mob::BaseMobAbstractFactory> mobF
     m_visitorFromAddEntity = FunctionVisitorEntitiesBuilder<void>()
         .setMob([this](mob::Mob* mob)
         {
-            m_mobs.push_back(mob);
+            m_mobs.push_front(mob);
         }).build();
 
     m_visitorFromRemoveEntity = FunctionVisitorEntitiesBuilder<void>()
