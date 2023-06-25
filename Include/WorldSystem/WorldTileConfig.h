@@ -23,6 +23,10 @@ void ReadArray(const rapidjson::Value& jsonArray, std::vector<ValueType>& output
     }
 }
 
+
+/**
+ * Level config
+ */
 class LevelTileConfig
 {
 public:
@@ -41,26 +45,26 @@ public:
         ReadArray(jsonValue["Chests"], m_chests);
     }
 
-    [[nodiscard]] const std::string& getName() const { return m_name; }
+    const std::string& getName() const { return m_name; }
 
-    [[nodiscard]] const std::vector<int>& getGround() const { return m_ground; }
-    [[nodiscard]] const std::vector<int>& getRareGround() const { return m_rareGround; }
-    [[nodiscard]] const std::vector<int>& getWalls() const { return m_walls; }
-    [[nodiscard]] const std::vector<int>& getRareWalls() const { return m_rareWalls; }
+    const std::vector<int>& getGround() const { return m_ground; }
+    const std::vector<int>& getRareGround() const { return m_rareGround; }
+    const std::vector<int>& getWalls() const { return m_walls; }
+    const std::vector<int>& getRareWalls() const { return m_rareWalls; }
 
-    [[nodiscard]] const std::vector<int>& getDecorations() const { return m_decorations; }
+    const std::vector<int>& getDecorations() const { return m_decorations; }
 
-    [[nodiscard]] const std::vector<int>& getNormalMobs() const { return m_normalMobs; }
-    [[nodiscard]] const std::vector<int>& getEliteMobs() const { return m_eliteMobs; }
-    [[nodiscard]] const std::vector<int>& getBossMobs() const { return m_bossMobs; }
-    [[nodiscard]] const std::vector<int>& getPassiveMobs() const { return m_passiveMobs; }
+    const std::vector<int>& getNormalMobs() const { return m_normalMobs; }
+    const std::vector<int>& getEliteMobs() const { return m_eliteMobs; }
+    const std::vector<int>& getBossMobs() const { return m_bossMobs; }
+    const std::vector<int>& getPassiveMobs() const { return m_passiveMobs; }
 
-    [[nodiscard]] const std::vector<int>& getChests() const { return m_chests; }
+    const std::vector<int>& getChests() const { return m_chests; }
 
 private:
     std::string m_name;
 
-    /// Vectors of sprite tile GIDs from tile set for this specific level
+    /// Sprite tile GIDs vectors from tile set for this specific level
     std::vector<int> m_ground;
     std::vector<int> m_rareGround;
     std::vector<int> m_walls;
@@ -77,6 +81,12 @@ private:
     std::vector<int> m_chests;
 };
 
+
+/**
+ * World config with tiles from tile set
+ *
+ * Aggregates different level configs
+ */
 class WorldTileConfig
 {
 public:
@@ -95,7 +105,7 @@ public:
             m_levels.emplace_back(std::make_shared<LevelTileConfig>(*it));
     }
 
-    [[nodiscard]] const std::vector<std::shared_ptr<LevelTileConfig>>& getLevelsTileConfig() const { return m_levels; }
+    const std::vector<std::shared_ptr<LevelTileConfig>>& getLevelsTileConfig() const { return m_levels; }
 
 private:
     std::vector<std::shared_ptr<LevelTileConfig>> m_levels;

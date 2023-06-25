@@ -11,6 +11,27 @@
 #include <cstring>
 #include <unordered_set>
 
+
+/**
+ * Random world generator
+ *
+ * When build is called generator randomly splits current world rectangle into 2 rectangles
+ * If relative ratio of these 2 rectangles is too low then redo current iteration again.
+ * This excludes very tight and very wide rectangles.
+ *
+ * This builds full binary decision tree where leaf rectangles are the base of resulting world rooms.
+ *
+ * Resulting number of rectangles is 2^iterCount, so after splitting world will have 2^iterCount rooms.
+ * Also the number of bosses in the world equals to iterCount.
+ *
+ * Then every leaf rectangle is randomly stripped from its edges when creating a room.
+ * Important!!! Every room must contain its parent rectangle center to connect every room with paths.
+ *
+ * Then all these rooms are randomly collected in a vector.
+ * The first room is assigned to spawn room.
+ * Then next iterCount rooms are assigned to be boss rooms.
+ * Other rooms are randomly split into normal, elite and treasure rooms.
+ */
 class RandomGeneratorWorldBuilder
 {
 private:
@@ -19,32 +40,61 @@ private:
 public:
     RandomGeneratorWorldBuilder() = default;
 
+    /**
+     * Build world with current parameters
+     * @return world
+     */
     cocos2d::TMXMapInfo* build() const;
 
+    /**
+     * Set path for template tmx map
+     * @param path path
+     * @return this builder
+     */
     RandomGeneratorWorldBuilder& setPath(const std::string& path)
     {
         m_path = path;
         return *this;
     }
 
+    /**
+     * Set world config
+     * @param cfg world config
+     * @return this builder
+     */
     RandomGeneratorWorldBuilder& setConfig(const std::shared_ptr<LevelTileConfig>& cfg)
     {
         m_config = cfg;
         return *this;
     }
 
+    /**
+     * Set height of the world
+     * @param height height
+     * @return this builder
+     */
     RandomGeneratorWorldBuilder& setHeight(int height)
     {
         m_height = std::max(16, height);
         return *this;
     }
 
+    /**
+     * Set width of the world
+     * @param width width
+     * @return this builder
+     */
     RandomGeneratorWorldBuilder& setWidth(int width)
     {
         m_width = std::max(16, width);
         return *this;
     }
 
+    /**
+     * Set iteration count for the world generating algorithm
+     * @param iterCount
+     * @return
+     */
     RandomGeneratorWorldBuilder& setIterCount(int iterCount)
     {
         m_iterCount = std::max(2, iterCount);
