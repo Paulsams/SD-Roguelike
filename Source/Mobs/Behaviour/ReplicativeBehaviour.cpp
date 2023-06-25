@@ -42,7 +42,7 @@ namespace mob
                             Mob* clone = mob->clone();
                             clone->setPositionOnMapWithoutNotify(pos + Vec2Int{i, j});
                             mob->getWorld()->addEntity(clone);
-                            mob->changeBehaviour(std::make_shared<AggressiveBehaviour>(std::move(m_attack)));
+                            mob->changeBehaviour(std::make_shared<AggressiveBehaviour>(m_attack));
                             return;
                         }
                     }

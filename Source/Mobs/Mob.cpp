@@ -33,7 +33,6 @@ Mob* Mob::create(World* world, const MobInfo& info, const std::string& pathToBar
 Mob* Mob::clone() const
 {
     Mob* res = create(getWorld(), m_mobInfo, m_pathToBar, std::make_shared<StatsContainer>(*m_stats));
-    res->subscribeOnHealthChanged();
     return res;
 }
 
